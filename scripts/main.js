@@ -47,16 +47,25 @@ class ShapeScene extends Scene2d {
     constructor(canvas) {
         super(canvas);
         // this.shape = new Polygon(12, 256, '#fd0', '#fda');
-        this.shapes = [new Star(7, 32, 8, '#0af', '#f07', 4), new Polygon(4, 128, 'pink', 'green', 4)];
-        this.ctx.shadowOffsetX = 10;
-        this.ctx.shadowOffsetY = 10;
-        this.ctx.shadowBlur = 10;
-        this.ctx.shadowColor = '#0ef';
+        this.shapes = [new Star(7, 32, 8, '#0af', '#f07', 24), new Polygon(4, 128, 'pink', 'green', 24)];
+        this.ctx.shadowOffsetX = 5;
+        this.ctx.shadowOffsetY = 3;
+        this.ctx.shadowBlur = 5;
+        this.ctx.shadowColor = '#101';
+        // this.ctx.globalCompositeOperation = 'difference';
 
         window.addEventListener('mousemove', event => {
-            this.shapes[0].draw(this.ctx, event.x, event.y);
-            // this.shapes[1].draw(this.ctx, event.x, event.y);
-        })
+            if (event.buttons == 1) {
+                const star = new Star(12, 64, 16, `hsl(${Math.random() * 360} 100% 50%)`, '#000', 2);
+                this.ctx.save();
+                {
+                    this.ctx.translate(event.x, event.y)
+                    this.ctx.rotate(this.progress * 10);
+                    star.draw(this.ctx, 0, 0);
+                }
+                this.ctx.restore();
+            }
+        });
     }
     render() {
         super.render();
@@ -64,10 +73,6 @@ class ShapeScene extends Scene2d {
     }
     update() {
         super.update();
-        // this.ctx.clearRect(0, 0, this.width, this.height);
-        // this.shapes[0].draw(this.ctx, this.width / 2 - 400 + this.progress * 20, this.height / 2 - 250 + this.progress * 20);
-        // this.shapes[1].draw(this.ctx, this.width / 2 + 400 - this.progress * 20, this.height / 2 + 250 - this.progress * 20);
-
         requestAnimationFrame(this.update.bind(this));
     }
 }
@@ -150,10 +155,10 @@ function init() {
     main.style.gridTemplateColumns = `1fr`;
     const {width: main_width, height: main_height} = main.getBoundingClientRect();
     const canvas = document.createElement('canvas');
-    canvas.width = Math.floor((main_width - 10) / tile_factor) * tile_factor;
-    canvas.height = Math.floor((main_height - 10) / tile_factor) * tile_factor;
+    canvas.width = Math.floor(main_width - 10);
+    canvas.height = Math.floor(main_height - 10);
     main.appendChild(canvas);
-    const scene = new ShapeScene(canvas, tile_factor, speed, chars);
+    const scene = new ShapeScene(canvas);
     scene.render();
 }
 
@@ -166,16 +171,12 @@ const rand_int = n => Math.floor(n * Math.random());
 
 // Main code 
 let debug = true;
-let tile_factor = 5;
-const speed = 0.02;
-let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
 window.addEventListener('keyup', event => {
     if (!event.ctrlKey && !event.altKey) {
         const char = event.key;
         const digit = char.match(/\d/)?.input;
         if (digit) {
-            tile_factor = digit;
-            init();
+            // Do something dependent on digit entered
         }
         else {
             switch(char) {
@@ -183,8 +184,8 @@ window.addEventListener('keyup', event => {
                     // Toggle debug
                     debug = !debug;
                     break;
-                case 'r':
-                    // Restart with next image
+                case 'Escape':
+                    // Clear drawing
                     init();
                     break;
                 default:
