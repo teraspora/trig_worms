@@ -47,11 +47,11 @@ class Scene2d extends Scene {
 class ShapeScene extends Scene2d {
     constructor(canvas) {
         super(canvas);
-        this.colours = ['#f04', '#006fff', '#00f1e1', '#ffca00', '#c221b7', '#00f1e1'];
+        this.colours = ['#0091f4', '#6e91ff', '#0459e2', '#f04', '#006fff', '#00f1e1', '#ffca00', '#c221b7', '#00f1e1'];
         this.shapes = [
-            new Star(12, 28, 4, this.colours[0], '#888', 2),  //`hsl(${Math.random() * 360} 100% 50%)`
-            new Polygon(3, 24, this.colours[1], '#888', 2),
-            new Star(3, 48, 5, this.colours[2], '#888', 2)
+            new Star(12, 96, 4, this.colours[0], '#888', 2),  //`hsl(${Math.random() * 360} 100% 50%)`
+            new Polygon(5, 96, this.colours[1], '#888', 2),
+            new Star(3, 96, 5, this.colours[2], '#888', 2)
         ];
         this.shape_index = 0;
         this.shape = this.shapes[0];
@@ -59,14 +59,9 @@ class ShapeScene extends Scene2d {
         this.ctx.shadowOffsetY = 3;
         this.ctx.shadowBlur = 5;
         this.ctx.shadowColor = '#101';
-        // this.ctx.globalCompositeOperation = /*'difference'; // 'lighter'*/ 'destination-over';
+        // this.ctx.globalCompositeOperation = /*'difference'; */'lighter'; // 'destination-over';
 
-        this.trig_grid = (p, q, t) => {
-            return [            
-                Math.sin(p * Math.PI * t / 10),
-                Math.cos(q * Math.PI * t / 10)
-            ]
-        };
+        // Curves
         this.hcrr = (R, r, t) => {
             const s = R - r;
             return [
@@ -80,7 +75,13 @@ class ShapeScene extends Scene2d {
                 (Math.cos(a * t_) + Math.cos(b * t_) / d + Math.sin(c * t_) / e) / 2,
                 (Math.sin(a * t_) + Math.sin(b * t_) / f + Math.cos(c * t_) / g) / 2
             ];
-        }
+        };
+        this.trig_grid = (p, q, t) => {
+            return [            
+                Math.sin(p * Math.PI * t / 10),
+                Math.cos(q * Math.PI * t / 10)
+            ]
+        };
         this.curves = [this.hcrr, this.unknown, this.trig_grid];
 
         // window.addEventListener('mousemove', event => {
@@ -160,30 +161,39 @@ class ShapeScene extends Scene2d {
             }
         });
     }
+
+    #transform_to_canvas([x, y]) {
+        return [
+            x = (x + 1) / 2 * this.width,
+            y = (y + 1) / 2 * this.height
+        ];
+    }
+
     render() {
         super.render();
         requestAnimationFrame(this.update.bind(this));
     }
+
     update() {
         super.update();
-        // let [x, y] = this.trig_grid(13, 15, this.progress * 0.1);
-        // let [x, y] = this.unknown(-53, 64, 52, 3, 2, 3, 4, this.progress * 0.1);
-        let [x, y] = this.hcrr(89, 31, this.progress * 0.7)
-        x = (x + 1) / 2 * this.width;
-        y = (y + 1) / 2 * this.height;
-        this.shapes[0].draw(this.ctx, x, y);
-        // [x, y] = this.unknown(-53, 64, 52, 3, 2, 3, 4, this.progress * 0.1);
-        [x, y] = this.unknown(-89, 220, 7, 9, 6, 7, 4.1, this.progress * 0.1);
-        x = (x + 1) / 2 * this.width;
-        y = (y + 1) / 2 * this.height;
-        this.shapes[1].draw(this.ctx, x, y);
-        [x, y] = this.trig_grid(13, 17, this.progress * 0.1);
-        x = (x + 1) / 2 * this.width;
-        y = (y + 1) / 2 * this.height;
-        this.shapes[2].draw(this.ctx, x, y);
+    
+        const params = [
+            [89, 31, this.progress * 0.7],
+            [-89, 220, 7, 9, 6, 7, 4.1, this.progress * 0.1],
+            [13, 17, this.progress * 0.1]
+        ];
+        let x, y;
+        for (let i = 0; i < 3; i++) {
+            [x, y] = this.#transform_to_canvas(this.curves[i](...params[i]));
+            this.ctx.save();
+            this.ctx.translate(x, y);
+            this.ctx.rotate(this.progress * (i + 3) * (i % 2 * 2 - 1));
+            this.shapes[i].draw(this.ctx, 0, 0);
+            this.ctx.restore();
+        }
         if (!this.paused) {
             requestAnimationFrame(this.update.bind(this));
-        }
+        }    
     }
 }
 
