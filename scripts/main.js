@@ -10,6 +10,7 @@ class Scene {
         this.height = this.canvas.height;
         this.progress = 0;
         this.progress_delta = 0.02;
+        this.paused = false;
     }
     render() {
     }
@@ -57,19 +58,41 @@ class ShapeScene extends Scene2d {
         this.ctx.shadowOffsetY = 3;
         this.ctx.shadowBlur = 5;
         this.ctx.shadowColor = '#101';
-        // this.ctx.globalCompositeOperation = 'difference';
+        // this.ctx.globalCompositeOperation = /*'difference'; // 'lighter'*/ 'destination-over';
 
-        window.addEventListener('mousemove', event => {
-            if (event.buttons == 1) {
-                this.ctx.save();
-                {
-                    this.ctx.translate(event.x, event.y)
-                    this.ctx.rotate(this.progress * 10);
-                    this.shape.draw(this.ctx, 0, 0);
-                }
-                this.ctx.restore();
-            }
-        });
+        this.trig_grid = (p, q, t) => {
+            const amplitude = 200;
+            return [            
+                amplitude * Math.sin(p * Math.PI * t / 10),
+                amplitude * Math.cos(q * Math.PI * t / 10)
+            ]
+        };
+        this.hcrr = (R, r, amp, t) => {
+            const s = R - r;
+            return [
+                amp * (s * Math.cos(t) + r * Math.cos(s / r * t)),
+                amp * (s * Math.sin(t) - r * Math.sin(s / r * t))
+            ]
+        };
+        this.unknown = (a, b, c, d, e, f, g, amp, t) => {
+            const t_ = t / 10;
+            return [
+                amp * (Math.cos(a * t_) + Math.cos(b * t_) / d + Math.sin(c * t_) / e),
+                amp * (Math.sin(a * t_) + Math.sin(b * t_) / f + Math.cos(c * t_) / g)
+            ];
+        }
+
+        // window.addEventListener('mousemove', event => {
+        //     if (event.buttons == 1) {
+        //         this.ctx.save();
+        //         {
+        //             this.ctx.translate(event.x, event.y)
+        //             this.ctx.rotate(this.progress * 10);
+        //             this.shape.draw(this.ctx, 0, 0);
+        //         }
+        //         this.ctx.restore();
+        //     }
+        // });
 
         window.addEventListener('keyup', event => {
             console.log(event);
@@ -123,6 +146,13 @@ class ShapeScene extends Scene2d {
                                 this.shape.hub += 10;
                             }
                             break;
+                        case ' ':
+                            // Toggle play/pause
+                            this.paused = !this.paused;
+                            if (!this.paused) {
+                                requestAnimationFrame(this.update.bind(this));
+                            }
+                            break;
                         default:
                     }
                 }
@@ -135,7 +165,17 @@ class ShapeScene extends Scene2d {
     }
     update() {
         super.update();
-        requestAnimationFrame(this.update.bind(this));
+        this.ctx.save();
+        {
+            this.ctx.translate(this.width / 2 - this.progress * 10, this.height / 2 - this.progress * 10);
+            this.ctx.rotate(this.progress * 1);
+            this.shape.draw(this.ctx, this.progress * 10, this.progress * 10);
+        }
+        this.ctx.restore();
+        // this.shape.draw(this.ctx, this.progress * 10, this.progress * 10);
+        if (!this.paused) {
+            requestAnimationFrame(this.update.bind(this));
+        }
     }
 }
 
