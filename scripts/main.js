@@ -9,7 +9,7 @@ class Scene {
         this.width = this.canvas.width;
         this.height = this.canvas.height;
         this.progress = 0;
-        this.progress_delta = 0.02;
+        this.progress_delta = 0.1;
         this.paused = false;
     }
     render() {
@@ -47,11 +47,14 @@ class Scene2d extends Scene {
 class ShapeScene extends Scene2d {
     constructor(canvas) {
         super(canvas);
-        this.colours = ['#0091f4', '#6e91ff', '#0459e2', '#f04', '#006fff', '#00f1e1', '#ffca00', '#c221b7', '#00f1e1'];
+        this.colours = [
+            '#ff0049', '#001dfb', '#e4ff00', '#ff2592', '#ac29ff', '#f04', '#006fff', '#00f1e1', '#ffca00',
+            '#c221b7', '#0091f4', '#6e91ff', '#0459e2', '#00f1e1'
+        ];
         this.shapes = [
-            new Star(12, 96, 4, this.colours[0], '#888', 2),  //`hsl(${Math.random() * 360} 100% 50%)`
-            new Polygon(5, 96, this.colours[1], '#888', 2),
-            new Star(3, 96, 5, this.colours[2], '#888', 2)
+            new Star(6, 12, 6, this.colours[0], '#888', 2),  //`hsl(${Math.random() * 360} 100% 50%)`
+            new Polygon(5, 28, this.colours[1], '#888', 4),
+            new Star(3, 6, 3, this.colours[2], '#04ff4b', 2)
         ];
         this.shape_index = 0;
         this.shape = this.shapes[0];
@@ -62,6 +65,21 @@ class ShapeScene extends Scene2d {
         // this.ctx.globalCompositeOperation = /*'difference'; */'lighter'; // 'destination-over';
 
         // Curves
+        this.rhodonea = (k, t) => [
+            Math.cos(k * t + t) * Math.cos(t),
+            Math.cos(k * t + t) * Math.sin(t),
+        ];
+        this.ellipse = (a, b, t) => [
+            a * Math.cos(t),
+            b * Math.sin(t)
+        ];
+        this.wobbly_spiral = (r, density, x_wobble_amp, y_wobble_amp, x_wobble_freq, y_wobble_freq, t) => {
+            const r_ = r * (density * Math.PI - t) / (density * Math.PI);
+            return [
+                r_ * Math.cos(-t) + x_wobble_amp * Math.sin(t * x_wobble_freq),
+                r_ * Math.sin(-t) + y_wobble_amp * Math.cos(t * y_wobble_freq)
+            ];
+        };
         this.hcrr = (R, r, t) => {
             const s = R - r;
             return [
@@ -82,7 +100,7 @@ class ShapeScene extends Scene2d {
                 Math.cos(q * Math.PI * t / 10)
             ]
         };
-        this.curves = [this.hcrr, this.unknown, this.trig_grid];
+        this.curves = [this.rhodonea, this.ellipse, this.wobbly_spiral, this.hcrr, this.unknown, this.trig_grid];
 
         // window.addEventListener('mousemove', event => {
         //     if (event.buttons == 1) {
@@ -178,17 +196,28 @@ class ShapeScene extends Scene2d {
         super.update();
     
         const params = [
-            [89, 31, this.progress * 0.7],
-            [-89, 220, 7, 9, 6, 7, 4.1, this.progress * 0.1],
-            [13, 17, this.progress * 0.1]
+            [rand_in_range(1, 13) / rand_in_range(1, 23), this.progress * 0.1],     // rhodonea
+            [Math.random() * 20, Math.random() * 20, this.progress * 0.001],                   // ellipse
+            [
+                Math.random(),    // radius
+                rand_in_range(12, 64),      // density
+                Math.random(),         // x_wobble_amp
+                Math.random(),         // y_wobble_amp
+                Math.random() * 20,         // x_wobble_freq
+                Math.random() * 20,          // y_wobble_freq
+                this.progress * 0.0001
+            ],                                                                      // wobbly_spiral
+            [-37, -31, this.progress * 0.7],                                        // hcrr
+            [23, 13, 7, 29, 16, 7, 9, this.progress * 0.1],                         // unknown
+            [13, 41, this.progress * 0.01]                                          // trig_grid
         ];
         let x, y;
-        for (let i = 0; i < 3; i++) {
+        for (let i = 3; i < 6; i++) {
             [x, y] = this.#transform_to_canvas(this.curves[i](...params[i]));
             this.ctx.save();
             this.ctx.translate(x, y);
-            this.ctx.rotate(this.progress * (i + 3) * (i % 2 * 2 - 1));
-            this.shapes[i].draw(this.ctx, 0, 0);
+            this.ctx.rotate(this.progress * (6 - i) * (i % 2 * 2 - 1));
+            this.shapes[i % this.shapes.length].draw(this.ctx, 0, 0);
             this.ctx.restore();
         }
         if (!this.paused) {

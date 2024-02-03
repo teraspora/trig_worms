@@ -1,23 +1,26 @@
 html, body, * {
     background-color: #000;
     margin: 0 auto;
+    padding: 0;
     text-align: center;
     overflow: hidden;
     font-family: 'Courier New', Courier, monospace;
+    box-sizing: border-box;
+    border-radius: 5px;
 }
 main#main {
     display: grid;
-    width: 95vw;
-    height: 95vh;
+    width: 98vw;
+    height: 98vh;
     gap: 0.2vw;
     justify-items: stretch;
     align-items: stretch;
     border: 1px solid #333;
+
     margin: 1vw auto;
 }
 canvas {
     border: 1px ridge #7a7265;
-    border-radius: 5px;
     margin: 0.5vw;
     /* background-color: #fdc; */
     background-color: #000;
