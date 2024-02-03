@@ -90,25 +90,39 @@ class ShapeScene extends Scene2d {
                             // Clear drawing
                             init();
                             break;
-                            case 's':
-                                // Cycle shape
-                                this.shape_index = (this.shape_index + 1) % this.shapes.length;
-                                this.shape = this.shapes[this.shape_index];
-                                break;
-                            case 'c':
-                                // Change colour
-                                this.shape.colour = this.colours[rand_int(this.colours.length)];
-                                break;
-                            case '<':
-                                // Decrease radius
-                                if ((this.shape.radius -= 10) < 0) {
-                                    this.shape.radius = 0;
+                        case 's':
+                            // Cycle shape
+                            this.shape_index = (this.shape_index + 1) % this.shapes.length;
+                            this.shape = this.shapes[this.shape_index];
+                            break;
+                        case 'c':
+                            // Change colour
+                            this.shape.colour = this.colours[rand_int(this.colours.length)];
+                            break;
+                        case '<':
+                            // Decrease radius
+                            if ((this.shape.radius -= 10) < 0) {
+                                this.shape.radius = 0;
+                            }
+                            break;
+                        case '>':
+                            // Increase radius
+                            this.shape.radius += 10;
+                            break;
+                        case ',':
+                            // Decrease star hub radius
+                            if (this.shape instanceof Star) {
+                                if ((this.shape.hub -= 10) < 0) {
+                                    this.shape.hub = 0;
                                 }
-                                break;
-                            case '>':
-                                // Increase radius
-                                this.shape.radius += 10;
-                                break;
+                            }
+                            break;
+                        case '.':
+                            // Increase star hub radius
+                            if (this.shape instanceof Star) {
+                                this.shape.hub += 10;
+                            }
+                            break;
                         default:
                     }
                 }
