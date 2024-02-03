@@ -46,8 +46,13 @@ class Scene2d extends Scene {
 class ShapeScene extends Scene2d {
     constructor(canvas) {
         super(canvas);
-        // this.shape = new Polygon(12, 256, '#fd0', '#fda');
-        this.shapes = [new Star(7, 32, 8, '#0af', '#f07', 24), new Polygon(4, 128, 'pink', 'green', 24)];
+        this.colours = ["#f50041", "#0041f5", "#f59100", "#c221b7", "#0ef5a3"];
+        this.shapes = [
+            new Star(8, 50, 20, this.colours[rand_int(this.colours.length)], '#111', 2),  //`hsl(${Math.random() * 360} 100% 50%)`
+            new Polygon(5, 64, this.colours[rand_int(this.colours.length)], '#111', 2)
+        ];
+        this.shape_index = 0;
+        this.shape = this.shapes[0];
         this.ctx.shadowOffsetX = 5;
         this.ctx.shadowOffsetY = 3;
         this.ctx.shadowBlur = 5;
@@ -56,14 +61,57 @@ class ShapeScene extends Scene2d {
 
         window.addEventListener('mousemove', event => {
             if (event.buttons == 1) {
-                const star = new Star(12, 64, 16, `hsl(${Math.random() * 360} 100% 50%)`, '#000', 2);
                 this.ctx.save();
                 {
                     this.ctx.translate(event.x, event.y)
                     this.ctx.rotate(this.progress * 10);
-                    star.draw(this.ctx, 0, 0);
+                    this.shape.draw(this.ctx, 0, 0);
                 }
                 this.ctx.restore();
+            }
+        });
+
+        window.addEventListener('keyup', event => {
+            console.log(event);
+            if (!event.ctrlKey && !event.altKey) {
+                const char = event.key;
+                const digit = char.match(/\d/)?.input;
+                if (digit) {
+                    // Do something dependent on digit entered
+                    this.shape.order = digit;
+                }
+                else {
+                    switch(char) {
+                        case 'd':
+                            // Toggle debug
+                            debug = !debug;
+                            break;
+                        case 'Escape':
+                            // Clear drawing
+                            init();
+                            break;
+                            case 's':
+                                // Cycle shape
+                                this.shape_index = (this.shape_index + 1) % this.shapes.length;
+                                this.shape = this.shapes[this.shape_index];
+                                break;
+                            case 'c':
+                                // Change colour
+                                this.shape.colour = this.colours[rand_int(this.colours.length)];
+                                break;
+                            case '<':
+                                // Decrease radius
+                                if ((this.shape.radius -= 10) < 0) {
+                                    this.shape.radius = 0;
+                                }
+                                break;
+                            case '>':
+                                // Increase radius
+                                this.shape.radius += 10;
+                                break;
+                        default:
+                    }
+                }
             }
         });
     }
@@ -77,15 +125,21 @@ class ShapeScene extends Scene2d {
     }
 }
 
-class Polygon {
-    static instance_count = 0;
-    constructor(order, radius, colour, outline, thickness) {
-        this.id = Polygon.instance_count++;
-        this.order = order;
-        this.radius = radius;
+class Shape {
+    constructor(colour, outline, thickness) {
         this.colour = colour;
         this.outline = outline;
         this.thickness = thickness;
+    }
+}
+
+class Polygon extends Shape {
+    static instance_count = 0;
+    constructor(order, radius, colour, outline, thickness) {
+        super(colour, outline, thickness);
+        this.id = Polygon.instance_count++;
+        this.order = order;
+        this.radius = radius;
     }
     draw(ctx, x, y) {
         ctx.save();
@@ -111,27 +165,24 @@ class Polygon {
     }
 }
 
-class Star {
+class Star extends Shape {
     static instance_count = 0;
     constructor(order, radius_outer, radius_inner, colour, outline, thickness) {
+        super(colour, outline, thickness);
         this.id = Star.instance_count++;
         this.order = order;
-        this.R = radius_outer;
-        this.r = radius_inner;
-        this.colour = colour;
-        this.outline = outline;
-        this.thickness = thickness;
+        this.radius = radius_outer;
+        this.hub = radius_inner;
     }
     draw(ctx, x, y) {
         ctx.save();
         ctx.beginPath();
-        ctx.strokeStyle = '#fa5';
         ctx.translate(x, y);
-        ctx.moveTo(0, this.R);
+        ctx.moveTo(0, this.radius);
         for (let i = 0; i < this.order; i++) {
-            ctx.lineTo(0, this.R);
+            ctx.lineTo(0, this.radius);
             ctx.rotate(Math.PI / this.order);
-            ctx.lineTo(0, this.r);
+            ctx.lineTo(0, this.hub);
             ctx.rotate(Math.PI / this.order);
         }
         ctx.closePath();
@@ -171,27 +222,4 @@ const rand_int = n => Math.floor(n * Math.random());
 
 // Main code 
 let debug = true;
-window.addEventListener('keyup', event => {
-    if (!event.ctrlKey && !event.altKey) {
-        const char = event.key;
-        const digit = char.match(/\d/)?.input;
-        if (digit) {
-            // Do something dependent on digit entered
-        }
-        else {
-            switch(char) {
-                case 'd':
-                    // Toggle debug
-                    debug = !debug;
-                    break;
-                case 'Escape':
-                    // Clear drawing
-                    init();
-                    break;
-                default:
-            }
-        }
-    }
-});
-
 ['load', 'resize'].forEach(event => window.addEventListener(event, init));
