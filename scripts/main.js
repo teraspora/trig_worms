@@ -42,9 +42,9 @@ class ShapeScene extends Scene2d {
             '#0091f4', '#6e91ff', '#0459e2', '#00f1e1'
         ];
         this.shapes = [
-            new Star(6, 12, 6, this.colours[0], '#111', 2),  //`hsl(${Math.random() * 360} 100% 50%)`
+            new Star(6, 64, 6, this.colours[0], '#111', 2),  //`hsl(${Math.random() * 360} 100% 50%)`
             new Polygon(5, 28, this.colours[1], '#111', 4),
-            new Star(3, 6, 3, this.colours[2], '#111', 2)
+            new Star(3, 16, 3, this.colours[2], '#111', 2)
         ];
         this.shape_index = 0;
         this.shape = this.shapes[0];
@@ -77,6 +77,7 @@ class ShapeScene extends Scene2d {
         this.curves = [this.hcrr, this.unknown, this.trig_grid];
 
         window.addEventListener('keyup', event => {
+            console.log(event.key);
             if (!event.ctrlKey && !event.altKey) {
                 const char = event.key;
                 const digit = char.match(/\d/)?.input;
@@ -133,6 +134,11 @@ class ShapeScene extends Scene2d {
                             if (!this.paused) {
                                 requestAnimationFrame(this.update.bind(this));
                             }
+                            break;
+                        case 'h':
+                            // Show help
+                            const help = document.querySelector('aside#help');
+                            help.style.display = help.style.display == 'none' ? 'block' : 'none';
                             break;
                         default:
                     }
@@ -273,4 +279,7 @@ const rand_int = n => Math.floor(n * Math.random());
 
 // Main code 
 let debug = true;
+document.querySelector('aside#help button').addEventListener('click', event => {
+    event.target.parentElement.style.display = 'none';
+});
 ['load', 'resize'].forEach(event => window.addEventListener(event, init));

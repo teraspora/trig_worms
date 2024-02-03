@@ -23,3 +23,30 @@ canvas {
     margin: 0.5vw;
     background-color: #000;
 }
+
+aside#help {
+    display: none;
+    position: fixed;
+    background-color: #222;
+    color: antiquewhite;
+    border: 1px solid #f04;
+    top: 5vh;
+    left: 50vw;
+    padding: 1vw;
+    margin: 5px;
+}
+
+aside#help button {
+    background-color: #fa0;
+    columns: #000;
+    width: 3vw;
+    height: 3vh;
+    margin-top: 1vh;
+    font-size: 1vw;
+}
+
+aside#help table {
+    padding: 1vw;;
+}
+
+
