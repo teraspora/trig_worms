@@ -31,30 +31,20 @@ class Scene2d extends Scene {
     update() {
         super.update();
     }
-    test() {
-        // Draw something simple and small, just to verify canvas drawability!
-        this.ctx.fillStyle = '#00ccff';
-        this.ctx.fillRect(500, 500, 200, 200);
-        this.ctx.font = 'italic 128px Impact';
-        this.ctx.fillStyle = 'red';
-        this.ctx.textAlign = 'center';
-        this.ctx.textBaseline = 'middle';
-        this.ctx.fillText('Testing 123...', this.width / 2, this.height / 2);
-        console.log('*** In test() method of Scene2d class');
-    }
 }
 
 class ShapeScene extends Scene2d {
     constructor(canvas) {
         super(canvas);
         this.colours = [
-            '#ff0049', '#001dfb', '#e4ff00', '#ff2592', '#ac29ff', '#f04', '#006fff', '#00f1e1', '#ffca00',
-            '#c221b7', '#0091f4', '#6e91ff', '#0459e2', '#00f1e1'
+            '#ff6e98', '#001dfb', '#ff9200', '#ff2592', '#ac29ff',
+            '#f04', '#006fff', '#00f1e1', '#ffca00', '#c221b7',
+            '#0091f4', '#6e91ff', '#0459e2', '#00f1e1'
         ];
         this.shapes = [
-            new Star(6, 12, 6, this.colours[0], '#888', 2),  //`hsl(${Math.random() * 360} 100% 50%)`
-            new Polygon(5, 28, this.colours[1], '#888', 4),
-            new Star(3, 6, 3, this.colours[2], '#04ff4b', 2)
+            new Star(6, 12, 6, this.colours[0], '#111', 2),  //`hsl(${Math.random() * 360} 100% 50%)`
+            new Polygon(5, 28, this.colours[1], '#111', 4),
+            new Star(3, 6, 3, this.colours[2], '#111', 2)
         ];
         this.shape_index = 0;
         this.shape = this.shapes[0];
@@ -62,24 +52,8 @@ class ShapeScene extends Scene2d {
         this.ctx.shadowOffsetY = 3;
         this.ctx.shadowBlur = 5;
         this.ctx.shadowColor = '#101';
-        // this.ctx.globalCompositeOperation = /*'difference'; */'lighter'; // 'destination-over';
 
         // Curves
-        this.rhodonea = (k, t) => [
-            Math.cos(k * t + t) * Math.cos(t),
-            Math.cos(k * t + t) * Math.sin(t),
-        ];
-        this.ellipse = (a, b, t) => [
-            a * Math.cos(t),
-            b * Math.sin(t)
-        ];
-        this.wobbly_spiral = (r, density, x_wobble_amp, y_wobble_amp, x_wobble_freq, y_wobble_freq, t) => {
-            const r_ = r * (density * Math.PI - t) / (density * Math.PI);
-            return [
-                r_ * Math.cos(-t) + x_wobble_amp * Math.sin(t * x_wobble_freq),
-                r_ * Math.sin(-t) + y_wobble_amp * Math.cos(t * y_wobble_freq)
-            ];
-        };
         this.hcrr = (R, r, t) => {
             const s = R - r;
             return [
@@ -100,27 +74,14 @@ class ShapeScene extends Scene2d {
                 Math.cos(q * Math.PI * t / 10)
             ]
         };
-        this.curves = [this.rhodonea, this.ellipse, this.wobbly_spiral, this.hcrr, this.unknown, this.trig_grid];
-
-        // window.addEventListener('mousemove', event => {
-        //     if (event.buttons == 1) {
-        //         this.ctx.save();
-        //         {
-        //             this.ctx.translate(event.x, event.y)
-        //             this.ctx.rotate(this.progress * 10);
-        //             this.shape.draw(this.ctx, 0, 0);
-        //         }
-        //         this.ctx.restore();
-        //     }
-        // });
+        this.curves = [this.hcrr, this.unknown, this.trig_grid];
 
         window.addEventListener('keyup', event => {
-            // console.log(event);
             if (!event.ctrlKey && !event.altKey) {
                 const char = event.key;
                 const digit = char.match(/\d/)?.input;
                 if (digit) {
-                    // Do something dependent on digit entered
+                    // Set number of sides or points (0 - 9)
                     this.shape.order = digit;
                 }
                 else {
@@ -134,7 +95,7 @@ class ShapeScene extends Scene2d {
                             init();
                             break;
                         case 's':
-                            // Cycle shape
+                            // Cycle focused shape
                             this.shape_index = (this.shape_index + 1) % this.shapes.length;
                             this.shape = this.shapes[this.shape_index];
                             break;
@@ -196,23 +157,12 @@ class ShapeScene extends Scene2d {
         super.update();
     
         const params = [
-            [rand_in_range(1, 13) / rand_in_range(1, 23), this.progress * 0.1],     // rhodonea
-            [Math.random() * 20, Math.random() * 20, this.progress * 0.001],                   // ellipse
-            [
-                Math.random(),    // radius
-                rand_in_range(12, 64),      // density
-                Math.random(),         // x_wobble_amp
-                Math.random(),         // y_wobble_amp
-                Math.random() * 20,         // x_wobble_freq
-                Math.random() * 20,          // y_wobble_freq
-                this.progress * 0.0001
-            ],                                                                      // wobbly_spiral
             [-37, -31, this.progress * 0.7],                                        // hcrr
-            [23, 13, 7, 29, 16, 7, 9, this.progress * 0.1],                         // unknown
-            [13, 41, this.progress * 0.01]                                          // trig_grid
+            [13, 113, 109, 299, 16, 7, 9, this.progress * 0.1],                         // unknown
+            [31, 41, this.progress * 0.01]                                          // trig_grid
         ];
         let x, y;
-        for (let i = 3; i < 6; i++) {
+        for (let i = 0; i < 3; i++) {
             [x, y] = this.#transform_to_canvas(this.curves[i](...params[i]));
             this.ctx.save();
             this.ctx.translate(x, y);
