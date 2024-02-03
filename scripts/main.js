@@ -47,10 +47,11 @@ class Scene2d extends Scene {
 class ShapeScene extends Scene2d {
     constructor(canvas) {
         super(canvas);
-        this.colours = ["#f50041", "#0041f5", "#f59100", "#c221b7", "#0ef5a3"];
+        this.colours = ['#f04', '#006fff', '#00f1e1', '#ffca00', '#c221b7', '#00f1e1'];
         this.shapes = [
-            new Star(8, 50, 20, this.colours[rand_int(this.colours.length)], '#111', 2),  //`hsl(${Math.random() * 360} 100% 50%)`
-            new Polygon(5, 64, this.colours[rand_int(this.colours.length)], '#111', 2)
+            new Star(12, 28, 4, this.colours[0], '#888', 2),  //`hsl(${Math.random() * 360} 100% 50%)`
+            new Polygon(3, 24, this.colours[1], '#888', 2),
+            new Star(3, 48, 5, this.colours[2], '#888', 2)
         ];
         this.shape_index = 0;
         this.shape = this.shapes[0];
@@ -61,26 +62,26 @@ class ShapeScene extends Scene2d {
         // this.ctx.globalCompositeOperation = /*'difference'; // 'lighter'*/ 'destination-over';
 
         this.trig_grid = (p, q, t) => {
-            const amplitude = 200;
             return [            
-                amplitude * Math.sin(p * Math.PI * t / 10),
-                amplitude * Math.cos(q * Math.PI * t / 10)
+                Math.sin(p * Math.PI * t / 10),
+                Math.cos(q * Math.PI * t / 10)
             ]
         };
-        this.hcrr = (R, r, amp, t) => {
+        this.hcrr = (R, r, t) => {
             const s = R - r;
             return [
-                amp * (s * Math.cos(t) + r * Math.cos(s / r * t)),
-                amp * (s * Math.sin(t) - r * Math.sin(s / r * t))
+                (s * Math.cos(t) + r * Math.cos(s / r * t)) / R,
+                (s * Math.sin(t) - r * Math.sin(s / r * t)) / R
             ]
         };
-        this.unknown = (a, b, c, d, e, f, g, amp, t) => {
+        this.unknown = (a, b, c, d, e, f, g, t) => {
             const t_ = t / 10;
             return [
-                amp * (Math.cos(a * t_) + Math.cos(b * t_) / d + Math.sin(c * t_) / e),
-                amp * (Math.sin(a * t_) + Math.sin(b * t_) / f + Math.cos(c * t_) / g)
+                (Math.cos(a * t_) + Math.cos(b * t_) / d + Math.sin(c * t_) / e) / 2,
+                (Math.sin(a * t_) + Math.sin(b * t_) / f + Math.cos(c * t_) / g) / 2
             ];
         }
+        this.curves = [this.hcrr, this.unknown, this.trig_grid];
 
         // window.addEventListener('mousemove', event => {
         //     if (event.buttons == 1) {
@@ -95,7 +96,7 @@ class ShapeScene extends Scene2d {
         // });
 
         window.addEventListener('keyup', event => {
-            console.log(event);
+            // console.log(event);
             if (!event.ctrlKey && !event.altKey) {
                 const char = event.key;
                 const digit = char.match(/\d/)?.input;
@@ -165,14 +166,21 @@ class ShapeScene extends Scene2d {
     }
     update() {
         super.update();
-        this.ctx.save();
-        {
-            this.ctx.translate(this.width / 2 - this.progress * 10, this.height / 2 - this.progress * 10);
-            this.ctx.rotate(this.progress * 1);
-            this.shape.draw(this.ctx, this.progress * 10, this.progress * 10);
-        }
-        this.ctx.restore();
-        // this.shape.draw(this.ctx, this.progress * 10, this.progress * 10);
+        // let [x, y] = this.trig_grid(13, 15, this.progress * 0.1);
+        // let [x, y] = this.unknown(-53, 64, 52, 3, 2, 3, 4, this.progress * 0.1);
+        let [x, y] = this.hcrr(89, 31, this.progress * 0.7)
+        x = (x + 1) / 2 * this.width;
+        y = (y + 1) / 2 * this.height;
+        this.shapes[0].draw(this.ctx, x, y);
+        // [x, y] = this.unknown(-53, 64, 52, 3, 2, 3, 4, this.progress * 0.1);
+        [x, y] = this.unknown(-89, 220, 7, 9, 6, 7, 4.1, this.progress * 0.1);
+        x = (x + 1) / 2 * this.width;
+        y = (y + 1) / 2 * this.height;
+        this.shapes[1].draw(this.ctx, x, y);
+        [x, y] = this.trig_grid(13, 17, this.progress * 0.1);
+        x = (x + 1) / 2 * this.width;
+        y = (y + 1) / 2 * this.height;
+        this.shapes[2].draw(this.ctx, x, y);
         if (!this.paused) {
             requestAnimationFrame(this.update.bind(this));
         }

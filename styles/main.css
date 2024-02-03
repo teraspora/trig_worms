@@ -19,5 +19,6 @@ canvas {
     border: 1px ridge #7a7265;
     border-radius: 5px;
     margin: 0.5vw;
-    background-color: #fdc;
+    /* background-color: #fdc; */
+    background-color: #000;
 }
