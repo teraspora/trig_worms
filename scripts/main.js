@@ -128,6 +128,10 @@ class ShapeScene extends Scene2d {
                                 this.shape.hub += 10;
                             }
                             break;
+                        case 'm':
+                            // Toggle multicoloured
+                            this.shape.colour = this.shape.colour ? null : this.shape.default_colour;
+                            break;
                         case ' ':
                             // Toggle play/pause
                             this.paused = !this.paused;
@@ -173,7 +177,7 @@ class ShapeScene extends Scene2d {
             this.ctx.save();
             this.ctx.translate(x, y);
             this.ctx.rotate(this.progress * (6 - i) * (i % 2 * 2 - 1));
-            this.shapes[i % this.shapes.length].draw(this.ctx, 0, 0);
+            this.shapes[i % this.shapes.length].draw(this.ctx, 0, 0, this.progress);
             this.ctx.restore();
         }
         if (!this.paused) {
@@ -185,6 +189,7 @@ class ShapeScene extends Scene2d {
 class Shape {
     constructor(colour, outline, thickness) {
         this.colour = colour;
+        this.default_colour = colour;
         this.outline = outline;
         this.thickness = thickness;
     }
@@ -198,7 +203,7 @@ class Polygon extends Shape {
         this.order = order;
         this.radius = radius;
     }
-    draw(ctx, x, y) {
+    draw(ctx, x, y, progress) {
         ctx.save();
         ctx.beginPath();
         ctx.translate(x, y);
@@ -218,6 +223,10 @@ class Polygon extends Shape {
             ctx.fillStyle = this.colour;
             ctx.fill();
         }
+        else {
+            ctx.fillStyle = `hsl(${Math.sin(progress / 16) * 90 + 270 + this.order * this.radius} 100% 50%)`;
+            ctx.fill();
+        }
         ctx.restore();
     }
 }
@@ -231,7 +240,7 @@ class Star extends Shape {
         this.radius = radius_outer;
         this.hub = radius_inner;
     }
-    draw(ctx, x, y) {
+    draw(ctx, x, y, progress) {
         ctx.save();
         ctx.beginPath();
         ctx.translate(x, y);
@@ -251,6 +260,10 @@ class Star extends Shape {
         }
         if (this.colour) {
             ctx.fillStyle = this.colour;
+            ctx.fill();
+        }
+        else {
+            ctx.fillStyle = `hsl(${Math.sin(progress / 16) * 90 + 270 + this.order * this.radius} 100% 50%)`
             ctx.fill();
         }
         ctx.restore();
