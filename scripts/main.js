@@ -37,14 +37,16 @@ class ShapeScene extends Scene2d {
     constructor(canvas) {
         super(canvas);
         this.colours = [
-            '#ff6e98', '#001dfb', '#ff9200', '#ff2592', '#ac29ff',
+            '#ff9200', '#ff0049', '#0051ff', '#00c6ab',
+            '#ea13bc', '#ff6e98', '#001dfb', '#ff9200', '#ff2592', '#ac29ff',
             '#f04', '#006fff', '#00f1e1', '#ffca00', '#c221b7',
             '#0091f4', '#6e91ff', '#0459e2', '#00f1e1'
         ];
         this.shapes = [
-            new Star(6, 64, 6, this.colours[0], '#111', 2),  //`hsl(${Math.random() * 360} 100% 50%)`
-            new Polygon(5, 28, this.colours[1], '#111', 4),
-            new Star(3, 16, 3, this.colours[2], '#111', 2)
+            new Star(6, 48, 6, this.colours[0], '#111', 2),  //`hsl(${Math.random() * 360} 100% 50%)`
+            new Polygon(3, 6, this.colours[1], '#111', 4),
+            new Star(3, 32, 3, this.colours[2], '#111', 2),
+            new Polygon(5, 16, this.colours[3], '#111', 4)
         ];
         this.shape_index = 0;
         this.shape = this.shapes[0];
@@ -54,6 +56,27 @@ class ShapeScene extends Scene2d {
         this.ctx.shadowColor = '#101';
 
         // Curves
+        this.circle = (t) => {
+            return [
+                Math.cos(t),
+                Math.sin(t)
+            ]
+        };
+
+        this.rhodonea = (k, t) => [
+            Math.cos(k * t + t) * Math.cos(t),
+            Math.cos(k * t + t) * Math.sin(t),
+        ];
+
+        this.hypocycloid = (a, b, t) => {
+            const r = a - b;
+            const p = r / b;
+            return [
+                (r * Math.cos(t) + b * Math.cos(p * t)) / a,
+                (r * Math.sin(t) - b * Math.sin(p * t)) / a
+            ]
+        };
+
         this.hcrr = (R, r, t) => {
             const s = R - r;
             return [
@@ -61,6 +84,15 @@ class ShapeScene extends Scene2d {
                 (s * Math.sin(t) - r * Math.sin(s / r * t)) / R
             ]
         };
+
+        this.wobbly_hcrr = (R, r, t) => {
+            const s = R - r;
+            return [
+                (s * Math.cos(t) + r * Math.cos(s / r * t)) / R + 0.05 * Math.sin(t * 10),
+                (s * Math.sin(t) - r * Math.sin(s / r * t)) / R
+            ]
+        };
+
         this.unknown = (a, b, c, d, e, f, g, t) => {
             const t_ = t / 10;
             return [
@@ -68,13 +100,14 @@ class ShapeScene extends Scene2d {
                 (Math.sin(a * t_) + Math.sin(b * t_) / f + Math.cos(c * t_) / g) / 2
             ];
         };
+
         this.trig_grid = (p, q, t) => {
             return [            
                 Math.sin(p * Math.PI * t / 10),
                 Math.cos(q * Math.PI * t / 10)
             ]
         };
-        this.curves = [this.hcrr, this.unknown, this.trig_grid];
+        this.curves = [this.hypocycloid, this.wobbly_hcrr, this.unknown, this.trig_grid];   //, this.hcrr, 
 
         window.addEventListener('keyup', event => {
             console.log(event.key);
@@ -93,6 +126,11 @@ class ShapeScene extends Scene2d {
                             break;
                         case 'Escape':
                             // Clear drawing
+                            this.ctx.clearRect(0, 0, this.width, this.height);
+                            this.progress = 0;
+                            break;
+                        case '*':
+                            // Start again from scratch
                             init();
                             break;
                         case 's':
@@ -128,9 +166,18 @@ class ShapeScene extends Scene2d {
                                 this.shape.hub += 10;
                             }
                             break;
-                        case 'm':
+                        case 'x':
                             // Toggle multicoloured
                             this.shape.colour = this.shape.colour ? null : this.shape.default_colour;
+                            break;
+                        case 'm':
+                            // Toggle mute
+                            if (osc.context.state == 'running') {
+                                osc.context.suspend();
+                            }
+                            else {
+                                osc.context.resume();
+                            }
                             break;
                         case ' ':
                             // Toggle play/pause
@@ -139,9 +186,13 @@ class ShapeScene extends Scene2d {
                                 requestAnimationFrame(this.update.bind(this));
                             }
                             break;
+                        case 'Enter':
+                            // Toggle hide/show the current shape
+                            this.shape.hidden = !this.shape.hidden;
+                            break;
                         case 'h':
                             // Show help
-                            const help = document.querySelector('aside#help');
+                            event.preventDefault();
                             help.style.display = help.style.display == 'none' ? 'block' : 'none';
                             break;
                         default:
@@ -165,20 +216,32 @@ class ShapeScene extends Scene2d {
 
     update() {
         super.update();
-    
+        
         const params = [
-            [-37, -31, this.progress * 0.7],                                        // hcrr
-            [13, 113, 109, 299, 16, 7, 9, this.progress * 0.1],                         // unknown
-            [31, 41, this.progress * 0.01]                                          // trig_grid
+            [39.5, 37, this.progress * 0.3],      // hypocycloid   
+            // [rand_in_range(10, this.width / 2), rand_in_range(2, this.width / 4), this.progress * 0.01],      // hypocycloid                                      // hypocycloid
+            // [7 / 3, this.progress * 0.03],                                          // rhodonea
+            // [-37, -31, this.progress * 0.7],                                        // hcrr
+            [-37, -31, this.progress * 0.1],                                        // wobbly_hcrr
+            // [13, 113, 109, 299, 16, 7, 9, this.progress * 0.1],                     // unknown
+            [27, 291, 77338, 5, 400, 512, 2239, this.progress * 0.02],                     // unknown
+            [31, 41, this.progress * 0.002]                                       // trig_grid
         ];
-        let x, y;
-        for (let i = 0; i < 3; i++) {
-            [x, y] = this.#transform_to_canvas(this.curves[i](...params[i]));
-            this.ctx.save();
-            this.ctx.translate(x, y);
-            this.ctx.rotate(this.progress * (6 - i) * (i % 2 * 2 - 1));
-            this.shapes[i % this.shapes.length].draw(this.ctx, 0, 0, this.progress);
-            this.ctx.restore();
+        let x, y, y_aggregate = 0;
+        for (let i = 0; i < this.curves.length; i++) {
+            const current_shape = this.shapes[i % this.shapes.length];
+            if (!current_shape.hidden) {
+                [x, y] = this.#transform_to_canvas(this.curves[i](...params[i]));
+                y_aggregate +=  y - x;
+                this.ctx.save();
+                this.ctx.translate(x, y);
+                this.ctx.rotate(this.progress * (6 - i) * (i % 2 * 2 - 1));
+                current_shape.draw(this.ctx, 0, 0, this.progress);
+                this.ctx.restore();
+            }
+            if (i == 3) {
+                osc.frequency.value = (1 - y_aggregate / 8 / this.height) * 385 + 55;
+            }
         }
         if (!this.paused) {
             requestAnimationFrame(this.update.bind(this));
@@ -192,6 +255,7 @@ class Shape {
         this.default_colour = colour;
         this.outline = outline;
         this.thickness = thickness;
+        this.hidden = false;
     }
 }
 
@@ -271,7 +335,6 @@ class Star extends Shape {
 }
 
 function init() {
-    const main = document.getElementById('main');
     main.innerHTML = '';
     main.style.gridTemplateColumns = `1fr`;
     const {width: main_width, height: main_height} = main.getBoundingClientRect();
@@ -287,12 +350,28 @@ function init() {
 const rand_in_range = (m, n) => Math.floor((n - m) * Math.random() + m);
 const rand_int = n => Math.floor(n * Math.random());
 
+function oscillate() {
+    const audio_ctx = new AudioContext();
+    const osc = audio_ctx.createOscillator();
+    osc.connect(audio_ctx.destination);
+    osc.frequency.value = 0;
+    return osc;
+}
+
 // end of classes and functions
 // ============================
 
 // Main code 
 let debug = true;
+const help = document.querySelector('aside#help');
 document.querySelector('aside#help button').addEventListener('click', event => {
     event.target.parentElement.style.display = 'none';
+});
+const main = document.getElementById('main');
+let osc = oscillate();
+document.addEventListener('click', event => {
+    if (osc.context.state != 'running') {
+        osc.start();
+    }
 });
 ['load', 'resize'].forEach(event => window.addEventListener(event, init));
