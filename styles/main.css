@@ -1,12 +1,14 @@
 html, body, * {
     background-color: #000;
-    margin: 0.2vw;
+    margin: 0;
     padding: 0;
     overflow: hidden;
     font-family: 'Courier New', Courier, monospace;
     box-sizing: border-box;
     border-radius: 5px;
-    --clr-selected: #ffc000;
+    --highlight-col: #ffc000;
+    --plain-text-col: #ffe0b1;
+    --border-grey: #7a7265;
 }
 
 main#main {
@@ -18,26 +20,32 @@ main#main {
     gap: 0.2vw;
     justify-items: stretch;
     align-items: stretch;
-    border: 1px solid #333;
     margin: 1vw auto;
 }
 
-canvas, #controls, #shapes, #params {
-    border: 1px ridge #7a7265;
+canvas, #controls, #shapes, #params-wrapper {
+    border: 1px ridge var(--border-grey);
     margin: 0.5vw;
     background-color: #000;
+}
+
+#shapes {
+    margin-top: -2vh;
 }
 
 #controls {
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: 1fr 9fr 9fr;
-    padding: 0.5vw;
-    color: #fda;
+    padding: 0.1vw;
+    padding-top: 1vh;
+    color: var(--plain-text-col);
+    text-transform: capitalize;
 }
 
 #controls > h1 {
     font-size: 1vw;
+    margin: 0 auto;
 }
 
 input[type=checkbox].curve-check {
@@ -48,7 +56,7 @@ aside#help {
     display: none;
     position: fixed;
     background-color: #222;
-    color: antiquewhite;
+    color: var(--plain-text-col);
     border: 1px solid #f04;
     top: 5vh;
     left: 50vw;
@@ -56,8 +64,8 @@ aside#help {
     margin: 5px;
 }
 aside#help button {
-    background-color: #fa0;
-    columns: #000;
+    background-color: var(--highlight-col);
+    color: #000;
     width: 3vw;
     height: 3vh;
     margin-top: 1vh;
@@ -72,8 +80,8 @@ input[type="checkbox"] {
     position: relative;
     width: 2em;
     height: 2em;
-    border: 1px solid gray;
-    color: var(--clr-selected);
+    border: 1px solid var(--border-grey);
+    color: var(--highlight-col);
   }
   
 input[type="checkbox"]::before {
@@ -90,8 +98,8 @@ input[type="checkbox"]:checked::before {
 }
 
 input[type="checkbox"]:disabled {
-    border-color: black;
-    background: #ddd;
+    border-color: #000;
+    /* background: #ddd; */
     color: gray;
 }
 
@@ -114,6 +122,8 @@ select, select > option {
     font-size: 1vw;
     color: #0df;
     padding-left: 1vw;
+    margin-left: 1vw;
+    margin-top: 1vh;
 }
 
 #details {
@@ -122,6 +132,22 @@ select, select > option {
 }
 
 #details, #details > p {
-    color: #0f9;
+    color: var(--plain-text-col);
     padding: 0.5vw;
+}
+
+#details #func {
+    font-size: 0.7vw;
+    text-transform: none;
+    color: var(--highlight-col);
+}
+
+#details div.param {
+    border: 1px solid var(--border-grey);
+    padding: 0.1vw;
+    margin: 0.1vw;
+}
+
+#controls #params-wrapper {
+    overflow: scroll;
 }

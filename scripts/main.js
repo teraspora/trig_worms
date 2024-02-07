@@ -2,18 +2,6 @@
 // John Lynch - January 2024
 
 const Curves = {
-    circle: {
-        func: (r, t) => {
-            return [
-                r * Math.cos(t),
-                r * Math.sin(t)
-            ]
-        },
-        params: [0.6],
-        speed: 0.05,
-        hidden: false
-    },
-
     rhodonea: {
         func: (k, t) => [
             Math.cos(k * t + t) * Math.cos(t),
@@ -90,6 +78,18 @@ const Curves = {
         params: [31, 41],
         speed: 0.002,
         hidden: false
+    },
+
+    ellipse: {
+        func: (r, t) => {
+            return [
+                r * Math.cos(t),
+                r * Math.sin(t)
+            ]
+        },
+        params: [0.6],
+        speed: 0.05,
+        hidden: true
     }
 };
 
@@ -151,10 +151,12 @@ class ShapeScene extends Scene2d {
         this.curves = curves;
         this.curve_names = Object.keys(this.curves);
         this.current_curve = this.curves[this.curve_names[0]];
+        let i = 0;
         for (const curve in this.curves) {
             this.curves[curve].default_colour = this.#get_random_colour();
             this.curves[curve].colour = this.curves[curve].default_colour;
             this.curves[curve].shape = this.#get_random_shape();
+            this.curves[curve].rotation = ++i;
         }
         
         // Global effects
@@ -272,8 +274,10 @@ class ShapeScene extends Scene2d {
             checkbox_wrapper.appendChild(curve_switch);
             const label = curve_switch.querySelector('label');
             label.textContent = curve_name;
+            label.style.color = this.curves[curve_name].colour;
             const input = curve_switch.querySelector('input');
             input.type = 'checkbox';
+            input.checked = !this.curves[curve_name].hidden;
             input.name = curve_name;
             input.addEventListener('change', event => {
                 console.log(event);
@@ -289,35 +293,65 @@ class ShapeScene extends Scene2d {
         }
     }
 
+    #update_parameter_display() {
+        const param_elements = [...document.getElementsByClassName('param')];
+        param_elements.forEach(param => {
+            switch(param.id) {
+                case 'shape':
+                    param.textContent = this.current_curve.shape.constructor.name;
+                    break;
+                case 'order':
+                    param.textContent = this.current_curve.shape.order;
+                    break;
+                case 'speed':
+                    param.textContent = this.current_curve.speed;
+                    break;
+                case 'hue':
+                    param.textContent = this.current_curve.colour.split(' ')[0].split('(')[1];
+                    param.style.color = this.current_curve.colour;
+                    console.log(this.current_curve.colour.split(' ')[0].split('(')[1]);
+                    break;
+                case 'radius':
+                    param.textContent = this.current_curve.shape.radius;
+                    break;
+                case 'hub':
+                    param.textContent = this.current_curve.shape?.hub;
+                    break;
+                case 'rotation':
+                    param.textContent = this.current_curve.rotation;
+                    break;
+                case 'hidden':
+                    param.textContent = this.current_curve.hidden;
+                    break;
+                case 'func':
+                    param.textContent = this.current_curve.func;
+                    break;
+                case 'params':
+                    param.textContent = this.current_curve.params;
+                    break;
+                default:
+            }
+        });
+    }
+
     #create_params_section() {
-        const params_section = document.querySelector('section#controls > #params');
-        const select = document.querySelector('section#controls > #params >select#curve-select');
+        const params_section = document.querySelector('section#controls > #params-wrapper');
+        const select = document.querySelector('section#controls > #params-wrapper >select#curve-select');
         this.curve_names.forEach(curve_name => {
             const option = new Option(curve_name, curve_name);
             select.add(option);
+            option.style.color = this.curves[curve_name].colour;            
         });
+        select.style.color = this.current_curve.colour;
         select.addEventListener('change', event => {
-            const params = [...document.getElementsByClassName('param')];
             this.current_curve = this.curves[event.target.value];
-            console.log(this.current_curve.speed);
-            console.log(this.current_curve.params);
-            params.forEach(param => {
-                switch(param.id) {
-                    case 'speed':
-                        params[0].textContent = this.current_curve.speed;
-                        break;
-                    case 'colour':
-                        params[1].textContent = this.current_curve.colour;
-                        break;
-                    default:
-                }
-            });
+            event.target.style.color = this.current_curve.colour;
+            this.#update_parameter_display();
         });
-
     }
 
     #get_random_colour() {
-        return `hsl(${Math.random() * 180 + 180} 100% 50%)`;
+        return `hsl(${rand_int(360)} 100% 50%)`;
     }
 
     #get_random_shape() {
@@ -337,6 +371,7 @@ class ShapeScene extends Scene2d {
     render() {
         super.render();
         this.ctx.clearRect(0, 0, this.width, this.height);
+        this.#update_parameter_display();
         this.update();
     }
 
@@ -351,7 +386,7 @@ class ShapeScene extends Scene2d {
                 position_aggregate +=  (y + (x / this.width)) * 0.5;
                 this.ctx.save();
                 this.ctx.translate(x, y);
-                this.ctx.rotate(this.progress * (6 - i) * (i % 2 * 2 - 1));
+                this.ctx.rotate(curve.rotation * this.progress);
                 shape.draw(this.ctx, 0, 0, curve.colour, this.progress);
                 this.ctx.restore();
             }
@@ -449,16 +484,19 @@ class Star extends Shape {
 }
 
 function init() {
-    // const canvases = document.getElementsByTagName('canvas');
-    // if (canvases.length) {
-    //     canvases[0].remove();
-    //     delete canvases;
-    // }
+    if (scenes.length) {
+        console.log(scenes);
+        for (const scene of scenes) {
+            delete scene;
+        }
+        scenes = [];
+    }
     const {width: main_width, height: main_height} = main.getBoundingClientRect();
     
     canvas.width = Math.floor(main_width - 200);
-    canvas.height = Math.floor(main_height - 200);
+    canvas.height = main_height;
     const scene = new ShapeScene(canvas, Curves, controls);
+    scenes.push(scene);
     scene.render();
 }
 
@@ -484,7 +522,7 @@ const main = document.getElementById('main');
 const controls = document.querySelector('section#controls');
 const help = document.querySelector('aside#help');
 const canvas = document.querySelector('canvas');
-
+let scenes = [];
 // Set up controls
 
 
