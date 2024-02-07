@@ -286,9 +286,18 @@ class ShapeScene extends Scene2d {
             select.add(option);
         });
         select.addEventListener('change', event => {
+            const params = [...document.getElementsByClassName('param')];
             this.current_curve = this.curves[event.target.value];
             console.log(this.current_curve.speed);
             console.log(this.current_curve.params);
+            params.forEach(param => {
+                switch(param.id) {
+                    case 'speed':
+                        params[0].textContent = this.current_curve.speed;
+                        break;
+                    default:
+                }
+            });
         });
 
     }

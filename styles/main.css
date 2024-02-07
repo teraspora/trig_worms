@@ -1,6 +1,6 @@
 html, body, * {
     background-color: #000;
-    margin: 0 auto;
+    margin: 0.2vw;
     padding: 0;
     overflow: hidden;
     font-family: 'Courier New', Courier, monospace;
@@ -114,4 +114,14 @@ select, select > option {
     font-size: 1vw;
     color: #0df;
     padding-left: 1vw;
+}
+
+#details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+#details, #details > p {
+    color: #0f9;
+    padding: 0.5vw;
 }
