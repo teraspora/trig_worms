@@ -2,16 +2,16 @@ html, body, * {
     background-color: #000;
     margin: 0 auto;
     padding: 0;
-    text-align: center;
     overflow: hidden;
     font-family: 'Courier New', Courier, monospace;
     box-sizing: border-box;
     border-radius: 5px;
+    --clr-selected: #ffc000;
 }
 
 main#main {
     display: grid;
-    grid-template-columns: 8fr 1fr;
+    grid-template-columns: 6fr 1fr;
     grid-template-rows: 1fr;
     width: 98vw;
     height: 98vh;
@@ -65,4 +65,41 @@ aside#help button {
 }
 aside#help table {
     padding: 1vw;;
+}
+
+input[type="checkbox"] {
+    appearance: none;
+    position: relative;
+    width: 2em;
+    height: 2em;
+    border: 1px solid gray;
+    color: var(--clr-selected);
+  }
+  
+input[type="checkbox"]::before {
+    content: "☀";
+    position: absolute;
+    font-size: 1.2em;
+    right: 5px;
+    top: 2px;
+    visibility: hidden;
+}
+
+input[type="checkbox"]:checked::before {
+    visibility: visible;
+}
+
+input[type="checkbox"]:disabled {
+    border-color: black;
+    background: #ddd;
+    color: gray;
+}
+
+fieldset {
+    border: none;
+    padding: 0.4vw;
+}
+
+label:has(>input:checked) {
+    color: var(--clr-selected);
 }
