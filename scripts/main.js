@@ -1,6 +1,98 @@
 // Main Javascript file for Shapes
 // John Lynch - January 2024
 
+const Curves = {
+    circle: {
+        func: (r, t) => {
+            return [
+                r * Math.cos(t),
+                r * Math.sin(t)
+            ]
+        },
+        params: [0.6],
+        speed: 0.05,
+        hidden: false
+    },
+
+    rhodonea: {
+        func: (k, t) => [
+            Math.cos(k * t + t) * Math.cos(t),
+            Math.cos(k * t + t) * Math.sin(t),
+        ],
+        params: [27 / 11],
+        speed: 0.03,
+        hidden: false
+    },
+
+    hypocycloid: {
+        func: (a, b, t) => {
+            const r = a - b;
+            const p = r / b;
+            return [
+                (r * Math.cos(t) + b * Math.cos(p * t)) / a,
+                (r * Math.sin(t) - b * Math.sin(p * t)) / a
+            ]
+        },
+        params: [39.5, 37],
+        speed: 0.3,
+        hidden: false
+    },
+
+    hcrr: {
+        func: (R, r, t) => {
+            const s = R - r;
+            return [
+                (s * Math.cos(t) + r * Math.cos(s / r * t)) / R,
+                (s * Math.sin(t) - r * Math.sin(s / r * t)) / R
+            ]
+        },
+        params: [-37, -31],
+        speed: 0.1,
+        hidden: false
+    },
+
+
+    wobbly_hcrr: {
+        func: (R, r, t) => {
+            const s = R - r;
+            return [
+                (s * Math.cos(t) + r * Math.cos(s / r * t)) / R + 0.05 * Math.sin(t * 10),
+                (s * Math.sin(t) - r * Math.sin(s / r * t)) / R
+            ]
+        },
+        params: [-47, -29],
+        speed: 0.1,
+        hidden: false
+    },
+
+
+    unknown: {
+        func: (a, b, c, d, e, f, g, t) => {
+            const t_ = t / 10;
+            return [
+                (Math.cos(a * t_) + Math.cos(b * t_) / d + Math.sin(c * t_) / e) / 2,
+                (Math.sin(a * t_) + Math.sin(b * t_) / f + Math.cos(c * t_) / g) / 2
+            ];
+        },
+        params: [27, 291, 77338, 5, 400, 512, 2239],
+        speed: 0.02,
+        hidden: false
+    },
+
+
+    trig_grid: {
+        func: (p, q, t) => {
+            return [            
+                Math.sin(p * Math.PI * t / 10),
+                Math.cos(q * Math.PI * t / 10)
+            ]
+        },
+        params: [31, 41],
+        speed: 0.002,
+        hidden: false
+    }
+};
+
 class Scene {
     static instance_count = 0;
     constructor(canvas) {
@@ -34,7 +126,7 @@ class Scene2d extends Scene {
 }
 
 class ShapeScene extends Scene2d {
-    constructor(canvas, controls) {
+    constructor(canvas, curves, controls) {
         super(canvas);
         this.controls = controls;
         this.colours = [
@@ -51,66 +143,18 @@ class ShapeScene extends Scene2d {
         ];
         this.shape_index = 0;
         this.shape = this.shapes[0];
+        this.curves = curves;
+        this.curve_names = Object.keys(this.curves);
+        this.current_curve = this.curves[this.curve_names[0]];
         this.ctx.shadowOffsetX = 5;
         this.ctx.shadowOffsetY = 3;
         this.ctx.shadowBlur = 5;
         this.ctx.shadowColor = '#101';
 
-        // Curves
-        this.circle = (t) => {
-            return [
-                Math.cos(t),
-                Math.sin(t)
-            ]
-        };
-
-        this.rhodonea = (k, t) => [
-            Math.cos(k * t + t) * Math.cos(t),
-            Math.cos(k * t + t) * Math.sin(t),
-        ];
-
-        this.hypocycloid = (a, b, t) => {
-            const r = a - b;
-            const p = r / b;
-            return [
-                (r * Math.cos(t) + b * Math.cos(p * t)) / a,
-                (r * Math.sin(t) - b * Math.sin(p * t)) / a
-            ]
-        };
-
-        this.hcrr = (R, r, t) => {
-            const s = R - r;
-            return [
-                (s * Math.cos(t) + r * Math.cos(s / r * t)) / R,
-                (s * Math.sin(t) - r * Math.sin(s / r * t)) / R
-            ]
-        };
-
-        this.wobbly_hcrr = (R, r, t) => {
-            const s = R - r;
-            return [
-                (s * Math.cos(t) + r * Math.cos(s / r * t)) / R + 0.05 * Math.sin(t * 10),
-                (s * Math.sin(t) - r * Math.sin(s / r * t)) / R
-            ]
-        };
-
-        this.unknown = (a, b, c, d, e, f, g, t) => {
-            const t_ = t / 10;
-            return [
-                (Math.cos(a * t_) + Math.cos(b * t_) / d + Math.sin(c * t_) / e) / 2,
-                (Math.sin(a * t_) + Math.sin(b * t_) / f + Math.cos(c * t_) / g) / 2
-            ];
-        };
-
-        this.trig_grid = (p, q, t) => {
-            return [            
-                Math.sin(p * Math.PI * t / 10),
-                Math.cos(q * Math.PI * t / 10)
-            ]
-        };
-        this.curves = [this.hypocycloid, this.wobbly_hcrr, this.unknown, this.trig_grid];   //, this.hcrr, 
-        // UI Controls
         
+        // UI Controls
+        this.#create_curve_checkboxes();
+        this.#create_params_section();
 
 
         window.addEventListener('keyup', event => {
@@ -206,6 +250,49 @@ class ShapeScene extends Scene2d {
         });
     }
 
+    #create_curve_checkboxes() {
+        const checkbox_wrapper = document.querySelector('section#controls > #shapes > fieldset');
+        const checkbox = checkbox_wrapper.firstElementChild;
+        const checkbox_clone = checkbox.cloneNode(true);
+        checkbox.remove();
+        const checkboxes = [];
+        for (const curve_name of this.curve_names){
+            const curve_switch = checkbox_clone.cloneNode(true);
+            checkbox_wrapper.appendChild(curve_switch);
+            const label = curve_switch.querySelector('label');
+            label.textContent = curve_name;
+            const input = curve_switch.querySelector('input');
+            input.type = 'checkbox';
+            input.name = curve_name;
+            input.addEventListener('change', event => {
+                console.log(event);
+                const curve = this.curves[event.target.name];
+                curve.hidden = !curve.hidden;
+            });
+            label.addEventListener('click', event => {
+                console.log(event);
+                this.current_curve = this.curves[event.target.nextElementSibling.name];
+                event.target.style.color = 'f00';
+            });
+            checkboxes.push(input);
+        }
+    }
+
+    #create_params_section() {
+        const params_section = document.querySelector('section#controls > #params');
+        const select = document.querySelector('section#controls > #params >select#curve-select');
+        this.curve_names.forEach(curve_name => {
+            const option = new Option(curve_name, curve_name);
+            select.add(option);
+        });
+        select.addEventListener('change', event => {
+            this.current_curve = this.curves[event.target.value];
+            console.log(this.current_curve.speed);
+            console.log(this.current_curve.params);
+        });
+
+    }
+    
     #transform_to_canvas([x, y]) {
         return [
             x = (x + 1) / 2 * this.width,
@@ -221,22 +308,12 @@ class ShapeScene extends Scene2d {
 
     update() {
         super.update();
-        
-        const params = [
-            [39.5, 37, this.progress * 0.3],      // hypocycloid   
-            // [rand_in_range(10, this.width / 2), rand_in_range(2, this.width / 4), this.progress * 0.01],      // hypocycloid                                      // hypocycloid
-            // [7 / 3, this.progress * 0.03],                                          // rhodonea
-            // [-37, -31, this.progress * 0.7],                                        // hcrr
-            [-37, -31, this.progress * 0.1],                                        // wobbly_hcrr
-            // [13, 113, 109, 299, 16, 7, 9, this.progress * 0.1],                     // unknown
-            [27, 291, 77338, 5, 400, 512, 2239, this.progress * 0.02],                     // unknown
-            [31, 41, this.progress * 0.002]                                       // trig_grid
-        ];
         let x, y, position_aggregate = 0;
-        for (let i = 0; i < this.curves.length; i++) {
+        for (let i = 0; i < this.curve_names.length; i++) {
             const current_shape = this.shapes[i % this.shapes.length];
-            if (!current_shape.hidden) {
-                [x, y] = this.#transform_to_canvas(this.curves[i](...params[i]));
+            const curve = this.curves[this.curve_names[i]];
+            if (!curve.hidden) {
+                [x, y] = this.#transform_to_canvas(curve.func(...curve.params, this.progress * curve.speed));
                 position_aggregate +=  (y + (x / this.width)) * 0.5;
                 this.ctx.save();
                 this.ctx.translate(x, y);
@@ -349,7 +426,7 @@ function init() {
     
     canvas.width = Math.floor(main_width - 200);
     canvas.height = Math.floor(main_height - 200);
-    const scene = new ShapeScene(canvas, controls);
+    const scene = new ShapeScene(canvas, Curves, controls);
     scene.render();
 }
 
@@ -376,6 +453,9 @@ const controls = document.querySelector('section#controls');
 const help = document.querySelector('aside#help');
 const canvas = document.querySelector('canvas');
 
+// Set up controls
+
+
 document.querySelector('aside#help button').addEventListener('click', event => {
     event.target.parentElement.style.display = 'none';
 });
@@ -384,6 +464,7 @@ let osc = oscillate();
 document.addEventListener('click', event => {
     if (osc.status == 'initial') {
         osc.start();
+        osc.context.suspend();
         osc.status = 'playing';
     }
 });

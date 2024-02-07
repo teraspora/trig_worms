@@ -17,32 +17,25 @@
             <h1>Controls</h1>
             <div id="shapes">
                  
-                <form>
                     <fieldset>
-                  
-                      <p>
-                        <label>
-                          <input type="checkbox" name="hcrr" checked/>
-                          Hcrr
-                        </label>
-                      </p>
-                      <p>
-                        <label>
-                          <input type="checkbox" name="rhodonea" checked/>
-                          Rhodonea
-                        </label>
-                      </p>
-                      <p>
-                        <label>
-                          <input type="checkbox" name="hypocycloid"/>
-                          Hypocycloid
-                        </label>
-                      </p>
+                        <p>
+                            <label>---</label>
+                            <input type="checkbox" name="---" checked/>
+                            <span></span>
+                        </p>
+                        <!-- More checkboxes to be added in JS -->
                     </fieldset>
-                  </form>
 
             </div>
-            <div id="params"></div>
+            <div id="params">
+                <select id="curve-select"></select>
+                <div id="details">
+                    <p>speed</p> <p id="speed"></p>
+                    <p>colour</p> <p id="colour"></p>
+                    <p>radius</p> <p id="radius"></p>
+                    <p>rotation</p> <p id="rotation"></p>
+                </div>
+            </div>
         </section>
     </main>
     <aside id="help">
