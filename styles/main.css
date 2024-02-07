@@ -8,8 +8,11 @@ html, body, * {
     box-sizing: border-box;
     border-radius: 5px;
 }
+
 main#main {
     display: grid;
+    grid-template-columns: 8fr 1fr;
+    grid-template-rows: 1fr;
     width: 98vw;
     height: 98vh;
     gap: 0.2vw;
@@ -18,10 +21,27 @@ main#main {
     border: 1px solid #333;
     margin: 1vw auto;
 }
-canvas {
+
+canvas, #controls, #shapes, #params {
     border: 1px ridge #7a7265;
     margin: 0.5vw;
     background-color: #000;
+}
+
+#controls {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 9fr 9fr;
+    padding: 0.5vw;
+    color: #fda;
+}
+
+#controls > h1 {
+    font-size: 1vw;
+}
+
+input[type=checkbox].curve-check {
+    padding-top: 0.5vh;
 }
 
 aside#help {
@@ -35,7 +55,6 @@ aside#help {
     padding: 1vw;
     margin: 5px;
 }
-
 aside#help button {
     background-color: #fa0;
     columns: #000;
@@ -44,9 +63,6 @@ aside#help button {
     margin-top: 1vh;
     font-size: 1vw;
 }
-
 aside#help table {
     padding: 1vw;;
 }
-
-

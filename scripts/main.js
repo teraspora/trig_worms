@@ -34,8 +34,9 @@ class Scene2d extends Scene {
 }
 
 class ShapeScene extends Scene2d {
-    constructor(canvas) {
+    constructor(canvas, controls) {
         super(canvas);
+        this.controls = controls;
         this.colours = [
             '#ff9200', '#ff0049', '#0051ff', '#00c6ab',
             '#ea13bc', '#ff6e98', '#001dfb', '#ff9200', '#ff2592', '#ac29ff',
@@ -108,6 +109,9 @@ class ShapeScene extends Scene2d {
             ]
         };
         this.curves = [this.hypocycloid, this.wobbly_hcrr, this.unknown, this.trig_grid];   //, this.hcrr, 
+        // UI Controls
+        
+
 
         window.addEventListener('keyup', event => {
             console.log(event.key);
@@ -211,7 +215,8 @@ class ShapeScene extends Scene2d {
 
     render() {
         super.render();
-        requestAnimationFrame(this.update.bind(this));
+        this.ctx.clearRect(0, 0, this.width, this.height);
+        this.update();
     }
 
     update() {
@@ -227,20 +232,20 @@ class ShapeScene extends Scene2d {
             [27, 291, 77338, 5, 400, 512, 2239, this.progress * 0.02],                     // unknown
             [31, 41, this.progress * 0.002]                                       // trig_grid
         ];
-        let x, y, y_aggregate = 0;
+        let x, y, position_aggregate = 0;
         for (let i = 0; i < this.curves.length; i++) {
             const current_shape = this.shapes[i % this.shapes.length];
             if (!current_shape.hidden) {
                 [x, y] = this.#transform_to_canvas(this.curves[i](...params[i]));
-                y_aggregate +=  y - x;
+                position_aggregate +=  (y + (x / this.width)) * 0.5;
                 this.ctx.save();
                 this.ctx.translate(x, y);
                 this.ctx.rotate(this.progress * (6 - i) * (i % 2 * 2 - 1));
                 current_shape.draw(this.ctx, 0, 0, this.progress);
                 this.ctx.restore();
             }
-            if (i == 3) {
-                osc.frequency.value = (1 - y_aggregate / 8 / this.height) * 385 + 55;
+            if (i == 1 ) {
+                osc.frequency.value = (1 - position_aggregate / 2 / this.height) * 385 + 55;
             }
         }
         if (!this.paused) {
@@ -335,14 +340,16 @@ class Star extends Shape {
 }
 
 function init() {
-    main.innerHTML = '';
-    main.style.gridTemplateColumns = `1fr`;
+    // const canvases = document.getElementsByTagName('canvas');
+    // if (canvases.length) {
+    //     canvases[0].remove();
+    //     delete canvases;
+    // }
     const {width: main_width, height: main_height} = main.getBoundingClientRect();
-    const canvas = document.createElement('canvas');
-    canvas.width = Math.floor(main_width - 10);
-    canvas.height = Math.floor(main_height - 10);
-    main.appendChild(canvas);
-    const scene = new ShapeScene(canvas);
+    
+    canvas.width = Math.floor(main_width - 200);
+    canvas.height = Math.floor(main_height - 200);
+    const scene = new ShapeScene(canvas, controls);
     scene.render();
 }
 
@@ -355,6 +362,7 @@ function oscillate() {
     const osc = audio_ctx.createOscillator();
     osc.connect(audio_ctx.destination);
     osc.frequency.value = 0;
+    osc.status = 'initial';
     return osc;
 }
 
@@ -363,15 +371,21 @@ function oscillate() {
 
 // Main code 
 let debug = true;
+const main = document.getElementById('main');
+const controls = document.querySelector('section#controls');
 const help = document.querySelector('aside#help');
+const canvas = document.querySelector('canvas');
+
 document.querySelector('aside#help button').addEventListener('click', event => {
     event.target.parentElement.style.display = 'none';
 });
-const main = document.getElementById('main');
+
 let osc = oscillate();
 document.addEventListener('click', event => {
-    if (osc.context.state != 'running') {
+    if (osc.status == 'initial') {
         osc.start();
+        osc.status = 'playing';
     }
 });
+
 ['load', 'resize'].forEach(event => window.addEventListener(event, init));
