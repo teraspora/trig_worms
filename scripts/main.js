@@ -128,35 +128,46 @@ class Scene2d extends Scene {
 class ShapeScene extends Scene2d {
     constructor(canvas, curves, controls) {
         super(canvas);
-        this.controls = controls;
+        
+        // Shapes
+        this.shapes = [
+            new Star(6, 48, 6, 2),  //`hsl(${Math.random() * 360} 100% 50%)`
+            new Polygon(3, 6, 4),
+            new Star(3, 32, 3, 2),
+            new Polygon(5, 16, 4)
+        ];
+        this.shape_index = 0;
+        this.shape = this.shapes[0];
+
+        // Colours
         this.colours = [
             '#ff9200', '#ff0049', '#0051ff', '#00c6ab',
             '#ea13bc', '#ff6e98', '#001dfb', '#ff9200', '#ff2592', '#ac29ff',
             '#f04', '#006fff', '#00f1e1', '#ffca00', '#c221b7',
             '#0091f4', '#6e91ff', '#0459e2', '#00f1e1'
         ];
-        this.shapes = [
-            new Star(6, 48, 6, this.colours[0], '#111', 2),  //`hsl(${Math.random() * 360} 100% 50%)`
-            new Polygon(3, 6, this.colours[1], '#111', 4),
-            new Star(3, 32, 3, this.colours[2], '#111', 2),
-            new Polygon(5, 16, this.colours[3], '#111', 4)
-        ];
-        this.shape_index = 0;
-        this.shape = this.shapes[0];
+        
+        // Curves
         this.curves = curves;
         this.curve_names = Object.keys(this.curves);
         this.current_curve = this.curves[this.curve_names[0]];
+        for (const curve in this.curves) {
+            this.curves[curve].default_colour = this.#get_random_colour();
+            this.curves[curve].colour = this.curves[curve].default_colour;
+            this.curves[curve].shape = this.#get_random_shape();
+        }
+        
+        // Global effects
         this.ctx.shadowOffsetX = 5;
         this.ctx.shadowOffsetY = 3;
         this.ctx.shadowBlur = 5;
         this.ctx.shadowColor = '#101';
-
         
         // UI Controls
+        this.controls = controls;
         this.#create_curve_checkboxes();
         this.#create_params_section();
-
-
+        
         window.addEventListener('keyup', event => {
             console.log(event.key);
             if (!event.ctrlKey && !event.altKey) {
@@ -188,7 +199,7 @@ class ShapeScene extends Scene2d {
                             break;
                         case 'c':
                             // Change colour
-                            this.shape.colour = this.colours[rand_int(this.colours.length)];
+                            this.current_curve.colour = this.#get_random_colour();
                             break;
                         case '<':
                             // Decrease radius
@@ -216,7 +227,7 @@ class ShapeScene extends Scene2d {
                             break;
                         case 'x':
                             // Toggle multicoloured
-                            this.shape.colour = this.shape.colour ? null : this.shape.default_colour;
+                            this.current_curve.colour = this.current_curve.colour ? null : this.current_curve.default_colour;
                             break;
                         case 'm':
                             // Toggle mute
@@ -295,11 +306,25 @@ class ShapeScene extends Scene2d {
                     case 'speed':
                         params[0].textContent = this.current_curve.speed;
                         break;
+                    case 'colour':
+                        params[1].textContent = this.current_curve.colour;
+                        break;
                     default:
                 }
             });
         });
 
+    }
+
+    #get_random_colour() {
+        return `hsl(${Math.random() * 180 + 180} 100% 50%)`;
+    }
+
+    #get_random_shape() {
+        return (Math.random() > 0.5 
+            ? new Star(6, 48, 6, '#111', 2)
+            : new Polygon(5, 16, '#111', 4)
+        );
     }
     
     #transform_to_canvas([x, y]) {
@@ -319,15 +344,15 @@ class ShapeScene extends Scene2d {
         super.update();
         let x, y, position_aggregate = 0;
         for (let i = 0; i < this.curve_names.length; i++) {
-            const current_shape = this.shapes[i % this.shapes.length];
             const curve = this.curves[this.curve_names[i]];
+            const shape = curve.shape;
             if (!curve.hidden) {
                 [x, y] = this.#transform_to_canvas(curve.func(...curve.params, this.progress * curve.speed));
                 position_aggregate +=  (y + (x / this.width)) * 0.5;
                 this.ctx.save();
                 this.ctx.translate(x, y);
                 this.ctx.rotate(this.progress * (6 - i) * (i % 2 * 2 - 1));
-                current_shape.draw(this.ctx, 0, 0, this.progress);
+                shape.draw(this.ctx, 0, 0, curve.colour, this.progress);
                 this.ctx.restore();
             }
             if (i == 1 ) {
@@ -341,9 +366,7 @@ class ShapeScene extends Scene2d {
 }
 
 class Shape {
-    constructor(colour, outline, thickness) {
-        this.colour = colour;
-        this.default_colour = colour;
+    constructor(outline, thickness) {
         this.outline = outline;
         this.thickness = thickness;
         this.hidden = false;
@@ -352,13 +375,13 @@ class Shape {
 
 class Polygon extends Shape {
     static instance_count = 0;
-    constructor(order, radius, colour, outline, thickness) {
-        super(colour, outline, thickness);
+    constructor(order, radius, outline, thickness) {
+        super(outline, thickness);
         this.id = Polygon.instance_count++;
         this.order = order;
         this.radius = radius;
     }
-    draw(ctx, x, y, progress) {
+    draw(ctx, x, y, colour, progress) {
         ctx.save();
         ctx.beginPath();
         ctx.translate(x, y);
@@ -374,8 +397,8 @@ class Polygon extends Shape {
             ctx.lineWidth = this.thickness;
             ctx.stroke();
         }
-        if (this.colour) {
-            ctx.fillStyle = this.colour;
+        if (colour) {
+            ctx.fillStyle = colour;
             ctx.fill();
         }
         else {
@@ -388,14 +411,14 @@ class Polygon extends Shape {
 
 class Star extends Shape {
     static instance_count = 0;
-    constructor(order, radius_outer, radius_inner, colour, outline, thickness) {
-        super(colour, outline, thickness);
+    constructor(order, radius_outer, radius_inner, outline, thickness) {
+        super(outline, thickness);
         this.id = Star.instance_count++;
         this.order = order;
         this.radius = radius_outer;
         this.hub = radius_inner;
     }
-    draw(ctx, x, y, progress) {
+    draw(ctx, x, y, colour, progress) {
         ctx.save();
         ctx.beginPath();
         ctx.translate(x, y);
@@ -413,8 +436,8 @@ class Star extends Shape {
             ctx.lineWidth = this.thickness;
             ctx.stroke();
         }
-        if (this.colour) {
-            ctx.fillStyle = this.colour;
+        if (colour) {
+            ctx.fillStyle = colour;
             ctx.fill();
         }
         else {
