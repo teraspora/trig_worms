@@ -23,13 +23,13 @@ main#main {
     margin: 1vw auto;
 }
 
-canvas, #controls, #shapes, #params-wrapper {
+canvas, #controls, #curves, #params-wrapper {
     border: 1px ridge var(--border-grey);
     margin: 0.5vw;
     background-color: #000;
 }
 
-#shapes {
+#curves {
     margin-top: -2vh;
 }
 
@@ -142,10 +142,12 @@ select, select > option {
     color: var(--highlight-col);
 }
 
-#details div.param {
+#details select.param {
     border: 1px solid var(--border-grey);
     padding: 0.1vw;
     margin: 0.1vw;
+    color: var(--plain-text-col);
+    font-size: 0.7vw;
 }
 
 #controls #params-wrapper {

@@ -8,7 +8,7 @@ const Curves = {
             Math.cos(k * t + t) * Math.sin(t),
         ],
         params: [27 / 11],
-        speed: 0.03,
+        speed: 0.02,
         hidden: false
     },
 
@@ -171,7 +171,6 @@ class ShapeScene extends Scene2d {
         this.#create_params_section();
         
         window.addEventListener('keyup', event => {
-            console.log(event.key);
             if (!event.ctrlKey && !event.altKey) {
                 const char = event.key;
                 const digit = char.match(/\d/)?.input;
@@ -264,7 +263,7 @@ class ShapeScene extends Scene2d {
     }
 
     #create_curve_checkboxes() {
-        const checkbox_wrapper = document.querySelector('section#controls > #shapes > fieldset');
+        const checkbox_wrapper = document.querySelector('section#controls > #curves > fieldset');
         const checkbox = checkbox_wrapper.firstElementChild;
         const checkbox_clone = checkbox.cloneNode(true);
         checkbox.remove();
@@ -280,15 +279,21 @@ class ShapeScene extends Scene2d {
             input.checked = !this.curves[curve_name].hidden;
             input.name = curve_name;
             input.addEventListener('change', event => {
-                console.log(event);
                 const curve = this.curves[event.target.name];
                 curve.hidden = !curve.hidden;
+                if (curve.hidden && curve == this.current_curve) {
+                    const active_curves = this.curve_names.filter(curve_name => !this.curves[curve_name].hidden);
+                    if (active_curves.length) {
+                        this.current_curve = active_curves[0];
+                        this.#update_parameter_display();
+                    }
+                    // else... hmmm, if we set it to null, we'll have to include that value in the select...
+                }
             });
-            label.addEventListener('click', event => {
-                console.log(event);
-                this.current_curve = this.curves[event.target.nextElementSibling.name];
-                event.target.style.color = 'f00';
-            });
+            // label.addEventListener('click', event => {
+            //     this.current_curve = this.curves[event.target.nextElementSibling.name];
+            //     event.target.style.color = 'f00';
+            // });
             checkboxes.push(input);
         }
     }
@@ -298,18 +303,17 @@ class ShapeScene extends Scene2d {
         param_elements.forEach(param => {
             switch(param.id) {
                 case 'shape':
-                    param.textContent = this.current_curve.shape.constructor.name;
+                    param.value = this.current_curve.shape.constructor.name;
                     break;
                 case 'order':
-                    param.textContent = this.current_curve.shape.order;
+                    param.value = this.current_curve.shape.order;
                     break;
                 case 'speed':
-                    param.textContent = this.current_curve.speed;
+                    param.value = this.current_curve.speed;
                     break;
                 case 'hue':
-                    param.textContent = this.current_curve.colour.split(' ')[0].split('(')[1];
+                    param.value = this.current_curve.colour.split(' ')[0].split('(')[1];
                     param.style.color = this.current_curve.colour;
-                    console.log(this.current_curve.colour.split(' ')[0].split('(')[1]);
                     break;
                 case 'radius':
                     param.textContent = this.current_curve.shape.radius;
@@ -318,7 +322,7 @@ class ShapeScene extends Scene2d {
                     param.textContent = this.current_curve.shape?.hub;
                     break;
                 case 'rotation':
-                    param.textContent = this.current_curve.rotation;
+                    // param.textContent = this.current_curve.rotation;
                     break;
                 case 'hidden':
                     param.textContent = this.current_curve.hidden;
@@ -335,30 +339,55 @@ class ShapeScene extends Scene2d {
     }
 
     #create_params_section() {
-        const params_section = document.querySelector('section#controls > #params-wrapper');
-        const select = document.querySelector('section#controls > #params-wrapper >select#curve-select');
+        const select_curve = document.querySelector('section#controls > #params-wrapper >select#curve-select');
         this.curve_names.forEach(curve_name => {
             const option = new Option(curve_name, curve_name);
-            select.add(option);
+            select_curve.add(option);
             option.style.color = this.curves[curve_name].colour;            
         });
-        select.style.color = this.current_curve.colour;
-        select.addEventListener('change', event => {
+        select_curve.style.color = this.current_curve.colour;
+        select_curve.addEventListener('change', event => {
             this.current_curve = this.curves[event.target.value];
             event.target.style.color = this.current_curve.colour;
             this.#update_parameter_display();
         });
+        param_details.addEventListener('change', event => {
+            console.log(event.target.id);
+            console.log(event.target.selectedOptions[0].value);
+            const param = event.target.id;
+            const value = event.target.selectedOptions[0].value;
+            switch(param) {
+                case 'shape':
+                    this.current_curve.shape = this.#get_random_shape(value);
+                    break;
+                case 'order':
+                    this.current_curve.shape.order = Number(value);
+                    break;
+                case 'speed':
+                    this.current_curve.speed = Number(value);
+                    break;
+                case 'hue':
+                    this.current_curve.colour = `hsl(${value} 100% 50%)`;
+                case 'rotation':
+                    this.current_curve.rotation = Number(value);
+                default:
+                    break;
+            }
+        });
+        this.#update_parameter_display();
     }
 
     #get_random_colour() {
         return `hsl(${rand_int(360)} 100% 50%)`;
     }
 
-    #get_random_shape() {
-        return (Math.random() > 0.5 
-            ? new Star(6, 48, 6, '#111', 2)
-            : new Polygon(5, 16, '#111', 4)
-        );
+    #get_random_shape(type) {
+        if (!['Star', 'Polygon'].includes(type)) {
+            type = Math.random() < 0.5 ? 'Star' : 'Polygon';
+        }
+        return type == 'Star'
+            ? new Star(rand_in_range(3, 13), rand_in_range(2, 128), rand_in_range(0, 64), '#111', 2)
+            : new Polygon(rand_in_range(3, 13), rand_in_range(2, 64), '#111', 4);
     }
     
     #transform_to_canvas([x, y]) {
@@ -390,9 +419,7 @@ class ShapeScene extends Scene2d {
                 shape.draw(this.ctx, 0, 0, curve.colour, this.progress);
                 this.ctx.restore();
             }
-            if (i == 1 ) {
-                osc.frequency.value = (1 - position_aggregate / 2 / this.height) * 385 + 55;
-            }
+            osc.frequency.value = (1 - position_aggregate / 2 / this.height) * 385 + 55;
         }
         if (!this.paused) {
             requestAnimationFrame(this.update.bind(this));
@@ -522,6 +549,7 @@ const main = document.getElementById('main');
 const controls = document.querySelector('section#controls');
 const help = document.querySelector('aside#help');
 const canvas = document.querySelector('canvas');
+const param_details = document.querySelector('#params-wrapper > #details');
 let scenes = [];
 // Set up controls
 
