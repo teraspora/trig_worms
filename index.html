@@ -14,7 +14,17 @@
     <main id="main">
         <canvas></canvas>
         <section id="controls">
-            <h1>Controls</h1>
+            <div id="buttons">
+                <button id="pause">Pause</button>
+                <button id="clear">Clear</button>
+                <button id="init">Init</button>
+                <button id="speed" disabled>Speed</button>
+                <button id="shadow-blur" disabled>Shadow Blur</button>
+                <button id="shadow-colour" disabled>Shadow Colour</button>
+                <button id="github">Github</button>
+                <button id="ZU">ZU</button>
+                <button id="IO">IO</button>
+            </div>
             <div id="curves">
                  
                     <fieldset>
@@ -22,7 +32,6 @@
                             <label>---</label>
                             <input type="checkbox" name="---" checked/>
                             <span></span>
-                        </p>
                         <!-- More checkboxes to be added in JS -->
                     </fieldset>
 
@@ -54,10 +63,13 @@
                     <div>speed:</div> 
                     <select class="param" id="speed">
                         <option value="0.001">0.001</option>
+                        <option value="0.002">0.002</option>
                         <option value="0.005">0.005</option>
+                        <option value="0.008">0.008</option>
                         <option value="0.01">0.01</option>
                         <option value="0.02">0.02</option>
                         <option value="0.04">0.04</option>
+                        <option value="0.05">0.05</option>
                         <option value="0.06">0.06</option>
                         <option value="0.08">0.08</option>
                         <option value="0.1">0.1</option>
@@ -68,22 +80,14 @@
                         <option value="0.5">0.5</option>
                     </select>
                     
-                    <div>hue:</div> 
-                    <div class="param" id="hue"></div>
-                    <!-- <select class="param" id="speed">
-                      --- Range 0 - 360
-                    </select> -->
-                    <div>radius:</div> 
-                    <div class="param" id="radius"></div>
-                    <!-- <select class="param" id="radius">
-                        --- Range 1 - 512
-                    </select> -->
+                    <div class="hue-ui">hue: <output id="hue-output"></output></div> 
+                    <input type="range"  min="0" max="359" value="0" class="param hue-ui" id="hue">
+
+                    <div class="radius-ui">radius: <output id="radius-output"></output></div> 
+                    <input type="range"  min="1" max="512" value="0" class="param radius-ui" id="radius">
                     
-                    <div>hub:</div> 
-                    <div class="param" id="hub"></div>
-                    <!-- <select class="param" id="radius">
-                        --- Range 1 - 128
-                    </select> -->
+                    <div class="hub-ui">hub: <output id="hub-output"></output></div> 
+                    <input type="range"  min="1" max="512" value="0" class="param hub-ui" id="hub">
                     
                     <div>rotation:</div>
                     <select class="param" id="rotation">
@@ -107,17 +111,12 @@
                         <option value="12">12</option>
                     </select>
                     
-                    
-                    <div>hidden:</div> 
-                    <div class="param" id="hidden"></div>
-                    
                     <div>function:</div> 
                     <div class="param" id="func"></div>
                     
                     <div>params:</div> 
                     <div class="param" id="params"></div>
-                </di
-                v>
+                </div>
             </div>
         </section>
     </main>
