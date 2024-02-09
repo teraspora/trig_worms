@@ -503,7 +503,7 @@ class ShapeScene extends Scene2d {
                 shape.draw(this.ctx, 0, 0, curve.colour, this.progress);
                 this.ctx.restore();
             }
-            osc.frequency.value = (1 - position_aggregate / 2 / this.height) * 385 + 55;
+            osc.frequency.value = this.height - y + 55;   //((1 - y) / this.height) * 385 + 55;
         }
         if (!this.paused) {
             requestAnimationFrame(this.update.bind(this));
