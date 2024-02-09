@@ -133,17 +133,15 @@ class Scene2d extends Scene {
 }
 
 class ShapeScene extends Scene2d {
-    constructor(canvas, curves, controls) {
+    constructor(canvas, curves) {
         super(canvas);
         
-        // Colours
-        this.colours = [
-            '#ff9200', '#ff0049', '#0051ff', '#00c6ab',
-            '#ea13bc', '#ff6e98', '#001dfb', '#ff9200', '#ff2592', '#ac29ff',
-            '#f04', '#006fff', '#00f1e1', '#ffca00', '#c221b7',
-            '#0091f4', '#6e91ff', '#0459e2', '#00f1e1'
-        ];
-        
+        // Global effects
+        this.ctx.shadowOffsetX = 5;
+        this.ctx.shadowOffsetY = 3;
+        this.ctx.shadowBlur = 5;
+        this.ctx.shadowColor = '#101';
+                
         // Curves
         this.curves = curves;
         this.curve_names = Object.keys(this.curves);
@@ -156,14 +154,7 @@ class ShapeScene extends Scene2d {
             this.curves[curve].rotation = ++i;
         }
         
-        // Global effects
-        this.ctx.shadowOffsetX = 5;
-        this.ctx.shadowOffsetY = 3;
-        this.ctx.shadowBlur = 5;
-        this.ctx.shadowColor = '#101';
-        
         // UI Controls
-        this.controls = controls;
         this.#create_curve_checkboxes();
         this.#create_params_section();
 
@@ -271,6 +262,10 @@ class ShapeScene extends Scene2d {
         curve_select.value = this.current_curve.name;
         curve_select.style.color = this.current_curve.colour;
         const param_elements = [...document.getElementsByClassName('param')];
+        // Hide hub setting for plain polygons
+        [...document.getElementsByClassName('hub-ui')].forEach(el => {
+            this.current_curve.shape.type == 'Polygon' ? el.classList.add('hidden') : el.classList.remove('hidden');
+        });
         param_elements.forEach(param => {
             switch(param.id) {
                 case 'shape':
@@ -326,6 +321,13 @@ class ShapeScene extends Scene2d {
             this.#update_parameter_display();
             event.target.blur();
         });
+        // Hide hub setting for plain polygons
+        if (this.current_curve.shape.type == 'Polygon') {
+            [...document.getElementsByClassName('hub-ui')].forEach(el => {
+                el.classList.add('hidden');
+            });
+        }
+
         param_details.addEventListener('change', event => {
             const param = event.target.id;
             let value;
@@ -390,6 +392,7 @@ class ShapeScene extends Scene2d {
                 default:
                     break;
             }
+            this.#update_parameter_display();
         });
         this.#update_parameter_display();
     }
@@ -450,6 +453,7 @@ class ShapeScene extends Scene2d {
 
 class Shape {
     constructor(outline, thickness) {
+        this.type = this.constructor.name;
         this.outline = outline;
         this.thickness = thickness;
         this.hidden = false;
@@ -543,7 +547,7 @@ function init() {
     
     canvas.width = Math.floor(main_width - 200);
     canvas.height = main_height;
-    const scene = new ShapeScene(canvas, Curves, controls);
+    const scene = new ShapeScene(canvas, Curves);
     scenes.push(scene);
     scene.render();
 }
@@ -566,13 +570,10 @@ function oscillate() {
 
 // Main code
 const main = document.getElementById('main');
-const controls = document.querySelector('section#controls');
 const help = document.querySelector('aside#help');
 const canvas = document.querySelector('canvas');
 const param_details = document.querySelector('#params-wrapper > #details');
 let scenes = [];
-// Set up controls
-
 
 document.querySelector('aside#help button').addEventListener('click', event => {
     event.target.parentElement.style.display = 'none';
