@@ -11,6 +11,11 @@ html, body, * {
     --border-grey: #7a7265;
 }
 
+a {
+    text-decoration: none;
+    background-color: inherit;
+}
+
 main#main {
     display: grid;
     grid-template-columns: 6fr 1fr;
@@ -177,6 +182,7 @@ select, select > option {
     padding-left: 1vw;
     margin-left: 1vw;
     margin-top: 1vh;
+    cursor: pointer;
 }
 
 #details {

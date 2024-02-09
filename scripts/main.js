@@ -39,7 +39,7 @@ const Curves = {
         },
         params: [-37, -31],
         speed: 0.1,
-        hidden: false
+        hidden: true
     },
 
 
@@ -58,8 +58,8 @@ const Curves = {
     },
 
 
-    unknown: {
-        name: 'unknown',
+    curious: {
+        name: 'curious',
         func: (a, b, c, d, e, f, g, t) => {
             const t_ = t / 10;
             return [
@@ -69,7 +69,7 @@ const Curves = {
         },
         params: [27, 291, 77338, 5, 400, 512, 2239],
         speed: 0.02,
-        hidden: false
+        hidden: true
     },
 
 
@@ -83,7 +83,7 @@ const Curves = {
         },
         params: [31, 41],
         speed: 0.002,
-        hidden: false
+        hidden: true
     },
 
     ellipse: {
@@ -160,7 +160,37 @@ class ShapeScene extends Scene2d {
 
         // Buttons
         [...document.querySelectorAll('#buttons>button')].forEach(button => {
-            
+            button.addEventListener('click', event => {
+                switch(event.target.id) {
+                    case 'pause':
+                        // Toggle play/pause
+                        this.paused = !this.paused;
+                        if (!this.paused) {
+                            requestAnimationFrame(this.update.bind(this));
+                        }
+                        break;
+                    case 'clear':
+                        // Clear drawing
+                        this.ctx.clearRect(0, 0, this.width, this.height);
+                        this.progress = 0;
+                        break;
+                    case 'init':
+                        location.reload();
+                        break;
+                    case 'speed':
+                        break;
+                    case 'shadow-blur':
+                        break;
+                    case 'shadow-colour':
+                        break;
+                    case 'github':
+                        break;
+                    case 'ZU':
+                        break;
+                    case 'IO':
+                        break;            
+                }
+            });
         });
         
         window.addEventListener('keyup', event => {
@@ -316,7 +346,11 @@ class ShapeScene extends Scene2d {
         curve_select.style.color = this.current_curve.colour;
         curve_select.addEventListener('change', event => {
             this.current_curve = this.curves[event.target.value];
-            this.current_curve.hidden = false;
+            if (this.current_curve.hidden) {
+                this.current_curve.hidden = false;
+                document.querySelector(`section#controls > #curves > fieldset ${curve_name}-label`).checked = true;
+                this.#update_parameter_display();
+            }
             event.target.style.color = this.current_curve.colour;
             this.#update_parameter_display();
             event.target.blur();
