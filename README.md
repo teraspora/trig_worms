@@ -21,7 +21,7 @@ Do please try it out at <https://teraspora.github.io/trig_worms/>, but don't com
 
 ## TODO:
 
-- Fix bug where selecting a hidden curve messes the show/hide colours
+- Fix bug where selecting a hidden curve messes the show/hide colours and that messes the active curve
 - Fix UI colours not updating properly in some cases    - **DONE!**
 - Fix **Github**, **ZU** & **IO** button links          - **DONE!**
 - Update **Pause** to **Play** when paused              - **DONE!**

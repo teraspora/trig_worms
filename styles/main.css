@@ -64,6 +64,7 @@ input[type=checkbox].curve-check {
 #buttons>button {
     font-size: 0.8vw;
     font-weight: bold;
+    height: 4vh;
 }
 
 #buttons>button#pause {
@@ -208,6 +209,10 @@ select, select > option {
     margin: 0.1vw;
     color: var(--plain-text-col);
     font-size: 0.7vw;
+}
+
+div.radius-ui {
+    font-size: 0.8vw;
 }
 
 .hidden {

@@ -2,17 +2,6 @@
 // John Lynch - January 2024
 
 const Curves = {
-    rhodonea: {
-        name: 'rhodonea',
-        func: (k, t) => [
-            Math.cos(k * t + t) * Math.cos(t),
-            Math.cos(k * t + t) * Math.sin(t),
-        ],
-        params: [27 / 11],
-        speed: 0.02,
-        hidden: false
-    },
-
     hypocycloid: {
         name: 'hypocycloid',
         func: (a, b, t) => {
@@ -25,6 +14,57 @@ const Curves = {
         },
         params: [39.5, 37],
         speed: 0.3,
+        hidden: false
+    },
+
+    lissajous: {
+        name: 'lissajous',
+        func: (kx, ky, t) => {
+            return [
+                Math.cos(kx * t),
+                Math.sin(ky * t)
+            ]
+        },
+        params: [5, 11],
+        speed: 0.02,
+        hidden: false
+    },
+
+    hypotrochoid: {
+        name: 'hypotrochoid',
+        func: (R, r, d, t) => {
+            return [
+                ((R - r) * Math.cos(t) + d * Math.cos((R - r) / r * t)) / (R - r + d),
+                ((R - r) * Math.sin(t) - d * Math.sin((R - r) / r * t)) / (R - r + d)
+            ]
+        },
+        params: [13, 11, 1],
+        speed: 0.1,
+        hidden: false
+    },
+
+    astroid: {
+        name: 'astroid',
+        func: (a, t) => {
+            const [c, s] = [Math.cos(t) , Math.sin(t)];
+            return [
+                a * c * c * c,
+                a * s * s * s
+            ]
+        },
+        params: [1],
+        speed: 0.03,
+        hidden: true
+    },
+
+    rhodonea: {
+        name: 'rhodonea',
+        func: (k, t) => [
+            Math.cos(k * t + t) * Math.cos(t),
+            Math.cos(k * t + t) * Math.sin(t),
+        ],
+        params: [27 / 11],
+        speed: 0.02,
         hidden: false
     },
 
@@ -42,7 +82,6 @@ const Curves = {
         hidden: true
     },
 
-
     wobbly_hcrr: {
         name: 'wobbly_hcrr',
         func: (R, r, t) => {
@@ -56,7 +95,6 @@ const Curves = {
         speed: 0.1,
         hidden: false
     },
-
 
     curious: {
         name: 'curious',
@@ -72,7 +110,6 @@ const Curves = {
         hidden: true
     },
 
-
     trig_grid: {
         name: 'trig_grid',
         func: (p, q, t) => {
@@ -83,19 +120,6 @@ const Curves = {
         },
         params: [31, 41],
         speed: 0.002,
-        hidden: true
-    },
-
-    ellipse: {
-        name: 'ellipse',
-        func: (r, t) => {
-            return [
-                r * Math.cos(t),
-                r * Math.sin(t)
-            ]
-        },
-        params: [0.6],
-        speed: 0.05,
         hidden: true
     }
 };
@@ -139,7 +163,7 @@ class ShapeScene extends Scene2d {
         // Global effects
         this.ctx.shadowOffsetX = 5;
         this.ctx.shadowOffsetY = 3;
-        this.ctx.shadowBlur = 5;
+        this.ctx.shadowBlur = 3;
         this.ctx.shadowColor = '#101';
         this.volatile = false;
         this.trails = false;
@@ -467,8 +491,8 @@ class ShapeScene extends Scene2d {
     
     #transform_to_canvas([x, y]) {
         return [
-            x = (x + 1) / 2 * this.width,
-            y = (y + 1) / 2 * this.height
+            Math.floor(x = (x + 1) / 2 * this.width),
+            Math.floor(y = (y + 1) / 2 * this.height)
         ];
     }
 
@@ -496,14 +520,18 @@ class ShapeScene extends Scene2d {
             const shape = curve.shape;
             if (!curve.hidden) {
                 [x, y] = this.#transform_to_canvas(curve.func(...curve.params, this.progress * curve.speed));
-                position_aggregate +=  (y + (x / this.width)) * 0.5;
+                
+                // console.log(curve.name, x, y);
+                // position_aggregate +=  (y + (x / this.width)) * 0.5;
                 this.ctx.save();
                 this.ctx.translate(x, y);
                 this.ctx.rotate(curve.rotation * this.progress);
                 shape.draw(this.ctx, 0, 0, curve.colour, this.progress);
                 this.ctx.restore();
+                osc.frequency.value = Math.floor(this.height - y + 55);   //((1 - y) / this.height) * 385 + 55;
             }
-            osc.frequency.value = this.height - y + 55;   //((1 - y) / this.height) * 385 + 55;
+            // console.log(osc.frequency.value, curve.name, y);
+            // debugger;
         }
         if (!this.paused) {
             requestAnimationFrame(this.update.bind(this));
@@ -621,6 +649,7 @@ function oscillate() {
     const osc = audio_ctx.createOscillator();
     osc.connect(audio_ctx.destination);
     osc.frequency.value = 0;
+    osc.type = 'triangle';
     osc.status = 'initial';
     return osc;
 }
