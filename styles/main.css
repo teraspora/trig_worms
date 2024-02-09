@@ -55,7 +55,7 @@ input[type=checkbox].curve-check {
 #buttons {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr;
+    grid-template-rows: repeat(4, 1fr);
     grid-gap: 0.3vw;
     padding: 0.5vw;
 
@@ -78,20 +78,21 @@ input[type=checkbox].curve-check {
     background-color: #f04;
 }
 
-#buttons>button#speed {
+#buttons>button#volatile {
+    background-color: #ff4800;
+    font-size: 0.6vw;
+}
+
+#buttons>button#trails {
+    background-color: #33ff00;
+}
+
+#buttons>button#global {
     background-color: #00ff88;
 }
 
-#buttons>button#shadow-blur {
-    background-color: #ffe09c;
-}
-
-#buttons>button#shadow-colour {
-    background-color: #686667;
-}
-
 #buttons>button#github {
-    background-color: #6e7681;;
+    background-color: #6e7681;
 }
 
 #buttons>button#ZU {

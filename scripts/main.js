@@ -141,6 +141,8 @@ class ShapeScene extends Scene2d {
         this.ctx.shadowOffsetY = 3;
         this.ctx.shadowBlur = 5;
         this.ctx.shadowColor = '#101';
+        this.volatile = false;
+        this.trails = false;
                 
         // Curves
         this.curves = curves;
@@ -166,7 +168,11 @@ class ShapeScene extends Scene2d {
                         // Toggle play/pause
                         this.paused = !this.paused;
                         if (!this.paused) {
+                            event.target.textContent = 'Pause';
                             requestAnimationFrame(this.update.bind(this));
+                        }
+                        else {
+                            event.target.textContent = 'Play';
                         }
                         break;
                     case 'clear':
@@ -179,16 +185,23 @@ class ShapeScene extends Scene2d {
                         break;
                     case 'speed':
                         break;
-                    case 'shadow-blur':
-                        break;
-                    case 'shadow-colour':
-                        break;
                     case 'github':
                         break;
                     case 'ZU':
                         break;
                     case 'IO':
-                        break;            
+                        break;
+                    case 'volatile':
+                        // Toggle volatile/persistent
+                        this.volatile = !this.volatile;
+                        event.target.textContent = this.volatile ? 'Persistent' : 'Volatile';
+                        document.querySelector('#buttons>button#trails').disabled = !this.volatile;
+                        break;
+                    case 'trails':
+                        this.trails = !this.trails;
+                        event.target.style.textDecoration = this.trails ? 'line-through' : 'none';
+                        break;
+                    default:
                 }
             });
         });
@@ -291,6 +304,10 @@ class ShapeScene extends Scene2d {
         const curve_select = document.querySelector('section#controls > #params-wrapper >select#curve-select');
         curve_select.value = this.current_curve.name;
         curve_select.style.color = this.current_curve.colour;
+        const curve_options = curve_select.querySelectorAll('option');
+        curve_options.forEach(option => {
+            option.style.color = this.curves[option.value].colour;            
+        });
         const param_elements = [...document.getElementsByClassName('param')];
         // Hide hub setting for plain polygons
         [...document.getElementsByClassName('hub-ui')].forEach(el => {
@@ -348,7 +365,7 @@ class ShapeScene extends Scene2d {
             this.current_curve = this.curves[event.target.value];
             if (this.current_curve.hidden) {
                 this.current_curve.hidden = false;
-                document.querySelector(`section#controls > #curves > fieldset ${curve_name}-label`).checked = true;
+                document.querySelector(`section#controls > #curves > fieldset input[name="hcrr"]`).checked = true;
                 this.#update_parameter_display();
             }
             event.target.style.color = this.current_curve.colour;
@@ -464,6 +481,15 @@ class ShapeScene extends Scene2d {
 
     update() {
         super.update();
+        if (this.volatile) {
+            if (!this.trails) {            
+            this.ctx.clearRect(0, 0, this.width, this.height);
+            }
+            else {
+                this.ctx.fillStyle = 'hsl(0 100% 0% / 5%)';
+                this.ctx.fillRect(0, 0, this.width, this.height);
+            }
+        }
         let x, y, position_aggregate = 0;
         for (let i = 0; i < this.curve_names.length; i++) {
             const curve = this.curves[this.curve_names[i]];
