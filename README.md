@@ -18,3 +18,25 @@ In the meantime here are a couple of screenshots:
 
 
 Do please try it out at <https://teraspora.github.io/trig_worms/>, but don't complain or file issues at this point!   And don't expect it to work on mobile:  that's not a priority at the moment, large screens are the target.   If it crashes your browser, sorry, tough!
+
+## TODO:
+
+- Fix UI colours not updating properly in some cases
+- Fix **Github**, **ZU** & **IO** button links
+- Update **Pause** to **Play** when paused
+- Curve show/hide styling - put checkboxes on LHS
+- Keyboard shortcuts
+- Update this `README` with full documentation
+- Fix `init()`  multiplying scenes
+- Allow user to vary curve parameters
+- Allow user to specify own functions
+- Button to remove persistence by calling `clearRect()` every frame
+- Option to clear to a given opacity
+- Bubbles
+- Other browsers
+- Mobile
+- Multiple canvases
+- Refactor:
+  - Organise inputs better
+  - Use web components
+- Mutate using shader
