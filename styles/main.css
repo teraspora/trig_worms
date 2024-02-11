@@ -41,6 +41,7 @@ canvas, #controls, #curves, #params-wrapper, #buttons {
     align-content: stretch;
     color: var(--plain-text-col);
     text-transform: capitalize;
+    overflow-y: auto;
 }
 
 #controls > h1 {

@@ -2,18 +2,43 @@
 // John Lynch - January 2024
 
 const Curves = {
-    hypocycloid: {
-        name: 'hypocycloid',
-        func: (a, b, t) => {
-            const r = a - b;
-            const p = r / b;
+
+    epitrochoid: {
+        name: 'epitrochoid',
+        func: (a, b, c, t) => {
             return [
-                (r * Math.cos(t) + b * Math.cos(p * t)) / a,
-                (r * Math.sin(t) - b * Math.sin(p * t)) / a
-            ]
+                ((a + b) * Math.cos(t) - c * Math.cos((a / b + 1) * t)) / (a + b + c),
+                ((a + b) * Math.sin(t) - c * Math.sin((a / b + 1) * t)) / (a + b + c),
+            ];
         },
-        params: [39.5, 37],
-        speed: 0.3,
+        params: [5, 13, 7],
+        speed: 0.1,
+        hidden: false
+    },
+
+    ovaloopy: {
+        name: 'ovaloopy',
+        func: (a, b, t) => {
+            return [
+                (Math.sin(a * t) * Math.cos(b * t)),
+                (Math.cos(a * t) / (y = Math.sin(b * t)) ? y : 0.00000000000000000001),
+            ];
+        },
+        params: [5, 7],
+        speed: 0.01,
+        hidden: false
+    },
+
+    n_folium: {
+        name: 'n_folium',
+        func: (a, b, t) => {
+            return [
+                (Math.sin(a * t) + Math.sin(b * t)) / 2,
+                (Math.cos(a * t) - Math.cos(b * t)) / 2,
+            ];
+        },
+        params: [7, 5],
+        speed: 0.02,
         hidden: false
     },
 
@@ -23,38 +48,11 @@ const Curves = {
             return [
                 Math.cos(kx * t),
                 Math.sin(ky * t)
-            ]
+            ];
         },
         params: [5, 11],
         speed: 0.02,
         hidden: false
-    },
-
-    hypotrochoid: {
-        name: 'hypotrochoid',
-        func: (R, r, d, t) => {
-            return [
-                ((R - r) * Math.cos(t) + d * Math.cos((R - r) / r * t)) / (R - r + d),
-                ((R - r) * Math.sin(t) - d * Math.sin((R - r) / r * t)) / (R - r + d)
-            ]
-        },
-        params: [13, 11, 1],
-        speed: 0.1,
-        hidden: false
-    },
-
-    astroid: {
-        name: 'astroid',
-        func: (a, t) => {
-            const [c, s] = [Math.cos(t) , Math.sin(t)];
-            return [
-                a * c * c * c,
-                a * s * s * s
-            ]
-        },
-        params: [1],
-        speed: 0.03,
-        hidden: true
     },
 
     rhodonea: {
@@ -65,34 +63,6 @@ const Curves = {
         ],
         params: [27 / 11],
         speed: 0.02,
-        hidden: false
-    },
-
-    hcrr: {
-        name: 'hcrr',
-        func: (R, r, t) => {
-            const s = R - r;
-            return [
-                (s * Math.cos(t) + r * Math.cos(s / r * t)) / R,
-                (s * Math.sin(t) - r * Math.sin(s / r * t)) / R
-            ]
-        },
-        params: [-37, -31],
-        speed: 0.1,
-        hidden: true
-    },
-
-    wobbly_hcrr: {
-        name: 'wobbly_hcrr',
-        func: (R, r, t) => {
-            const s = R - r;
-            return [
-                (s * Math.cos(t) + r * Math.cos(s / r * t)) / R + 0.05 * Math.sin(t * 10),
-                (s * Math.sin(t) - r * Math.sin(s / r * t)) / R
-            ]
-        },
-        params: [-47, -29],
-        speed: 0.1,
         hidden: false
     },
 
@@ -107,6 +77,167 @@ const Curves = {
         },
         params: [27, 291, 77338, 5, 400, 512, 2239],
         speed: 0.02,
+        hidden: false
+    },
+
+    hypotrochoid: {
+        name: 'hypotrochoid',
+        func: (R, r, d, t) => {
+            return [
+                ((R - r) * Math.cos(t) + d * Math.cos((R - r) / r * t)) / (R - r + d),
+                ((R - r) * Math.sin(t) - d * Math.sin((R - r) / r * t)) / (R - r + d)
+            ];
+        },
+        params: [13, 11, 1],
+        speed: 0.1,
+        hidden: true
+    },
+
+    hypocycloid: {
+        name: 'hypocycloid',
+        func: (a, b, t) => {
+            const r = a - b;
+            const p = r / b;
+            return [
+                (r * Math.cos(t) + b * Math.cos(p * t)) / a,
+                (r * Math.sin(t) - b * Math.sin(p * t)) / a
+            ];
+        },
+        params: [39.5, 37],
+        speed: 0.3,
+        hidden: true
+    },
+
+    astroid: {
+        name: 'astroid',
+        func: (a, t) => {
+            const [c, s] = [Math.cos(t) , Math.sin(t)];
+            return [
+                a * c * c * c,
+                a * s * s * s
+            ];
+        },
+        params: [1],
+        speed: 0.03,
+        hidden: true
+    },
+
+    hcrr: {
+        name: 'hcrr',
+        func: (R, r, t) => {
+            const s = R - r;
+            return [
+                (s * Math.cos(t) + r * Math.cos(s / r * t)) / R,
+                (s * Math.sin(t) - r * Math.sin(s / r * t)) / R
+            ];
+        },
+        params: [-37, -31],
+        speed: 0.1,
+        hidden: true
+    },
+
+    wobbly_hcrr: {
+        name: 'wobbly_hcrr',
+        func: (R, r, t) => {
+            const s = R - r;
+            return [
+                (s * Math.cos(t) + r * Math.cos(s / r * t)) / R + 0.05 * Math.sin(t * 10),
+                (s * Math.sin(t) - r * Math.sin(s / r * t)) / R
+            ];
+        },
+        params: [-47, -29],
+        speed: 0.1,
+        hidden: true
+    },
+
+    wacky_cos: {
+        name: 'wacky_cos',
+        func: (a, b, t) => {
+            return [
+                (Math.cos(a * t) + Math.cos(b * t)) / 2,
+                (Math.cos(a * t) - Math.cos(b * t)) / 2,
+            ];
+        },
+        params: [9, 7],
+        speed: 0.02,
+        hidden: true
+    },
+
+    wacky_sin: {
+        name: 'wacky_sin',
+        func: (a, b, t) => {
+            return [
+                (Math.sin(a * t) + Math.sin(b * t)) / 2,
+                (Math.sin(a * t) - Math.sin(b * t)) / 2,
+            ];
+        },
+        params: [5, 9],
+        speed: 0.02,
+        hidden: true
+    },
+
+    loopy: {
+        name: 'loopy',
+        func: (a, b, t) => {
+            return [
+                (Math.sin(a * t) + Math.cos(b * t)) / 2,
+                (Math.cos(a * t) - Math.sin(b * t)) / 2,
+            ];
+        },
+        params: [13, 17],
+        speed: 0.04,
+        hidden: true
+    },
+
+    fiveam: {
+        name: 'fiveam',
+        func: (a, b, t) => {
+            return [
+                (Math.sin(a * Math.atan2(t, Math.cos(t)))),
+                (Math.cos(b * Math.atan2(t, Math.sin(t)))),
+            ];
+        },
+        params: [12, 17],
+        speed: 0.01,
+        hidden: true
+    },
+
+    convoluted: {
+        name: 'convoluted',
+        func: (a, b, t) => {
+            return [
+                (Math.sin(a * Math.cos(t)) + Math.cos(b * Math.sin(t))) / 2,
+                (Math.cos(a * Math.sin(t)) - Math.sin(b * Math.cos(t))) / 2,
+            ];
+        },
+        params: [137, 19],
+        speed: 0.001,
+        hidden: true
+    },
+
+    otter: {
+        name: 'otter',
+        func: (a, b, t) => {
+            return [
+                (Math.sin(a * t) * Math.cos(b * t)),
+                (Math.cos(a * t) / (y = Math.sin(b * t)) ? y : 0.00000000000000000001),
+            ];
+        },
+        params: [5, 1],
+        speed: 0.03,
+        hidden: true
+    },
+
+    dormouse: {
+        name: 'dormouse',
+        func: (a, b, t) => {
+            return [
+                (Math.sin(a * Math.cos(t)) + Math.cos(b * Math.sin(t))) / 2,
+                (Math.cos(a * Math.sin(t)) - Math.sin(b * Math.cos(t))) / 2,
+            ];
+        },
+        params: [12, 17],
+        speed: 0.04,
         hidden: true
     },
 
@@ -116,10 +247,10 @@ const Curves = {
             return [            
                 Math.sin(p * Math.PI * t / 10),
                 Math.cos(q * Math.PI * t / 10)
-            ]
+            ];
         },
-        params: [31, 41],
-        speed: 0.002,
+        params: [13, 19],
+        speed: 0.004,
         hidden: true
     }
 };
@@ -178,6 +309,19 @@ class ShapeScene extends Scene2d {
             this.curves[curve].colour = this.curves[curve].default_colour;
             this.curves[curve].shape = this.#get_random_shape();
             this.curves[curve].rotation = ++i;
+            if (DEBUG) {
+                if (i != 1) {
+                    this.curves[curve].hidden = true;
+                }
+                else {
+                    this.curves[curve].shape.radius = 8;
+                    if (this.curves[curve].shape.type == 'Star') {
+                        this.curves[curve].shape.hub = 4;
+                    }
+                    this.curves[curve].colour = 'hsl(20 100% 50%)';
+                    this.curves[curve].rotation = 1;
+                }
+            }
         }
         
         // UI Controls
@@ -311,14 +455,17 @@ class ShapeScene extends Scene2d {
                 if (curve.hidden && curve == this.current_curve) {
                     if (active_curves.length) {
                         this.current_curve = active_curves[0];
-                        this.#update_parameter_display();
+                    }
+                    else {
+                        this.current_curve = this.curves[this.curve_names[0]];
                     }
                 }
                 // Or if user unhides a curve when all curves are hidden, then this is the only active one, so set it as the current curve
-                else if (!curve.hidden && !active_curves.length) {
+                else if (!curve.hidden && active_curves.length == 1) {
                     this.current_curve = curve;
                 }
                 // else... hmmm, if we set it to null, we'll have to include that value in the select...
+                this.#update_parameter_display();
             });
             checkboxes.push(input);
         }
@@ -514,15 +661,11 @@ class ShapeScene extends Scene2d {
                 this.ctx.fillRect(0, 0, this.width, this.height);
             }
         }
-        let x, y, position_aggregate = 0;
         for (let i = 0; i < this.curve_names.length; i++) {
             const curve = this.curves[this.curve_names[i]];
             const shape = curve.shape;
             if (!curve.hidden) {
-                [x, y] = this.#transform_to_canvas(curve.func(...curve.params, this.progress * curve.speed));
-                
-                // console.log(curve.name, x, y);
-                // position_aggregate +=  (y + (x / this.width)) * 0.5;
+                const [x, y] = this.#transform_to_canvas(curve.func(...curve.params, this.progress * curve.speed));
                 this.ctx.save();
                 this.ctx.translate(x, y);
                 this.ctx.rotate(curve.rotation * this.progress);
@@ -530,8 +673,6 @@ class ShapeScene extends Scene2d {
                 this.ctx.restore();
                 osc.frequency.value = Math.floor(this.height - y + 55);   //((1 - y) / this.height) * 385 + 55;
             }
-            // console.log(osc.frequency.value, curve.name, y);
-            // debugger;
         }
         if (!this.paused) {
             requestAnimationFrame(this.update.bind(this));
@@ -616,7 +757,7 @@ class Star extends Shape {
             ctx.fill();
         }
         else {
-            ctx.fillStyle = `hsl(${Math.sin(progress / 16) * 90 + 270 + this.order * this.radius} 100% 50%)`
+            ctx.fillStyle = `hsl(${Math.sin(progress / (this.order * this.radius / 4)) * 90 + 270} 100% 50%)`
             ctx.fill();
         }
         ctx.restore();
@@ -658,6 +799,7 @@ function oscillate() {
 // ============================
 
 // Main code
+DEBUG = false;
 const main = document.getElementById('main');
 const help = document.querySelector('aside#help');
 const canvas = document.querySelector('canvas');
