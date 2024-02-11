@@ -460,8 +460,8 @@ class ShapeScene extends Scene2d {
                         this.current_curve = this.curves[this.curve_names[0]];
                     }
                 }
-                // Or if user unhides a curve when all curves are hidden, then this is the only active one, so set it as the current curve
-                else if (!curve.hidden && active_curves.length == 1) {
+                // Set the newly-unhidden curve to be the current curve
+                else if (!curve.hidden) {
                     this.current_curve = curve;
                 }
                 // else... hmmm, if we set it to null, we'll have to include that value in the select...
