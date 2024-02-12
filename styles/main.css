@@ -31,7 +31,7 @@ main#main {
 canvas, #controls, #curves, #params-wrapper, #buttons {
     border: 1px ridge var(--border-grey);
     margin: 0.5vw;
-    background-color: #000;
+    background-color: #000000;
 }
 
 #controls {
@@ -80,7 +80,7 @@ input[type=checkbox].curve-check {
     background-color: #f04;
 }
 
-#buttons>button#volatile {
+#buttons>button#chromute {
     background-color: #ff4800;
     font-size: 0.6vw;
 }

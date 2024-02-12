@@ -307,11 +307,43 @@ class ShapeScene extends Scene2d {
         super(canvas);
         
         // Global effects
-        this.ctx.shadowOffsetX = 5;
-        this.ctx.shadowOffsetY = 3;
-        this.ctx.shadowBlur = 3;
-        this.ctx.shadowColor = '#101';
-        this.volatile = false;
+        this.ctx.shadowOffsetX = 2;
+        this.ctx.shadowOffsetY = 2;
+        this.ctx.shadowBlur = 8;
+        this.ctx.shadowColor = '#000';
+
+        // CanvasRenderingContext2D: globalCompositeOperation property
+        // see https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation
+        const gco_values = {
+            0: 'source-over',
+            1: 'source-in',
+            2: 'source-out',
+            3: 'source-atop',
+            4: 'destination-over',
+            5: 'destination-in',
+            6: 'destination-out',
+            7: 'destination-atop',
+            8: 'lighter',
+            9: 'copy',
+            10:'xor',
+            11:'multiply',
+            12:'screen',
+            13:'overlay',
+            14:'darken',
+            15:'lighten',
+            16:'color-dodge',
+            17:'color-burn',
+            18:'hard-light',
+            19:'soft-light',
+            20:'difference',
+            21:'exclusion',
+            22:'hue',
+            23:'saturation',
+            24:'color',
+            25:'luminosity'
+        };
+        const gco_type = 0;
+        this.ctx.globalCompositeOperation = gco_values[gco_type];
         this.trails = false;
                 
         // Curves
@@ -323,7 +355,8 @@ class ShapeScene extends Scene2d {
             this.curves[curve].default_colour = this.#get_random_colour();
             this.curves[curve].colour = this.curves[curve].default_colour;
             this.curves[curve].shape = this.#get_random_shape();
-            this.curves[curve].rotation = ++i;
+            this.rotations = [...document.querySelector('select.param#rotation').options].map(option => Number(option.value));
+            this.curves[curve].rotation = this.rotations[rand_int(this.rotations.length)];
             this.curves[curve].seed = Math.random() * 64;
             if (DEBUG) {
                 if (i != 1) {
@@ -331,7 +364,7 @@ class ShapeScene extends Scene2d {
                 }
                 else {
                     this.curves[curve].shape.radius = 8;
-                    if (this.curves[curve].shape.type == 'Star') {
+                    if (this.current_curve.shape instanceof HubbedShape) {
                         this.curves[curve].shape.hub = 4;
                     }
                     this.curves[curve].colour = 'hsl(20 100% 50%)';
@@ -375,11 +408,10 @@ class ShapeScene extends Scene2d {
                         break;
                     case 'IO':
                         break;
-                    case 'volatile':
-                        // Toggle volatile/persistent
-                        this.volatile = !this.volatile;
-                        event.target.textContent = this.volatile ? 'Persistent' : 'Volatile';
-                        document.querySelector('#buttons>button#trails').disabled = !this.volatile;
+                    case 'chromute':
+                        // Toggle Chromute/Plain
+                        this.current_curve.colour = this.current_curve.colour ? null : this.current_curve.default_colour;
+                        event.target.textContent = this.current_curve.colour ? 'Chromute' : 'Plain';
                         break;
                     case 'trails':
                         this.trails = !this.trails;
@@ -396,7 +428,9 @@ class ShapeScene extends Scene2d {
                 const digit = char.match(/\d/)?.input;
                 if (digit) {
                     // Set number of sides or points (0 - 9)
-                    this.shape.order = digit;
+                    if (this.current_curve.shape?.order) {
+                        this.current_curve.shape.order = digit;
+                    }
                 }
                 else {
                     switch(char) {
@@ -438,6 +472,7 @@ class ShapeScene extends Scene2d {
                         default:
                     }
                 }
+                this.#update_parameter_display();
             }
         });
     }
@@ -496,9 +531,17 @@ class ShapeScene extends Scene2d {
             option.style.color = this.curves[option.value].colour;            
         });
         const param_elements = [...document.getElementsByClassName('param')];
-        // Hide hub setting for plain polygons
+        // Hide hub setting for non-hubbed shapes (like polygons)
         [...document.getElementsByClassName('hub-ui')].forEach(el => {
-            this.current_curve.shape.type == 'Polygon' ? el.classList.add('hidden') : el.classList.remove('hidden');
+            this.current_curve.shape instanceof HubbedShape ? el.classList.remove('hidden') : el.classList.add('hidden');
+        });
+        // Hide order setting for rings
+        [...document.getElementsByClassName('order-ui')].forEach(el => {
+            this.current_curve.shape instanceof Ring ? el.classList.add('hidden') : el.classList.remove('hidden');
+        });
+        // Hide eccentricity setting for non-rings
+        [...document.getElementsByClassName('eccentricity-ui')].forEach(el => {
+            this.current_curve.shape instanceof Ring ? el.classList.remove('hidden') : el.classList.add('hidden');
         });
         param_elements.forEach(param => {
             switch(param.id) {
@@ -507,6 +550,9 @@ class ShapeScene extends Scene2d {
                     break;
                 case 'order':
                     param.value = this.current_curve.shape.order;
+                    break;
+                case 'eccentricity':
+                    param.value = this.current_curve.shape.eccentricity;
                     break;
                 case 'speed':
                     param.value = this.current_curve.speed;
@@ -552,7 +598,7 @@ class ShapeScene extends Scene2d {
             this.current_curve = this.curves[event.target.value];
             if (this.current_curve.hidden) {
                 this.current_curve.hidden = false;
-                document.querySelector(`section#controls > #curves > fieldset input[name="hcrr"]`).checked = true;
+                // document.querySelector(`section#controls > #curves > fieldset input[name="hcrr"]`).checked = true;
                 this.#update_parameter_display();
             }
             event.target.style.color = this.current_curve.colour;
@@ -575,7 +621,7 @@ class ShapeScene extends Scene2d {
                     switch (value) {
                         case 'Star':
                             this.current_curve.shape = new Star(
-                                this.current_curve.shape.order, 
+                                this.current_curve.shape.order ?? 5, 
                                 this.current_curve.shape.radius, 
                                 Math.floor(this.current_curve.shape.radius / 4),
                                 '#111',
@@ -584,8 +630,17 @@ class ShapeScene extends Scene2d {
                             break;
                         case 'Polygon':
                             this.current_curve.shape = new Polygon(
-                                this.current_curve.shape.order, 
+                                this.current_curve.shape.order ?? 5, 
                                 this.current_curve.shape.radius,
+                                '#111',
+                                2
+                            );
+                            break;
+                        case 'Ring':
+                            this.current_curve.shape = new Ring(
+                                rand_int(6) / 5,    // eccentricity
+                                this.current_curve.shape.radius,
+                                Math.floor(this.current_curve.shape.radius / 4),
                                 '#111',
                                 2
                             );
@@ -597,6 +652,10 @@ class ShapeScene extends Scene2d {
                 case 'order':
                     value = event.target.selectedOptions[0].value;
                     this.current_curve.shape.order = Number(value);
+                    break;
+                case 'eccentricity':
+                    value = event.target.selectedOptions[0].value;
+                    this.current_curve.shape.eccentricity = Number(value);
                     break;
                 case 'speed':
                     value = event.target.selectedOptions[0].value;
@@ -644,13 +703,18 @@ class ShapeScene extends Scene2d {
         return hsl_colour.split(' ')[0].split('(')[1];
     }
 
-    #get_random_shape(type) {
-        if (!['Star', 'Polygon'].includes(type)) {
-            type = Math.random() < 0.5 ? 'Star' : 'Polygon';
+    #get_random_shape() {
+        const shapes = ['Star', 'Polygon', 'Ring'];
+        switch(rand_int(shapes.length)) {
+            case 0:
+                return new Star(rand_in_range(3, 9), rand_in_range(6, 36), rand_in_range(1, 16), '#111', 2);
+            case 1:
+                return new Polygon(rand_in_range(3, 9), rand_in_range(6, 64), '#111', 4);
+            case 2:
+            default:
+                const r = rand_in_range(8, 40);
+                return new Ring(rand_int(6) / 5, r, Math.floor(r / 4), '#111', 4);
         }
-        return type == 'Star'
-            ? new Star(rand_in_range(3, 9), rand_in_range(6, 36), rand_in_range(1, 16), '#111', 2)
-            : new Polygon(rand_in_range(3, 9), rand_in_range(6, 64), '#111', 4);
     }
     
     #transform_to_canvas([x, y]) {
@@ -674,7 +738,7 @@ class ShapeScene extends Scene2d {
             this.ctx.clearRect(0, 0, this.width, this.height);
             }
             else {
-                this.ctx.fillStyle = 'hsl(0 100% 0% / 5%)';
+                this.ctx.fillStyle = 'hsl(0 100% 0% / 1%)';
                 this.ctx.fillRect(0, 0, this.width, this.height);
             }
         }
@@ -688,7 +752,6 @@ class ShapeScene extends Scene2d {
                 this.ctx.rotate(curve.rotation * this.progress);
                 shape.draw(this.ctx, 0, 0, curve.colour, this.progress);
                 this.ctx.restore();
-                osc.frequency.value = Math.floor(this.height - y + 55);   //((1 - y) / this.height) * 385 + 55;
             }
         }
         if (!this.paused) {
@@ -742,40 +805,70 @@ class Polygon extends Shape {
     }
 }
 
-class Star extends Shape {
+class HubbedShape extends Shape {
+    // Meant to be an abstract class, don't instantiate!
     static instance_count = 0;
-    constructor(order, radius_outer, radius_inner, outline, thickness) {
+    constructor(radius_outer, radius_inner, outline, thickness) {
         super(outline, thickness);
-        this.id = Star.instance_count++;
-        this.order = order;
         this.radius = radius_outer;
         this.hub = radius_inner;
     }
+}
+
+class Ring extends HubbedShape {
+    static instance_count = 0;
+    constructor(eccentricity, radius_outer, radius_inner, outline, thickness) {
+        super(radius_outer, radius_inner, outline, thickness);
+        this.id = Ring.instance_count++;
+        this.eccentricity = eccentricity;
+    }
+    draw(ctx, x, y, colour, progress) {
+        ctx.fillStyle = colour ?? `hsl(${Math.sin(progress / this.radius * (this.id + 1)) * 90 + 270} 100% 50%)`;
+        
+        ctx.beginPath();
+        ctx.ellipse(x, y, this.radius, this.radius * this.eccentricity, 0, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.fillStyle = 'hsla(0, 0%, 0%, 1)';
+        ctx.beginPath();
+        ctx.ellipse(x, y, this.hub, this.hub * this.eccentricity, 0, 0, 2 * Math.PI);
+        ctx.fill();
+    }
+}
+
+class Star extends HubbedShape {
+    static instance_count = 0;
+    constructor(order, radius_outer, radius_inner, outline, thickness) {
+        super(radius_outer, radius_inner, outline, thickness);
+        this.id = Star.instance_count++;
+        this.order = order;
+    }
     draw(ctx, x, y, colour, progress) {
         ctx.save();
-        ctx.beginPath();
-        ctx.translate(x, y);
-        ctx.moveTo(0, this.radius);
-        for (let i = 0; i < this.order; i++) {
-            ctx.lineTo(0, this.radius);
-            ctx.rotate(Math.PI / this.order);
-            ctx.lineTo(0, this.hub);
-            ctx.rotate(Math.PI / this.order);
-        }
-        ctx.closePath();
+        {
+            ctx.beginPath();
+            ctx.translate(x, y);
+            ctx.moveTo(0, this.radius);
+            for (let i = 0; i < this.order; i++) {
+                ctx.lineTo(0, this.radius);
+                ctx.rotate(Math.PI / this.order);
+                ctx.lineTo(0, this.hub);
+                ctx.rotate(Math.PI / this.order);
+            }
+            ctx.closePath();
 
-        if (this.outline) {
-            ctx.strokeStyle = this.outline;
-            ctx.lineWidth = this.thickness;
-            ctx.stroke();
-        }
-        if (colour) {
-            ctx.fillStyle = colour;
-            ctx.fill();
-        }
-        else {
-            ctx.fillStyle = `hsl(${Math.sin(progress / (this.order * this.radius / 4)) * 90 + 270} 100% 50%)`
-            ctx.fill();
+            if (this.outline) {
+                ctx.strokeStyle = this.outline;
+                ctx.lineWidth = this.thickness;
+                ctx.stroke();
+            }
+            if (colour) {
+                ctx.fillStyle = colour;
+                ctx.fill();
+            }
+            else {
+                ctx.fillStyle = `hsl(${Math.sin(progress / (this.order * this.radius / 4)) * 90 + 270} 100% 50%)`
+                ctx.fill();
+            }
         }
         ctx.restore();
     }
@@ -793,6 +886,7 @@ function init() {
     
     canvas.width = Math.floor(main_width - 200);
     canvas.height = main_height;
+    // const scene = new DesignScene(canvas);
     const scene = new ShapeScene(canvas, Curves);
     scenes.push(scene);
     scene.render();
