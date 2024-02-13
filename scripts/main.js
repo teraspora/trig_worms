@@ -4,7 +4,6 @@
 const Curves = {
 
     curious: {
-        name: 'curious',
         func: (a, b, c, d, e, f, g, t) => {
             const t_ = t / 10;
             const [ad, ae, af, ag] = [d, e, f, g].map(w => Math.abs(w));
@@ -41,7 +40,6 @@ const Curves = {
     },
 
     dormouse: {
-        name: 'dormouse',
         func: (a, b, t) => {
             return [
                 (Math.sin(a * Math.cos(t)) + Math.cos(b * Math.sin(t))) / 2,
@@ -54,7 +52,6 @@ const Curves = {
     },
 
     epitrochoid: {
-        name: 'epitrochoid',
         func: (a, b, c, t) => {
             return [
                 ((a + b) * Math.cos(t) - c * Math.cos((a / b + 1) * t)) / (Math.abs(a) + Math.abs(b) + Math.abs(c)),
@@ -67,7 +64,6 @@ const Curves = {
     },
 
     ovaloopy: {
-        name: 'ovaloopy',
         func: (a, b, t) => {
             return [
                 (Math.sin(a * t) * Math.cos(b * t)),
@@ -80,7 +76,6 @@ const Curves = {
     },
 
     n_folium: {
-        name: 'n_folium',
         func: (a, b, t) => {
             return [
                 (Math.sin(a * t) + Math.sin(b * t)) / 2,
@@ -93,7 +88,6 @@ const Curves = {
     },
 
     lissajous: {
-        name: 'lissajous',
         func: (kx, ky, t) => {
             return [
                 Math.cos(kx * t),
@@ -106,7 +100,6 @@ const Curves = {
     },
 
     rhodonea: {
-        name: 'rhodonea',
         func: (k, t) => [
             Math.cos(k * t + t) * Math.cos(t),
             Math.cos(k * t + t) * Math.sin(t),
@@ -117,7 +110,6 @@ const Curves = {
     },
 
     hypotrochoid: {
-        name: 'hypotrochoid',
         func: (R, r, d, t) => {
             return [
                 ((R - r) * Math.cos(t) + d * Math.cos((R - r) / r * t)) / (R - r + d),
@@ -130,7 +122,6 @@ const Curves = {
     },
 
     hypocycloid: {
-        name: 'hypocycloid',
         func: (a, b, t) => {
             const r = a - b;
             const p = r / b;
@@ -145,7 +136,6 @@ const Curves = {
     },
 
     convoluted: {
-        name: 'convoluted',
         func: (a, b, t) => {
             return [
                 (Math.sin(a * Math.cos(t)) + Math.cos(b * Math.sin(t))) / 2,
@@ -162,7 +152,6 @@ const Curves = {
     },
 
     trig_grid: {
-        name: 'trig_grid',
         func: (p, q, t) => {
             return [            
                 Math.sin(p * Math.PI * t / 10),
@@ -175,7 +164,6 @@ const Curves = {
     },
     
     wacky_sin: {
-        name: 'wacky_sin',
         func: (a, b, t) => {
             return [
                 (Math.sin(a * t) + Math.sin(b * t)) / 2,
@@ -188,7 +176,6 @@ const Curves = {
     },
 
     wacky_cos: {
-        name: 'wacky_cos',
         func: (a, b, t) => {
             return [
                 (Math.cos(a * t) + Math.cos(b * t)) / 2,
@@ -201,7 +188,6 @@ const Curves = {
     },
 
     what: {
-        name: 'what',
         func: (a, b, t) => {
             return [
                 (Math.sin(a * Math.cos(b * t))),
@@ -214,7 +200,6 @@ const Curves = {
     },
 
     wobbly_hcrr: {
-        name: 'wobbly_hcrr',
         func: (R, r, t) => {
             const s = R - r;
             return [
@@ -228,7 +213,6 @@ const Curves = {
     },
 
     hcrr: {
-        name: 'hcrr',
         func: (R, r, t) => {
             const s = R - r;
             return [
@@ -242,7 +226,6 @@ const Curves = {
     },
 
     astroid: {
-        name: 'astroid',
         func: (t) => {
             const [c, s] = [Math.cos(t) , Math.sin(t)];
             return [
@@ -256,7 +239,6 @@ const Curves = {
     },
 
     loopy: {
-        name: 'loopy',
         func: (a, b, t) => {
             return [
                 (Math.sin(a * t) + Math.cos(b * t)) / 2,
@@ -268,7 +250,13 @@ const Curves = {
         hidden: true
     },
 
-    };
+    init: function() {
+        Object.keys(this).forEach(key => this[key].name = key);
+        delete this.init;
+        return this;
+    }
+
+}.init();
 
 class Scene {
     static instance_count = 0;
