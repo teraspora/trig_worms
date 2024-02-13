@@ -345,7 +345,7 @@ class ShapeScene extends Scene2d {
             this.curves[curve].shape = this.#get_random_shape();
             this.rotations = [...document.querySelector('select.param#rotation').options].map(option => Number(option.value));
             this.curves[curve].rotation = this.rotations[rand_int(this.rotations.length)];
-            this.curves[curve].seed = Math.random() * 64;
+            this.curves[curve].seed = Math.random() * 4095;
             if (DEBUG) {
                 if (i != 1) {
                     this.curves[curve].hidden = true;
@@ -397,9 +397,22 @@ class ShapeScene extends Scene2d {
                     case 'IO':
                         break;
                     case 'chromute':
-                        // Toggle Chromute/Plain
+                        // Toggle multicoloured
                         this.current_curve.colour = this.current_curve.colour ? null : this.current_curve.default_colour;
-                        event.target.textContent = this.current_curve.colour ? 'Chromute' : 'Plain';
+                        document.querySelector('button#chromute').textContent = this.current_curve.colour ? 'Chromute' : 'Plain';
+                        document.querySelector(`input[name="${this.current_curve.name}"]`).style.background = 
+                            this.current_curve.colour 
+                            ? '#000' 
+                            : rg_0;
+                        const curve_option = [...document.querySelector('select#curve-select').options].filter(option => option.value == this.current_curve.name)[0];
+                        curve_option.style.backgroundColor =
+                            this.current_curve.colour 
+                            ? '#000' 
+                            : this.current_curve.default_colour;
+                        curve_option.style.Color =
+                            this.current_curve.colour 
+                            ? this.current_curve.colour
+                            : '#000';
                         break;
                     case 'trails':
                         this.trails = !this.trails;
@@ -435,6 +448,17 @@ class ShapeScene extends Scene2d {
                         case 'x':
                             // Toggle multicoloured
                             this.current_curve.colour = this.current_curve.colour ? null : this.current_curve.default_colour;
+                            document.querySelector('button#chromute').textContent = this.current_curve.colour ? 'Chromute' : 'Plain';
+                            document.querySelector(`input[name="${this.current_curve.name}"]`).style.background = 
+                                this.current_curve.colour 
+                                ? '#000' 
+                                : rg_0;
+                            const curve_option = [...document.querySelector('select#curve-select').options].filter(option => option.value == this.current_curve.name)[0];
+                            curve_option.style.backgroundColor =
+                                this.current_curve.colour   // if it's null (multicoloured) then text = black, background = default colour
+                                ? '#000' 
+                                : this.current_curve.default_colour;
+                            curve_option.style.color = this.current_curve.colour ?? '#000';
                             break;
                         case 'm':
                             // Toggle mute
@@ -594,11 +618,11 @@ class ShapeScene extends Scene2d {
             event.target.blur();
         });
         // Hide hub setting for plain polygons
-        if (this.current_curve.shape.type == 'Polygon') {
-            [...document.getElementsByClassName('hub-ui')].forEach(el => {
-                el.classList.add('hidden');
-            });
-        }
+        // if (this.current_curve.shape.type == 'Polygon') {
+        //     [...document.getElementsByClassName('hub-ui')].forEach(el => {
+        //         el.classList.add('hidden');
+        //     });
+        // }
 
         param_details.addEventListener('change', event => {
             const param = event.target.id;
@@ -688,7 +712,7 @@ class ShapeScene extends Scene2d {
     }
 
     #get_hue_from_hsl(hsl_colour) {
-        return hsl_colour.split(' ')[0].split('(')[1];
+        return hsl_colour ? hsl_colour.split(' ')[0].split('(')[1] : -1;
     }
 
     #get_random_shape() {
@@ -899,6 +923,7 @@ function oscillate() {
 
 // Main code
 DEBUG = false;
+const rg_0 = 'radial-gradient(#0000ff, #990029)';
 const main = document.getElementById('main');
 const help = document.querySelector('aside#help');
 const canvas = document.querySelector('canvas');

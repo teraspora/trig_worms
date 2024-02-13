@@ -43,3 +43,19 @@ Do please try it out at <https://teraspora.github.io/trig_worms/>, but don't com
   - Organise inputs better
   - Use web components
 - Mutate using shader
+
+## Acknowledgements
+
+- https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D
+- https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial 
+- https://bucephalus.org/text/CanvasHandbook/CanvasHandbook.html
+- https://www.youtube.com/@Frankslaboratory for inspiring me about:
+  - the OOP approach to animation;
+  - managing particles;
+  - drawing rotationally symmetrical objects by using rotation within context save/restore
+  - use of vector and scalar fields (aka 'flow fields') to influence motion
+- https://www.youtube.com/@Radu for inspiration regarding
+  - video pixel manipulation
+  - audio oscillators
+- http://buildnewgames.com/ for some interesting articles, a bit old, but much still relevant
+
