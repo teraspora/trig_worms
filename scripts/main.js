@@ -3,6 +3,18 @@
 
 const Curves = {
 
+    merlin: {
+        func: (a, b, c, d, t) => {
+            return [
+                Math.cos(a * Math.cos(b + Math.cos(t))),
+                Math.sin(c * Math.sin(d + Math.sin(t))),
+            ];
+        },
+        params: [56, 12, 76, 102],  // good use of whole space
+        speed: 0.003,
+        hidden: false
+    },
+
     curious: {
         func: (a, b, c, d, e, f, g, t) => {
             const t_ = t / 10;
@@ -46,9 +58,9 @@ const Curves = {
                 (Math.cos(a * Math.sin(t)) - Math.sin(b * Math.cos(t))) / 2,
             ];
         },
-        params: [19, 16],   // electron rings
+        params: [33, 11],   // electron rings
         speed: 0.005,
-        hidden: false
+        hidden: true
     },
 
     epitrochoid: {
@@ -60,7 +72,7 @@ const Curves = {
         },
         params: [15, 23, -8],
         speed: 0.1,
-        hidden: false
+        hidden: true
     },
 
     ovaloopy: {
@@ -106,7 +118,7 @@ const Curves = {
         ],
         params: [27 / 11],
         speed: 0.02,
-        hidden: false
+        hidden: true
     },
 
     hypotrochoid: {
@@ -148,6 +160,18 @@ const Curves = {
         // speed: 0.005,
         params: [-23, 13],  // unpredictable, all over
         speed: 0.01,
+        hidden: true
+    },
+
+    grin: {
+        func: (a, b, c, d, t) => {
+            return [
+                Math.sin(a + Math.cos(b + Math.cos(t))),
+                Math.cos(a + Math.sin(b + Math.sin(t))),
+            ];
+        },
+        params: [400, 400],   // open mouth!
+        speed: 0.1,
         hidden: true
     },
 
@@ -397,22 +421,8 @@ class ShapeScene extends Scene2d {
                     case 'IO':
                         break;
                     case 'chromute':
-                        // Toggle multicoloured
                         this.current_curve.colour = this.current_curve.colour ? null : this.current_curve.default_colour;
-                        document.querySelector('button#chromute').textContent = this.current_curve.colour ? 'Chromute' : 'Plain';
-                        document.querySelector(`input[name="${this.current_curve.name}"]`).style.background = 
-                            this.current_curve.colour 
-                            ? '#000' 
-                            : rg_0;
-                        const curve_option = [...document.querySelector('select#curve-select').options].filter(option => option.value == this.current_curve.name)[0];
-                        curve_option.style.backgroundColor =
-                            this.current_curve.colour 
-                            ? '#000' 
-                            : this.current_curve.default_colour;
-                        curve_option.style.Color =
-                            this.current_curve.colour 
-                            ? this.current_curve.colour
-                            : '#000';
+                        this.#update_current_curve_styling();
                         break;
                     case 'trails':
                         this.trails = !this.trails;
@@ -446,19 +456,8 @@ class ShapeScene extends Scene2d {
                             init();
                             break;
                         case 'x':
-                            // Toggle multicoloured
                             this.current_curve.colour = this.current_curve.colour ? null : this.current_curve.default_colour;
-                            document.querySelector('button#chromute').textContent = this.current_curve.colour ? 'Chromute' : 'Plain';
-                            document.querySelector(`input[name="${this.current_curve.name}"]`).style.background = 
-                                this.current_curve.colour 
-                                ? '#000' 
-                                : rg_0;
-                            const curve_option = [...document.querySelector('select#curve-select').options].filter(option => option.value == this.current_curve.name)[0];
-                            curve_option.style.backgroundColor =
-                                this.current_curve.colour   // if it's null (multicoloured) then text = black, background = default colour
-                                ? '#000' 
-                                : this.current_curve.default_colour;
-                            curve_option.style.color = this.current_curve.colour ?? '#000';
+                            this.#update_current_curve_styling();
                             break;
                         case 'm':
                             // Toggle mute
@@ -535,9 +534,8 @@ class ShapeScene extends Scene2d {
     }
 
     #update_parameter_display() {
+        this.#update_current_curve_styling();
         const curve_select = document.querySelector('section#controls > #params-wrapper >select#curve-select');
-        curve_select.value = this.current_curve.name;
-        curve_select.style.color = this.current_curve.colour;
         const curve_options = curve_select.querySelectorAll('option');
         curve_options.forEach(option => {
             option.style.color = this.curves[option.value].colour;            
@@ -728,6 +726,35 @@ class ShapeScene extends Scene2d {
                 return new Ring(rand_int(6) / 5, r, Math.floor(r / 4), '#111', 4);
         }
     }
+
+    #update_current_curve_styling() {
+        const chromute_button = document.querySelector('button#chromute');
+        const curve_checkbox = document.querySelector(`input[name="${this.current_curve.name}"]`);
+        const curve_label = document.querySelector(`label#${this.current_curve.name}-label`);
+        const curve_option = [...document.querySelector('select#curve-select').options].filter(option => option.value == this.current_curve.name)[0];
+        
+        chromute_button.textContent = this.current_curve.colour ? 'Chromute' : 'Plain';
+        curve_checkbox.style.background = 
+            this.current_curve.colour 
+            ? '#000' 
+            : rg_0;
+        curve_label.style.background =
+            this.current_curve.colour 
+            ? '#000' 
+            : rg_0;
+        curve_label.style.color =
+            this.current_curve.colour 
+            ? this.current_curve.colour 
+            : 'hsl(36 100% 90%)';
+        curve_option.style.backgroundColor =
+            this.current_curve.colour 
+            ? '#000' 
+            : this.current_curve.default_colour;
+        curve_option.style.Color =
+            this.current_curve.colour 
+            ? this.current_curve.colour
+            : '#000';
+    }
     
     #transform_to_canvas([x, y]) {
         return [
@@ -745,15 +772,6 @@ class ShapeScene extends Scene2d {
 
     update() {
         super.update();
-        if (this.volatile) {
-            if (!this.trails) {            
-            this.ctx.clearRect(0, 0, this.width, this.height);
-            }
-            else {
-                this.ctx.fillStyle = 'hsl(0 100% 0% / 1%)';
-                this.ctx.fillRect(0, 0, this.width, this.height);
-            }
-        }
         for (let i = 0; i < this.curve_names.length; i++) {
             const curve = this.curves[this.curve_names[i]];
             const shape = curve.shape;
