@@ -18,7 +18,7 @@ a {
 
 main#main {
     display: grid;
-    grid-template-columns: 6fr 1fr;
+    grid-template-columns: 4fr 1fr;
     grid-template-rows: 1fr;
     width: 98vw;
     height: 98vh;
