@@ -163,18 +163,6 @@ const Curves = {
         hidden: true
     },
 
-    grin: {
-        func: (a, b, c, d, t) => {
-            return [
-                Math.sin(a + Math.cos(b + Math.cos(t))),
-                Math.cos(a + Math.sin(b + Math.sin(t))),
-            ];
-        },
-        params: [400, 400],   // open mouth!
-        speed: 0.1,
-        hidden: true
-    },
-
     trig_grid: {
         func: (p, q, t) => {
             return [            
@@ -580,6 +568,16 @@ class ShapeScene extends Scene2d {
                     const pulse_output = param.previousElementSibling.firstElementChild;
                     pulse_output.value = this.current_curve.shape.pulse;
                     break;
+                case 'wave-amp':
+                    param.value = this.current_curve.shape.wave_amplitude;
+                    const wave_amp_output = param.previousElementSibling.firstElementChild;
+                    wave_amp_output.value = this.current_curve.shape.wave_amplitude;
+                    break;
+                case 'wave-freq':
+                    param.value = this.current_curve.shape.wave_frequency;
+                    const wave_freq_output = param.previousElementSibling.firstElementChild;
+                    wave_freq_output.value = this.current_curve.shape.wave_frequency;
+                    break;
                 case 'rotation':
                     param.value = this.current_curve.rotation;
                     break;
@@ -626,8 +624,10 @@ class ShapeScene extends Scene2d {
                                 this.current_curve.shape.radius, 
                                 this.current_curve.shape.hub ?? Math.floor(this.current_curve.shape.radius / 4),
                                 '#111',
-                                2,
-                                this.current_curve.shape.pulse
+                                1,
+                                this.current_curve.shape.pulse,
+                                this.current_curve.shape.wave_amplitude,
+                                this.current_curve.shape.wave_frequency
                             );
                             break;
                         case 'Polygon':
@@ -635,8 +635,10 @@ class ShapeScene extends Scene2d {
                                 this.current_curve.shape.order ?? 5, 
                                 this.current_curve.shape.radius,
                                 '#111',
-                                2,
-                                this.current_curve.shape.pulse
+                                1,
+                                this.current_curve.shape.pulse,
+                                this.current_curve.shape.wave_amplitude,
+                                this.current_curve.shape.wave_frequency
                             );
                             break;
                         case 'Ring':
@@ -645,16 +647,20 @@ class ShapeScene extends Scene2d {
                                 this.current_curve.shape.radius,
                                 this.current_curve.shape.hub ?? Math.floor(this.current_curve.shape.radius / 4),
                                 '#111',
-                                2,
-                                this.current_curve.shape.pulse
+                                1,
+                                this.current_curve.shape.pulse,
+                                this.current_curve.shape.wave_amplitude,
+                                this.current_curve.shape.wave_frequency
                             );
                             break;
                         case 'Moon':
                             this.current_curve.shape = new Moon(
                                 this.current_curve.shape.radius,
                                 '#111',
-                                2,
-                                this.current_curve.shape.pulse
+                                1,
+                                this.current_curve.shape.pulse,
+                                this.current_curve.shape.wave_amplitude,
+                                this.current_curve.shape.wave_frequency
                             );
                             break;
                         default:
@@ -701,6 +707,18 @@ class ShapeScene extends Scene2d {
                     const pulse_output = document.getElementById('pulse-output');
                     pulse_output.value = value;
                     break;
+                case 'wave-amp':
+                    value = event.target.value;
+                    this.current_curve.shape.wave_amplitude = Number(value);
+                    const wave_amp_output = document.getElementById('wave-amp-output');
+                    wave_amp_output.value = value;
+                    break;
+                case 'wave-freq':
+                    value = event.target.value;
+                    this.current_curve.shape.wave_frequency = Number(value);
+                    const wave_freq_output = document.getElementById('wave-freq-output');
+                    wave_freq_output.value = value;
+                    break;
                 case 'rotation':
                     value = event.target.selectedOptions[0].value;
                     this.current_curve.rotation = Number(value);
@@ -725,14 +743,14 @@ class ShapeScene extends Scene2d {
         const shapes = ['Star', 'Polygon', 'Ring', 'Moon'];
         switch(rand_int(shapes.length)) {
             case 0:
-                return new Star(rand_in_range(3, 9), rand_in_range(6, 36), rand_in_range(1, 16), '#111', 2, 0);
+                return new Star(rand_in_range(3, 9), rand_in_range(6, 36), rand_in_range(1, 16), '#111', 1, 0, 0, 4);
             case 1:
-                return new Polygon(rand_in_range(3, 9), rand_in_range(6, 64), '#111', 2, 0);
+                return new Polygon(rand_in_range(3, 9), rand_in_range(6, 64), '#111', 1, 0, 0, 4);
             case 2:
                 const r = rand_in_range(8, 40);
-                return new Ring(rand_int(6) / 5, r, Math.floor(r / 4), '#111', 2, 0);
+                return new Ring(rand_int(6) / 5, r, Math.floor(r / 4), '#111', 1, 0, 0, 4);
             case 3:
-                return new Moon(rand_in_range(6, 64), '#111', 2, 0);            
+                return new Moon(rand_in_range(6, 64), '#111', 1, 0, 0, 4);            
             default:
         }
     }
@@ -788,7 +806,16 @@ class ShapeScene extends Scene2d {
             if (!curve.hidden) {
                 const [x, y] = this.#transform_to_canvas(curve.func(...curve.params, this.progress * curve.speed + curve.seed));
                 this.ctx.save();
-                this.ctx.translate(x, y);
+
+
+                const [nx, ny] = [shape.y_last - y, x - shape.x_last];
+                const mag = Math.sqrt(nx * nx + ny * ny);
+                shape.normal = mag ? {x: nx / mag, y: ny / mag} : {x: 0, y: 0};
+                [shape.x_last, shape.y_last] = [x, y];
+                const x_ = x + shape.wave_amplitude * Math.sin(this.progress * shape.wave_frequency) * shape.normal.x;
+                const y_ = y + shape.wave_amplitude * Math.sin(this.progress * shape.wave_frequency) * shape.normal.y;
+
+                this.ctx.translate(x_, y_);
                 this.ctx.rotate(curve.rotation * this.progress);
                 shape.draw(this.ctx, 0, 0, curve.colour, this.progress);
                 this.ctx.restore();
@@ -801,24 +828,32 @@ class ShapeScene extends Scene2d {
 }
 
 class Shape {
-    constructor(outline, thickness, pulse) {
+    constructor(outline, thickness, pulse, wave_amplitude, wave_frequency) {
         this.type = this.constructor.name;
         this.outline = outline;
         this.thickness = thickness;
         this.hidden = false;
         this.pulse = pulse;
+        this.x_last = 0;
+        this.y_last = 0;
+        this.normal = null;
+        this.wave_amplitude = wave_amplitude;
+        this.wave_frequency = wave_frequency;
+    }
+    draw(x, y) {
     }
 }
 
 class Polygon extends Shape {
     static instance_count = 0;
-    constructor(order, radius, outline, thickness, pulse) {
-        super(outline, thickness, pulse);
+    constructor(order, radius, outline, thickness, pulse, wave_amplitude, wave_frequency) {
+        super(outline, thickness, pulse, wave_amplitude, wave_frequency);
         this.id = Polygon.instance_count++;
         this.order = order;
         this.radius = radius;
     }
     draw(ctx, x, y, colour, progress) {
+        super.draw(x, y);
         let r = this.radius;
         if (this.pulse) {
             r +=  Math.max(-r + 1, this.pulse * Math.sin(progress) * r);
@@ -852,12 +887,13 @@ class Polygon extends Shape {
 
 class Moon extends Shape {
     static instance_count = 0;
-    constructor(radius, outline, thickness, pulse) {
-        super(outline, thickness, pulse);
+    constructor(radius, outline, thickness, pulse, wave_amplitude, wave_frequency) {
+        super(outline, thickness, pulse, wave_amplitude, wave_frequency);
         this.id = Moon.instance_count++;
         this.radius = radius;
     }
     draw(ctx, x, y, colour, progress) {
+        super.draw(x, y);
         let r = this.radius;
         if (this.pulse) {
             r +=  Math.max(-r + 1, this.pulse * Math.sin(progress) * r);
@@ -889,21 +925,25 @@ class Moon extends Shape {
 class HubbedShape extends Shape {
     // Meant to be an abstract class, don't instantiate!
     static instance_count = 0;
-    constructor(radius_outer, radius_inner, outline, thickness, pulse) {
-        super(outline, thickness, pulse);
+    constructor(radius_outer, radius_inner, outline, thickness, pulse, wave_amplitude, wave_frequency) {
+        super(outline, thickness, pulse, wave_amplitude, wave_frequency);
         this.radius = radius_outer;
         this.hub = radius_inner;
+    }
+    draw(x, y) {
+        super.draw(x, y);
     }
 }
 
 class Ring extends HubbedShape {
     static instance_count = 0;
-    constructor(eccentricity, radius_outer, radius_inner, outline, thickness, pulse) {
-        super(radius_outer, radius_inner, outline, thickness, pulse);
+    constructor(eccentricity, radius_outer, radius_inner, outline, thickness, pulse, wave_amplitude, wave_frequency) {
+        super(radius_outer, radius_inner, outline, thickness, pulse, wave_amplitude, wave_frequency);
         this.id = Ring.instance_count++;
         this.eccentricity = eccentricity;
     }
     draw(ctx, x, y, colour, progress) {
+        super.draw(x, y);
         let r = this.radius;
         if (this.pulse) {
             r +=  Math.max(-r + 1, this.pulse * Math.sin(progress) * r);
@@ -921,12 +961,13 @@ class Ring extends HubbedShape {
 
 class Star extends HubbedShape {
     static instance_count = 0;
-    constructor(order, radius_outer, radius_inner, outline, thickness, pulse) {
-        super(radius_outer, radius_inner, outline, thickness, pulse);
+    constructor(order, radius_outer, radius_inner, outline, thickness, pulse, wave_amplitude, wave_frequency) {
+        super(radius_outer, radius_inner, outline, thickness, pulse, wave_amplitude, wave_frequency);
         this.id = Star.instance_count++;
         this.order = order;
     }
     draw(ctx, x, y, colour, progress) {
+        super.draw(x, y);
         let r = this.radius;
         if (this.pulse) {
             r +=  Math.max(-r + 1, this.pulse * Math.sin(progress) * r);
