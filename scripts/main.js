@@ -147,6 +147,31 @@ const Curves = {
         hidden: true
     },
 
+    concave: {
+        func: (a, b, t) => {
+            return [
+                (a * Math.cos(-t) + Math.cos(b * t)) / (a + 1),
+                (a * Math.sin(-t) + Math.sin(b * t)) / (a + 1)
+            ];
+        },
+        params: [13, 41],
+        speed: 0.05,
+        hidden: false
+    },
+
+    concave_ex: {
+        func: (a, b, c, d, t) => {
+            return [
+                (a * Math.cos(-t) + Math.cos(b * t)) / (a + 1),
+                (c * Math.sin(-t) + Math.sin(d * t)) / (c + 1)
+            ];
+        },
+        // params: [13, 15, 17, 19],
+        params: [1, 4, 6, 9],
+        speed: 0.05,
+        hidden: false
+    },
+
     convoluted: {
         func: (a, b, t) => {
             return [
@@ -349,8 +374,8 @@ class ShapeScene extends Scene2d {
         // Curves
         this.curves = curves;
         this.curve_names = Object.keys(this.curves);
-        this.current_curve = this.curves[this.curve_names[0]];
-        let i = 0;
+        // this.current_curve = this.curves[this.curve_names[0]];
+        // let i = 0;
         for (const curve in this.curves) {
             this.curves[curve].default_colour = this.#get_random_colour();
             this.curves[curve].colour = this.curves[curve].default_colour;
@@ -358,13 +383,15 @@ class ShapeScene extends Scene2d {
             this.rotations = [...document.querySelector('select.param#rotation').options].map(option => Number(option.value));
             this.curves[curve].rotation = this.rotations[rand_int(this.rotations.length)];
             this.curves[curve].seed = Math.random() * 4095;
-            if (DEBUG) {
-                if (i != 1) {
+            if (debug) {
+                if (this.curves[curve].name !=  debug) {
                     this.curves[curve].hidden = true;
                 }
                 else {
+                    this.current_curve = this.curves[curve];
+                    this.curves[curve].hidden = false;
                     this.curves[curve].shape.radius = 8;
-                    if (this.current_curve.shape instanceof HubbedShape) {
+                    if (this.curves[curve].shape instanceof HubbedShape) {
                         this.curves[curve].shape.hub = 4;
                     }
                     this.curves[curve].colour = 'hsl(20 100% 50%)';
@@ -1029,7 +1056,7 @@ const rand_int = n => Math.floor(n * Math.random());
 // ============================
 
 // Main code
-DEBUG = false;
+debug = 'concave_ex';
 const rg_0 = 'radial-gradient(#0000ff, #990029)';
 const main = document.getElementById('main');
 const help = document.querySelector('aside#help');
