@@ -22,22 +22,25 @@ Do please try it out at <https://teraspora.github.io/trig_worms/>, but don't com
 
 ## TODO:
 
+### Current
 - Fix bug where selecting a hidden curve messes the show/hide colours and that messes the active curve
-- Fix UI colours not updating properly in some cases    - **DONE!**
-- Fix **Github**, **ZU** & **IO** button links          - **DONE!**
-- Update **Pause** to **Play** when paused              - **DONE!**
-- Curve show/hide styling - put checkboxes on LHS
 - Keyboard shortcuts
 - Update this `README` with full documentation
 - Update Help pane
 - Fix `init()` multiplying scenes
+- Fix curve select not updating properly when
+  - curve hidden
+  - curve shown when all were hidden
+  - etc.!
 - Allow user to vary curve parameters
 - Allow user to specify own functions
-- Button to remove persistence by calling `clearRect()` every frame     - **DONE!**
-- Option to clear to a given opacity    - **DONE, sort of - as trails**
+- Allow mirroring
+- Allow save image and display all saved.   Local storage and user's local file system...
 - Bubbles
-- Other browsers
+- Other browsers - Safari showing sliders as black
 - Mobile
+
+### Longer-term
 - Multiple canvases
 - Refactor:
   - Organise inputs better

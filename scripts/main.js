@@ -369,7 +369,6 @@ class ShapeScene extends Scene2d {
         };
         const gco_type = 0;
         this.ctx.globalCompositeOperation = gco_values[gco_type];
-        this.trails = false;
                 
         // Curves
         this.curves = curves;
@@ -439,9 +438,9 @@ class ShapeScene extends Scene2d {
                         this.current_curve.colour = this.current_curve.colour ? null : this.current_curve.default_colour;
                         this.#update_current_curve_styling();
                         break;
-                    case 'trails':
-                        this.trails = !this.trails;
-                        event.target.style.textDecoration = this.trails ? 'line-through' : 'none';
+                    case 'debug':
+                        this.debug = !this.debug;
+                        event.target.textContent = this.debug ? 'User Mode' : 'Debug';
                         break;
                     default:
                 }
