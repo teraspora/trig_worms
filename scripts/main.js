@@ -1055,7 +1055,7 @@ const rand_int = n => Math.floor(n * Math.random());
 // ============================
 
 // Main code
-debug = 'concave_ex';
+debug = false;
 const rg_0 = 'radial-gradient(#0000ff, #990029)';
 const main = document.getElementById('main');
 const help = document.querySelector('aside#help');
