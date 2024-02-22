@@ -11,7 +11,7 @@ const Curves = {
             ];
         },
         params: [56, 12, 76, 102],  // good use of whole space
-        speed: 0.003,
+        speed: 0.002,
         hidden: false
     },
 
@@ -459,15 +459,6 @@ class ShapeScene extends Scene2d {
                             this.current_curve.colour = this.current_curve.colour ? null : this.current_curve.default_colour;
                             this.#update_current_curve_styling();
                             break;
-                        case 'm':
-                            // Toggle mute
-                            if (osc.context.state == 'running') {
-                                osc.context.suspend();
-                            }
-                            else {
-                                osc.context.resume();
-                            }
-                            break;
                         case ' ':
                             // Toggle play/pause
                             this.paused = !this.paused;
@@ -545,9 +536,11 @@ class ShapeScene extends Scene2d {
         [...document.getElementsByClassName('hub-ui')].forEach(el => {
             this.current_curve.shape instanceof HubbedShape ? el.classList.remove('hidden') : el.classList.add('hidden');
         });
-        // Hide order setting for rings
+        // Hide order setting for rings and moons
         [...document.getElementsByClassName('order-ui')].forEach(el => {
-            this.current_curve.shape instanceof Ring ? el.classList.add('hidden') : el.classList.remove('hidden');
+            this.current_curve.shape instanceof Ring || this.current_curve.shape instanceof Moon
+                ? el.classList.add('hidden')
+                : el.classList.remove('hidden');
         });
         // Hide eccentricity setting for non-rings
         [...document.getElementsByClassName('eccentricity-ui')].forEach(el => {
@@ -582,6 +575,11 @@ class ShapeScene extends Scene2d {
                     const hub_output = param.previousElementSibling.firstElementChild;
                     hub_output.value = this.current_curve.shape.hub;
                     break;
+                case 'pulse':
+                    param.value = this.current_curve.shape.pulse;
+                    const pulse_output = param.previousElementSibling.firstElementChild;
+                    pulse_output.value = this.current_curve.shape.pulse;
+                    break;
                 case 'rotation':
                     param.value = this.current_curve.rotation;
                     break;
@@ -608,19 +606,12 @@ class ShapeScene extends Scene2d {
             this.current_curve = this.curves[event.target.value];
             if (this.current_curve.hidden) {
                 this.current_curve.hidden = false;
-                // document.querySelector(`section#controls > #curves > fieldset input[name="hcrr"]`).checked = true;
                 this.#update_parameter_display();
             }
             event.target.style.color = this.current_curve.colour;
             this.#update_parameter_display();
             event.target.blur();
         });
-        // Hide hub setting for plain polygons
-        // if (this.current_curve.shape.type == 'Polygon') {
-        //     [...document.getElementsByClassName('hub-ui')].forEach(el => {
-        //         el.classList.add('hidden');
-        //     });
-        // }
 
         param_details.addEventListener('change', event => {
             const param = event.target.id;
@@ -633,9 +624,10 @@ class ShapeScene extends Scene2d {
                             this.current_curve.shape = new Star(
                                 this.current_curve.shape.order ?? 5, 
                                 this.current_curve.shape.radius, 
-                                Math.floor(this.current_curve.shape.radius / 4),
+                                this.current_curve.shape.hub ?? Math.floor(this.current_curve.shape.radius / 4),
                                 '#111',
-                                2
+                                2,
+                                this.current_curve.shape.pulse
                             );
                             break;
                         case 'Polygon':
@@ -643,16 +635,26 @@ class ShapeScene extends Scene2d {
                                 this.current_curve.shape.order ?? 5, 
                                 this.current_curve.shape.radius,
                                 '#111',
-                                2
+                                2,
+                                this.current_curve.shape.pulse
                             );
                             break;
                         case 'Ring':
                             this.current_curve.shape = new Ring(
                                 rand_int(6) / 5,    // eccentricity
                                 this.current_curve.shape.radius,
-                                Math.floor(this.current_curve.shape.radius / 4),
+                                this.current_curve.shape.hub ?? Math.floor(this.current_curve.shape.radius / 4),
                                 '#111',
-                                2
+                                2,
+                                this.current_curve.shape.pulse
+                            );
+                            break;
+                        case 'Moon':
+                            this.current_curve.shape = new Moon(
+                                this.current_curve.shape.radius,
+                                '#111',
+                                2,
+                                this.current_curve.shape.pulse
                             );
                             break;
                         default:
@@ -693,6 +695,12 @@ class ShapeScene extends Scene2d {
                     const hub_output = document.getElementById('hub-output');
                     hub_output.value = value;
                     break;
+                case 'pulse':
+                    value = event.target.value;
+                    this.current_curve.shape.pulse = Number(value);
+                    const pulse_output = document.getElementById('pulse-output');
+                    pulse_output.value = value;
+                    break;
                 case 'rotation':
                     value = event.target.selectedOptions[0].value;
                     this.current_curve.rotation = Number(value);
@@ -714,16 +722,18 @@ class ShapeScene extends Scene2d {
     }
 
     #get_random_shape() {
-        const shapes = ['Star', 'Polygon', 'Ring'];
+        const shapes = ['Star', 'Polygon', 'Ring', 'Moon'];
         switch(rand_int(shapes.length)) {
             case 0:
-                return new Star(rand_in_range(3, 9), rand_in_range(6, 36), rand_in_range(1, 16), '#111', 2);
+                return new Star(rand_in_range(3, 9), rand_in_range(6, 36), rand_in_range(1, 16), '#111', 2, 0);
             case 1:
-                return new Polygon(rand_in_range(3, 9), rand_in_range(6, 64), '#111', 4);
+                return new Polygon(rand_in_range(3, 9), rand_in_range(6, 64), '#111', 2, 0);
             case 2:
-            default:
                 const r = rand_in_range(8, 40);
-                return new Ring(rand_int(6) / 5, r, Math.floor(r / 4), '#111', 4);
+                return new Ring(rand_int(6) / 5, r, Math.floor(r / 4), '#111', 2, 0);
+            case 3:
+                return new Moon(rand_in_range(6, 64), '#111', 2, 0);            
+            default:
         }
     }
 
@@ -791,30 +801,35 @@ class ShapeScene extends Scene2d {
 }
 
 class Shape {
-    constructor(outline, thickness) {
+    constructor(outline, thickness, pulse) {
         this.type = this.constructor.name;
         this.outline = outline;
         this.thickness = thickness;
         this.hidden = false;
+        this.pulse = pulse;
     }
 }
 
 class Polygon extends Shape {
     static instance_count = 0;
-    constructor(order, radius, outline, thickness) {
-        super(outline, thickness);
+    constructor(order, radius, outline, thickness, pulse) {
+        super(outline, thickness, pulse);
         this.id = Polygon.instance_count++;
         this.order = order;
         this.radius = radius;
     }
     draw(ctx, x, y, colour, progress) {
+        let r = this.radius;
+        if (this.pulse) {
+            r +=  Math.max(-r + 1, this.pulse * Math.sin(progress) * r);
+        }
         ctx.save();
         ctx.beginPath();
         ctx.translate(x, y);
-        ctx.moveTo(0, this.radius);
+        ctx.moveTo(0, r);
         for (let i = 0; i < this.order; i++) {
             ctx.rotate(2 * Math.PI / this.order);
-            ctx.lineTo(0, this.radius);
+            ctx.lineTo(0, r);
         }
         ctx.closePath();
 
@@ -828,7 +843,43 @@ class Polygon extends Shape {
             ctx.fill();
         }
         else {
-            ctx.fillStyle = `hsl(${Math.sin(progress / 16) * 90 + 270 + this.order * this.radius} 100% 50%)`;
+            ctx.fillStyle = `hsl(${Math.sin(progress / 16) * 90 + 270 + this.order * r} 100% 50%)`;
+            ctx.fill();
+        }
+        ctx.restore();
+    }
+}
+
+class Moon extends Shape {
+    static instance_count = 0;
+    constructor(radius, outline, thickness, pulse) {
+        super(outline, thickness, pulse);
+        this.id = Moon.instance_count++;
+        this.radius = radius;
+    }
+    draw(ctx, x, y, colour, progress) {
+        let r = this.radius;
+        if (this.pulse) {
+            r +=  Math.max(-r + 1, this.pulse * Math.sin(progress) * r);
+        }
+        ctx.save();
+        ctx.beginPath();
+        ctx.translate(x, y);
+        ctx.arc(0, 0, r, -Math.PI / 2, Math.PI / 2, true);
+        ctx.arcTo(- r / 2, 0, 0, -r, 2 * r);
+        ctx.closePath();
+
+        if (this.outline) {
+            ctx.strokeStyle = this.outline;
+            ctx.lineWidth = this.thickness;
+            ctx.stroke();
+        }
+        if (colour) {
+            ctx.fillStyle = colour;
+            ctx.fill();
+        }
+        else {
+            ctx.fillStyle = `hsl(${Math.sin(progress / 32) * 90 + 270 + this.id * r} 100% 50%)`;
             ctx.fill();
         }
         ctx.restore();
@@ -838,8 +889,8 @@ class Polygon extends Shape {
 class HubbedShape extends Shape {
     // Meant to be an abstract class, don't instantiate!
     static instance_count = 0;
-    constructor(radius_outer, radius_inner, outline, thickness) {
-        super(outline, thickness);
+    constructor(radius_outer, radius_inner, outline, thickness, pulse) {
+        super(outline, thickness, pulse);
         this.radius = radius_outer;
         this.hub = radius_inner;
     }
@@ -847,16 +898,19 @@ class HubbedShape extends Shape {
 
 class Ring extends HubbedShape {
     static instance_count = 0;
-    constructor(eccentricity, radius_outer, radius_inner, outline, thickness) {
-        super(radius_outer, radius_inner, outline, thickness);
+    constructor(eccentricity, radius_outer, radius_inner, outline, thickness, pulse) {
+        super(radius_outer, radius_inner, outline, thickness, pulse);
         this.id = Ring.instance_count++;
         this.eccentricity = eccentricity;
     }
     draw(ctx, x, y, colour, progress) {
+        let r = this.radius;
+        if (this.pulse) {
+            r +=  Math.max(-r + 1, this.pulse * Math.sin(progress) * r);
+        }
         ctx.fillStyle = colour ?? `hsl(${Math.sin(progress / this.radius * (this.id + 1)) * 90 + 270} 100% 50%)`;
-        
         ctx.beginPath();
-        ctx.ellipse(x, y, this.radius, this.radius * this.eccentricity, 0, 0, 2 * Math.PI);
+        ctx.ellipse(x, y, r, r * this.eccentricity, 0, 0, 2 * Math.PI);
         ctx.fill();
         ctx.fillStyle = 'hsla(0, 0%, 0%, 1)';
         ctx.beginPath();
@@ -867,19 +921,23 @@ class Ring extends HubbedShape {
 
 class Star extends HubbedShape {
     static instance_count = 0;
-    constructor(order, radius_outer, radius_inner, outline, thickness) {
-        super(radius_outer, radius_inner, outline, thickness);
+    constructor(order, radius_outer, radius_inner, outline, thickness, pulse) {
+        super(radius_outer, radius_inner, outline, thickness, pulse);
         this.id = Star.instance_count++;
         this.order = order;
     }
     draw(ctx, x, y, colour, progress) {
+        let r = this.radius;
+        if (this.pulse) {
+            r +=  Math.max(-r + 1, this.pulse * Math.sin(progress) * r);
+        }
         ctx.save();
         {
             ctx.beginPath();
             ctx.translate(x, y);
-            ctx.moveTo(0, this.radius);
+            ctx.moveTo(0, r);
             for (let i = 0; i < this.order; i++) {
-                ctx.lineTo(0, this.radius);
+                ctx.lineTo(0, r);
                 ctx.rotate(Math.PI / this.order);
                 ctx.lineTo(0, this.hub);
                 ctx.rotate(Math.PI / this.order);
@@ -916,7 +974,6 @@ function init() {
     
     canvas.width = Math.floor(main_width - 200);
     canvas.height = main_height;
-    // const scene = new DesignScene(canvas);
     const scene = new ShapeScene(canvas, Curves);
     scenes.push(scene);
     scene.render();
@@ -926,15 +983,6 @@ function init() {
 const rand_in_range = (m, n) => Math.floor((n - m) * Math.random() + m);
 const rand_int = n => Math.floor(n * Math.random());
 
-function oscillate() {
-    const audio_ctx = new AudioContext();
-    const osc = audio_ctx.createOscillator();
-    osc.connect(audio_ctx.destination);
-    osc.frequency.value = 0;
-    osc.type = 'triangle';
-    osc.status = 'initial';
-    return osc;
-}
 
 // end of classes and functions
 // ============================
@@ -950,15 +998,6 @@ let scenes = [];
 
 document.querySelector('aside#help button').addEventListener('click', event => {
     event.target.parentElement.style.display = 'none';
-});
-
-let osc = oscillate();
-document.addEventListener('click', event => {
-    if (osc.status == 'initial') {
-        osc.start();
-        osc.context.suspend();
-        osc.status = 'playing';
-    }
 });
 
 ['load', 'resize'].forEach(event => window.addEventListener(event, init));

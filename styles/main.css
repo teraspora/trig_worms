@@ -89,7 +89,7 @@ input[type=checkbox].curve-check {
     background-color: #33ff00;
 }
 
-#buttons>button#global {
+#buttons>button#help {
     background-color: #00ff88;
 }
 
@@ -210,10 +210,6 @@ select, select > option {
     margin: 0.1vw;
     color: var(--plain-text-col);
     font-size: 0.7vw;
-}
-
-div.radius-ui {
-    font-size: 0.8vw;
 }
 
 .hidden {
