@@ -433,7 +433,7 @@ class ShapeScene extends Scene2d {
                         this.progress = 0;
                         break;
                     case 'init':
-                        location.reload();
+                        init();
                         break;
                     case 'mirror':
                         this.mirrored = !this.mirrored;
@@ -477,7 +477,6 @@ class ShapeScene extends Scene2d {
                             break;
                         case '*':
                             // Start again from scratch
-                            // Doesn't work - doubles the curves!
                             init();
                             break;
                         case 'x':
@@ -859,6 +858,7 @@ class ShapeScene extends Scene2d {
                 shape.draw(this.ctx, 0, 0, curve.colour, this.progress);
                 this.ctx.restore();
                 if (this.mirrored) {
+                    // Mirroring 4 ways; later refine this to allow individual reflections
                     this.ctx.save();
                     this.ctx.translate(this.width - x_, y_);
                     this.ctx.rotate(curve.rotation * this.progress);
@@ -1091,7 +1091,7 @@ const rand_int = n => Math.floor(n * Math.random());
 // ============================
 
 // Main code
-debug = 'concave_ex';
+debug = false;//'concave_ex';//false;
 const rg_0 = 'radial-gradient(#0000ff, #990029)';
 const main = document.getElementById('main');
 const help = document.querySelector('aside#help');
