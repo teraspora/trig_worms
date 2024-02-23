@@ -167,7 +167,7 @@ const Curves = {
             ];
         },
         // params: [13, 15, 17, 19],
-        params: [1, 4, 6, 9],
+        params: [1, 4, 2, 7],
         speed: 0.05,
         hidden: false
     },
@@ -373,8 +373,9 @@ class ShapeScene extends Scene2d {
         // Curves
         this.curves = curves;
         this.curve_names = Object.keys(this.curves);
-        // this.current_curve = this.curves[this.curve_names[0]];
-        // let i = 0;
+        if (!debug) {
+            this.current_curve = this.curves[this.curve_names[0]];
+        }
         for (const curve in this.curves) {
             this.curves[curve].default_colour = this.#get_random_colour();
             this.curves[curve].colour = this.curves[curve].default_colour;
@@ -388,13 +389,13 @@ class ShapeScene extends Scene2d {
                 }
                 else {
                     this.current_curve = this.curves[curve];
-                    this.curves[curve].hidden = false;
-                    this.curves[curve].shape.radius = 8;
-                    if (this.curves[curve].shape instanceof HubbedShape) {
-                        this.curves[curve].shape.hub = 4;
+                    this.current_curve.hidden = false;
+                    this.current_curve.shape.radius = 8;
+                    if (this.current_curve.shape instanceof HubbedShape) {
+                        this.current_curve.shape.hub = 4;
                     }
-                    this.curves[curve].colour = 'hsl(20 100% 50%)';
-                    this.curves[curve].rotation = 1;
+                    this.current_curve.colour = 'hsl(20 100% 50%)';
+                    this.current_curve.rotation = 1;
                 }
             }
         }
