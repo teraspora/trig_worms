@@ -167,8 +167,15 @@ const Curves = {
             ];
         },
         // params: [13, 15, 17, 19],
-        params: [1, 4, 2, 7],
-        speed: 0.05,
+        // params: [1, 4, 2, 7],
+        // params: [2 * Math.PI, 7 * Math.PI, 13 * Math.PI, 37 * Math.PI],
+        // params: [17 * Math.PI, 12 * Math.PI, 8 * Math.PI, 2 * Math.PI],
+        // params: [12, 18, 6, 24],
+        // params: [5, 9, 16, 29],
+        // params: [3, 6, 9, 12],
+        // params: [Math.PI, 3 * Math.PI, Math.PI, 7 * Math.PI],   // nice and twirly!
+        params: [2, 3 * Math.PI, 4, 5 * Math.PI],   // nice and twirly!
+        speed: 0.01,
         hidden: false
     },
 
@@ -308,7 +315,7 @@ class Scene {
     }
     render() {
     }
-    update(t) {
+    update() {
         this.progress += this.progress_delta;
     }
 }
@@ -336,6 +343,7 @@ class ShapeScene extends Scene2d {
         this.ctx.shadowOffsetY = 2;
         this.ctx.shadowBlur = 8;
         this.ctx.shadowColor = '#000';
+        this.mirrored = false;
 
         // CanvasRenderingContext2D: globalCompositeOperation property
         // see https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation
@@ -394,7 +402,7 @@ class ShapeScene extends Scene2d {
                     if (this.current_curve.shape instanceof HubbedShape) {
                         this.current_curve.shape.hub = 4;
                     }
-                    this.current_curve.colour = 'hsl(20 100% 50%)';
+                    this.current_curve.colour = 'hsl(206 100% 50%)';
                     this.current_curve.rotation = 1;
                 }
             }
@@ -427,7 +435,9 @@ class ShapeScene extends Scene2d {
                     case 'init':
                         location.reload();
                         break;
-                    case 'speed':
+                    case 'mirror':
+                        this.mirrored = !this.mirrored;
+                        event.target.textContent = this.mirrored ? 'Unmirror' : 'Mirror';
                         break;
                     case 'github':
                         break;
@@ -498,7 +508,7 @@ class ShapeScene extends Scene2d {
         const checkbox_wrapper = document.querySelector('section#controls > #curves > fieldset');
         const checkbox = checkbox_wrapper.firstElementChild;
         const checkbox_clone = checkbox.cloneNode(true);
-        checkbox.remove();
+        checkbox_wrapper.innerHTML = '';
         const checkboxes = [];
         for (const curve_name of this.curve_names){
             const curve_switch = checkbox_clone.cloneNode(true);
@@ -786,29 +796,33 @@ class ShapeScene extends Scene2d {
         const chromute_button = document.querySelector('button#chromute');
         const curve_checkbox = document.querySelector(`input[name="${this.current_curve.name}"]`);
         const curve_label = document.querySelector(`label#${this.current_curve.name}-label`);
-        const curve_option = [...document.querySelector('select#curve-select').options].filter(option => option.value == this.current_curve.name)[0];
-        
+        const curve_select = document.querySelector('section#controls > #params-wrapper > select#curve-select');
+        const curve_option = [...curve_select.options].filter(option => option.value == this.current_curve.name)[0];
+        curve_select.selectedIndex = curve_option.index;
+        const colour = this.current_curve.colour;
+        const non_colour = 'hsl(36 100% 90%)';
         chromute_button.textContent = this.current_curve.colour ? 'Chromute' : 'Plain';
         curve_checkbox.style.background = 
-            this.current_curve.colour 
+            colour 
             ? '#000' 
             : rg_0;
         curve_label.style.background =
-            this.current_curve.colour 
+            colour 
             ? '#000' 
             : rg_0;
         curve_label.style.color =
-            this.current_curve.colour 
-            ? this.current_curve.colour 
-            : 'hsl(36 100% 90%)';
+            colour 
+            ?? non_colour;
         curve_option.style.backgroundColor =
-            this.current_curve.colour 
+            colour 
             ? '#000' 
             : this.current_curve.default_colour;
         curve_option.style.Color =
-            this.current_curve.colour 
-            ? this.current_curve.colour
-            : '#000';
+            colour 
+            ?? '#000';
+        curve_select.style.color = 
+            colour
+            ?? non_colour;
     }
     
     #transform_to_canvas([x, y]) {
@@ -833,8 +847,6 @@ class ShapeScene extends Scene2d {
             if (!curve.hidden) {
                 const [x, y] = this.#transform_to_canvas(curve.func(...curve.params, this.progress * curve.speed + curve.seed));
                 this.ctx.save();
-
-
                 const [nx, ny] = [shape.y_last - y, x - shape.x_last];
                 const mag = Math.sqrt(nx * nx + ny * ny);
                 shape.normal = mag ? {x: nx / mag, y: ny / mag} : {x: 0, y: 0};
@@ -846,10 +858,32 @@ class ShapeScene extends Scene2d {
                 this.ctx.rotate(curve.rotation * this.progress);
                 shape.draw(this.ctx, 0, 0, curve.colour, this.progress);
                 this.ctx.restore();
+                if (this.mirrored) {
+                    this.ctx.save();
+                    this.ctx.translate(this.width - x_, y_);
+                    this.ctx.rotate(curve.rotation * this.progress);
+                    shape.draw(this.ctx, 0, 0, curve.colour, this.progress);
+                    this.ctx.restore();
+                    this.ctx.save();
+                    this.ctx.translate(x_, this.height - y_);
+                    this.ctx.rotate(curve.rotation * this.progress);
+                    shape.draw(this.ctx, 0, 0, curve.colour, this.progress);
+                    this.ctx.restore();
+                    this.ctx.save();
+                    this.ctx.translate(this.width - x_, y_);
+                    this.ctx.rotate(curve.rotation * this.progress);
+                    shape.draw(this.ctx, 0, 0, curve.colour, this.progress);
+                    this.ctx.restore();
+                    this.ctx.save();
+                    this.ctx.translate(this.width - x_, this.height - y_);
+                    this.ctx.rotate(curve.rotation * this.progress);
+                    shape.draw(this.ctx, 0, 0, curve.colour, this.progress);
+                    this.ctx.restore();
+                }
             }
         }
         if (!this.paused) {
-            requestAnimationFrame(this.update.bind(this));
+            this.frame_request = requestAnimationFrame(this.update.bind(this));
         }    
     }
 }
@@ -1034,6 +1068,7 @@ function init() {
     if (scenes.length) {
         console.log(scenes);
         for (const scene of scenes) {
+            cancelAnimationFrame(scene.frame_request);
             delete scene;
         }
         scenes = [];
@@ -1056,7 +1091,7 @@ const rand_int = n => Math.floor(n * Math.random());
 // ============================
 
 // Main code
-debug = false;
+debug = 'concave_ex';
 const rg_0 = 'radial-gradient(#0000ff, #990029)';
 const main = document.getElementById('main');
 const help = document.querySelector('aside#help');

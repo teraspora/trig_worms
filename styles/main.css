@@ -85,8 +85,20 @@ input[type=checkbox].curve-check {
     font-size: 0.6vw;
 }
 
+#buttons>button#mirror {
+    background-color: #d8bc97;
+}
+
 #buttons>button#debug {
     background-color: #0084ff;
+}
+
+#buttons>button#shampoo {
+    background-color: #ff80d9;
+}
+
+#buttons>button#ganesh {
+    background-color: #a75aff;
 }
 
 #buttons>button#help {
