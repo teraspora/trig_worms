@@ -9,6 +9,7 @@ html, body, * {
     --highlight-col: #ffc000;
     --plain-text-col: #ffe0b1;
     --border-grey: #7a7265;
+    /* outline: 2px solid red; */
 }
 
 a {
@@ -19,13 +20,27 @@ a {
 main#main {
     display: grid;
     grid-template-columns: 4fr 1fr;
-    grid-template-rows: 1fr;
+    grid-template-rows: 1fr 24fr;
     width: 98vw;
     height: 98vh;
     gap: 0.2vw;
     justify-items: stretch;
     align-items: stretch;
     margin: 1vw auto;
+}
+
+nav#nav-top {
+    color: var(--plain-text-col);
+    grid-column: 1 / -1;
+    margin: 1vh 1vw 0 1vw;
+}
+
+nav#nav-top span{
+    margin: 0 1vw 0 1vw;
+    background: radial-gradient(#3ad1ff, #ff7297);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 canvas, #controls, #curves, #params-wrapper, #buttons {
@@ -93,7 +108,7 @@ input[type=checkbox].curve-check {
     background-color: #0084ff;
 }
 
-#buttons>button#shampoo {
+#buttons>button#save {
     background-color: #ff80d9;
 }
 

@@ -312,6 +312,7 @@ class Scene {
         this.progress = 0;
         this.progress_delta = 0.1;
         this.paused = false;
+        this.non_colour = 'hsl(36 100% 90%)';
     }
     render() {
     }
@@ -413,7 +414,8 @@ class ShapeScene extends Scene2d {
         this.#create_params_section();
 
         // Buttons
-        [...document.querySelectorAll('#buttons>button')].forEach(button => {
+        this.buttons = [...document.querySelectorAll('#buttons>button')];
+        this.buttons.forEach(button => {
             button.addEventListener('click', event => {
                 switch(event.target.id) {
                     case 'pause':
@@ -421,9 +423,10 @@ class ShapeScene extends Scene2d {
                         this.paused = !this.paused;
                         if (!this.paused) {
                             event.target.textContent = 'Pause';
-                            requestAnimationFrame(this.update.bind(this));
+                            this.frame_request = requestAnimationFrame(this.update.bind(this));
                         }
                         else {
+                            cancelAnimationFrame(this.frame_request);
                             event.target.textContent = 'Play';
                         }
                         break;
@@ -433,6 +436,9 @@ class ShapeScene extends Scene2d {
                         this.progress = 0;
                         break;
                     case 'init':
+                        this.#initialise_buttons();
+                        this.paused = false;
+                        this.mirrored = false;
                         init();
                         break;
                     case 'mirror':
@@ -450,8 +456,34 @@ class ShapeScene extends Scene2d {
                         this.#update_current_curve_styling();
                         break;
                     case 'debug':
-                        this.debug = !this.debug;
-                        event.target.textContent = this.debug ? 'User Mode' : 'Debug';
+                        // Set all curves hidden except current curve
+                        this.curve_names.forEach(curve => {
+                            if (curve != this.current_curve.name) {
+                                this.curves[curve].hidden = true;
+                            }
+                            else {
+                                this.curves[curve].hidden = false;
+                                this.curves[curve].colour = this.curves[curve].default_colour;
+                            }
+                        });
+                        this.mirrored = false;
+                        this.#initialise_buttons();
+                        this.#update_parameter_display();
+                        this.#update_curve_checkboxes();
+                        // Clear drawing
+                        this.ctx.clearRect(0, 0, this.width, this.height);
+                        this.progress = 0
+                        if (this.paused) {
+                            this.paused = false;
+                            this.frame_request = requestAnimationFrame(this.update.bind(this));
+                        }
+                        break;
+                    case 'save':
+                        const link = document.createElement('a');
+                        link.download = 'canvas.png';
+                        link.href = this.canvas.toDataURL();
+                        link.click();
+                        link.delete;
                         break;
                     default:
                 }
@@ -486,8 +518,13 @@ class ShapeScene extends Scene2d {
                         case ' ':
                             // Toggle play/pause
                             this.paused = !this.paused;
-                            if (!this.paused) {
-                                requestAnimationFrame(this.update.bind(this));
+                            if (!this.paused) {     // User clicked "Play"
+                                event.target.textContent = 'Pause';
+                                this.frame_request = requestAnimationFrame(this.update.bind(this));
+                            }
+                            else {                  // User clicked "Pause"
+                                cancelAnimationFrame(this.frame_request);
+                                event.target.textContent = 'Play';
                             }
                             break;
                         case 'h':
@@ -508,7 +545,7 @@ class ShapeScene extends Scene2d {
         const checkbox = checkbox_wrapper.firstElementChild;
         const checkbox_clone = checkbox.cloneNode(true);
         checkbox_wrapper.innerHTML = '';
-        const checkboxes = [];
+        this.checkboxes = [];
         for (const curve_name of this.curve_names){
             const curve_switch = checkbox_clone.cloneNode(true);
             checkbox_wrapper.appendChild(curve_switch);
@@ -544,8 +581,14 @@ class ShapeScene extends Scene2d {
                 // else... hmmm, if we set it to null, we'll have to include that value in the select...
                 this.#update_parameter_display();
             });
-            checkboxes.push(input);
+            this.checkboxes.push(input);
         }
+    }
+
+    #update_curve_checkboxes() {
+        this.checkboxes.forEach(box => {
+            box.checked = !this.curves[box.name].hidden;
+        });
     }
 
     #update_parameter_display() {
@@ -641,6 +684,7 @@ class ShapeScene extends Scene2d {
             if (this.current_curve.hidden) {
                 this.current_curve.hidden = false;
                 this.#update_parameter_display();
+                this.#update_curve_checkboxes;
             }
             event.target.style.color = this.current_curve.colour;
             this.#update_parameter_display();
@@ -653,50 +697,42 @@ class ShapeScene extends Scene2d {
             switch(param) {
                 case 'shape':
                     value = event.target.selectedOptions[0].value;
+                    // When user changes shape, carry forward as many attributes as possible from the old shape
+                    const common_params = [
+                        '#111',
+                        1,
+                        this.current_curve.shape.pulse,
+                        this.current_curve.shape.wave_amplitude,
+                        this.current_curve.shape.wave_frequency
+                    ];
                     switch (value) {
                         case 'Star':
                             this.current_curve.shape = new Star(
-                                this.current_curve.shape.order ?? 5, 
+                                this.current_curve.shape.order ?? 3, 
                                 this.current_curve.shape.radius, 
-                                this.current_curve.shape.hub ?? Math.floor(this.current_curve.shape.radius / 4),
-                                '#111',
-                                1,
-                                this.current_curve.shape.pulse,
-                                this.current_curve.shape.wave_amplitude,
-                                this.current_curve.shape.wave_frequency
+                                this.current_curve.shape.hub ?? Math.max(Math.floor(this.current_curve.shape.radius / 4), 1),
+                                ...common_params
                             );
                             break;
                         case 'Polygon':
                             this.current_curve.shape = new Polygon(
                                 this.current_curve.shape.order ?? 5, 
                                 this.current_curve.shape.radius,
-                                '#111',
-                                1,
-                                this.current_curve.shape.pulse,
-                                this.current_curve.shape.wave_amplitude,
-                                this.current_curve.shape.wave_frequency
+                                ...common_params
                             );
                             break;
                         case 'Ring':
                             this.current_curve.shape = new Ring(
-                                rand_int(6) / 5,    // eccentricity
+                                rand_int(5) / 5,    // eccentricity
                                 this.current_curve.shape.radius,
-                                this.current_curve.shape.hub ?? Math.floor(this.current_curve.shape.radius / 4),
-                                '#111',
-                                1,
-                                this.current_curve.shape.pulse,
-                                this.current_curve.shape.wave_amplitude,
-                                this.current_curve.shape.wave_frequency
+                                this.current_curve.shape.hub ?? Math.max(Math.floor(this.current_curve.shape.radius / 4), 1),
+                                ...common_params
                             );
                             break;
                         case 'Moon':
                             this.current_curve.shape = new Moon(
                                 this.current_curve.shape.radius,
-                                '#111',
-                                1,
-                                this.current_curve.shape.pulse,
-                                this.current_curve.shape.wave_amplitude,
-                                this.current_curve.shape.wave_frequency
+                                ...common_params
                             );
                             break;
                         default:
@@ -717,13 +753,16 @@ class ShapeScene extends Scene2d {
                     break;
                 case 'hue':
                     value = event.target.value;
-                    const colour = this.current_curve.colour = `hsl(${value} 100% 50%)`;
-                    document.getElementById(`${this.current_curve.name}-label`).style.color = colour;
+                    this.current_curve.colour =
+                        (Number(value) == -1)
+                            ? null
+                            : `hsl(${value} 100% 50%)`;
+                    document.getElementById(`${this.current_curve.name}-label`).style.color = this.current_curve.colour;
                     const hue_output = document.getElementById('hue-output');
-                    hue_output.style.color = colour;
+                    hue_output.style.color = this.current_curve.colour ?? this.non_colour;
                     hue_output.value = value;
                     const curve_select = document.querySelector('section#controls > #params-wrapper >select#curve-select');
-                    curve_select.style.color = colour;
+                    curve_select.style.color = this.current_curve.colour ?? this.non_colour;
                     break;
                 case 'radius':
                     value = event.target.value;
@@ -766,6 +805,11 @@ class ShapeScene extends Scene2d {
         this.#update_parameter_display();
     }
 
+    #initialise_buttons() {
+        this.buttons.filter(button => button.id == 'pause')[0].textContent = 'Pause';
+        this.buttons.filter(button => button.id == 'mirror')[0].textContent = 'Mirror';
+    }
+
     #get_random_colour() {
         const r = rand_int(290);
         return `hsl(${(r) + (r > 70 ? 70 : 0)} 100% 50%)`;
@@ -799,7 +843,6 @@ class ShapeScene extends Scene2d {
         const curve_option = [...curve_select.options].filter(option => option.value == this.current_curve.name)[0];
         curve_select.selectedIndex = curve_option.index;
         const colour = this.current_curve.colour;
-        const non_colour = 'hsl(36 100% 90%)';
         chromute_button.textContent = this.current_curve.colour ? 'Chromute' : 'Plain';
         curve_checkbox.style.background = 
             colour 
@@ -811,7 +854,7 @@ class ShapeScene extends Scene2d {
             : rg_0;
         curve_label.style.color =
             colour 
-            ?? non_colour;
+            ?? this.non_colour;
         curve_option.style.backgroundColor =
             colour 
             ? '#000' 
@@ -821,7 +864,7 @@ class ShapeScene extends Scene2d {
             ?? '#000';
         curve_select.style.color = 
             colour
-            ?? non_colour;
+            ?? this.non_colour;
     }
     
     #transform_to_canvas([x, y]) {
@@ -1066,7 +1109,6 @@ class Star extends HubbedShape {
 
 function init() {
     if (scenes.length) {
-        console.log(scenes);
         for (const scene of scenes) {
             cancelAnimationFrame(scene.frame_request);
             delete scene;
