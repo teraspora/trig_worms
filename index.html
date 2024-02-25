@@ -23,7 +23,7 @@
                 <button id="pause">Pause</button>
                 <button id="clear">Clear</button>
                 <button id="init">Init</button>
-                <button id="chromute">Chromute</button>
+                <button id="global-speed">Global Speed</button>
                 <button id="mirror">Mirror</button>
                 <button id="debug">Debug</button>
                 <button id="save">Save</button>
@@ -119,6 +119,9 @@
                     
                     <div class="hue-ui">hue: <output id="hue-output"></output></div> 
                     <input type="range"  min="-1" max="359" value="0" class="param hue-ui" id="hue">
+
+                    <div class="polychrome-speed-ui hidden">polychrome speed: <output id="polychrome-speed-output"></output></div> 
+                    <input type="range"  min="0" max="100" value="0" class="param polychrome-speed-ui hidden" id="polychrome-speed">
 
                     <div class="radius-ui">radius: <output id="radius-output"></output></div> 
                     <input type="range"  min="1" max="512" value="0" class="param radius-ui" id="radius">

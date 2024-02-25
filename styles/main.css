@@ -95,7 +95,7 @@ input[type=checkbox].curve-check {
     background-color: #f04;
 }
 
-#buttons>button#chromute {
+#buttons>button#global-speed {
     background-color: #ff4800;
     font-size: 0.6vw;
 }
@@ -134,6 +134,10 @@ input[type=checkbox].curve-check {
     color: #00ff88;
     background-color: #000;
     border: 1px solid #333;
+}
+
+#buttons>button:hover {
+    transform: scale(1.04);
 }
 
 aside#help {

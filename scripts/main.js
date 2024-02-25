@@ -313,6 +313,7 @@ class Scene {
         this.progress_delta = 0.1;
         this.paused = false;
         this.non_colour = 'hsl(36 100% 90%)';
+        this.debug_colour = 'hsl(206 100% 50%)';
     }
     render() {
     }
@@ -388,7 +389,9 @@ class ShapeScene extends Scene2d {
         for (const curve in this.curves) {
             this.curves[curve].default_colour = this.#get_random_colour();
             this.curves[curve].colour = this.curves[curve].default_colour;
+            this.curves[curve].polychrome_speed = 25;       // we'll have a range [0, .., 100] and set the normal to 25, so user can speed up 4x and slow down 25x
             this.curves[curve].shape = this.#get_random_shape();
+            this.curves[curve].shape.polychrome_speed = this.curves[curve].polychrome_speed;
             this.rotations = [...document.querySelector('select.param#rotation').options].map(option => Number(option.value));
             this.curves[curve].rotation = this.rotations[rand_int(this.rotations.length)];
             this.curves[curve].seed = Math.random() * 4095;
@@ -403,7 +406,7 @@ class ShapeScene extends Scene2d {
                     if (this.current_curve.shape instanceof HubbedShape) {
                         this.current_curve.shape.hub = 4;
                     }
-                    this.current_curve.colour = 'hsl(206 100% 50%)';
+                    this.current_curve.colour = this.debug_colour;
                     this.current_curve.rotation = 1;
                 }
             }
@@ -451,9 +454,8 @@ class ShapeScene extends Scene2d {
                         break;
                     case 'IO':
                         break;
-                    case 'chromute':
-                        this.current_curve.colour = this.current_curve.colour ? null : this.current_curve.default_colour;
-                        this.#update_current_curve_styling();
+                    case 'global-speed':
+                        console.log("In global speed case!");
                         break;
                     case 'debug':
                         // Set all curves hidden except current curve
@@ -510,10 +512,6 @@ class ShapeScene extends Scene2d {
                         case '*':
                             // Start again from scratch
                             init();
-                            break;
-                        case 'x':
-                            this.current_curve.colour = this.current_curve.colour ? null : this.current_curve.default_colour;
-                            this.#update_current_curve_styling();
                             break;
                         case ' ':
                             // Toggle play/pause
@@ -613,6 +611,10 @@ class ShapeScene extends Scene2d {
         [...document.getElementsByClassName('eccentricity-ui')].forEach(el => {
             this.current_curve.shape instanceof Ring ? el.classList.remove('hidden') : el.classList.add('hidden');
         });
+        // Hide polychrome-speed slider unless hue is -1 / colour is null
+        [...document.getElementsByClassName('polychrome-speed-ui')].forEach(el => {
+            this.current_curve.colour ? el.classList.add('hidden') : el.classList.remove('hidden');
+        });
         param_elements.forEach(param => {
             switch(param.id) {
                 case 'shape':
@@ -629,8 +631,16 @@ class ShapeScene extends Scene2d {
                     break;
                 case 'hue':
                     const hue_output = param.previousElementSibling.firstElementChild;
-                    param.value = hue_output.value = this.#get_hue_from_hsl(this.current_curve.colour)
-                    hue_output.style.color = this.current_curve.colour;
+                    param.value = hue_output.value = 
+                        this.current_curve.colour
+                            ? this.#get_hue_from_hsl(this.current_curve.colour)
+                            : -1
+                    hue_output.style.color = this.current_curve.colour ?? this.non_colour;
+                    break;
+                case 'polychrome-speed':
+                    param.value = this.current_curve.polychrome_speed;
+                    const polychrome_speed_output = param.previousElementSibling.firstElementChild;
+                    polychrome_speed_output.value = this.current_curve.polychrome_speed;
                     break;
                 case 'radius':
                     param.value = this.current_curve.shape.radius;
@@ -752,9 +762,9 @@ class ShapeScene extends Scene2d {
                     this.current_curve.speed = Number(value);
                     break;
                 case 'hue':
-                    value = event.target.value;
+                    value = Number(event.target.value);
                     this.current_curve.colour =
-                        (Number(value) == -1)
+                        (value == -1)
                             ? null
                             : `hsl(${value} 100% 50%)`;
                     document.getElementById(`${this.current_curve.name}-label`).style.color = this.current_curve.colour;
@@ -763,6 +773,14 @@ class ShapeScene extends Scene2d {
                     hue_output.value = value;
                     const curve_select = document.querySelector('section#controls > #params-wrapper >select#curve-select');
                     curve_select.style.color = this.current_curve.colour ?? this.non_colour;
+                    // Whether hue is -1 or in [0, .., 359] determines whether we show the Polychrome Speed UI -
+                    // But this gets handled in this.#update_parameter_display(), called after this switch
+                    break;
+                case 'polychrome-speed':
+                    value = event.target.value;
+                    this.current_curve.polychrome_speed = Number(value);
+                    const polychrome_speed_output = document.getElementById('pulse-output');
+                    polychrome_speed_output.value = value;
                     break;
                 case 'radius':
                     value = event.target.value;
@@ -811,8 +829,8 @@ class ShapeScene extends Scene2d {
     }
 
     #get_random_colour() {
-        const r = rand_int(290);
-        return `hsl(${(r) + (r > 70 ? 70 : 0)} 100% 50%)`;
+        const r = rand_int(340);
+        return `hsl(${(r) + (r > 100 ? 20 : 0)} 100% 50%)`;
     }
 
     #get_hue_from_hsl(hsl_colour) {
@@ -843,7 +861,6 @@ class ShapeScene extends Scene2d {
         const curve_option = [...curve_select.options].filter(option => option.value == this.current_curve.name)[0];
         curve_select.selectedIndex = curve_option.index;
         const colour = this.current_curve.colour;
-        chromute_button.textContent = this.current_curve.colour ? 'Chromute' : 'Plain';
         curve_checkbox.style.background = 
             colour 
             ? '#000' 
@@ -869,8 +886,8 @@ class ShapeScene extends Scene2d {
     
     #transform_to_canvas([x, y]) {
         return [
-            Math.floor(x = (x + 1) / 2 * this.width),
-            Math.floor(y = (y + 1) / 2 * this.height)
+            Math.floor((x + 1) / 2 * this.width),
+            Math.floor((y + 1) / 2 * this.height)
         ];
     }
 
@@ -887,6 +904,7 @@ class ShapeScene extends Scene2d {
             const curve = this.curves[this.curve_names[i]];
             const shape = curve.shape;
             if (!curve.hidden) {
+                
                 const [x, y] = this.#transform_to_canvas(curve.func(...curve.params, this.progress * curve.speed + curve.seed));
                 this.ctx.save();
                 const [nx, ny] = [shape.y_last - y, x - shape.x_last];
@@ -895,30 +913,25 @@ class ShapeScene extends Scene2d {
                 [shape.x_last, shape.y_last] = [x, y];
                 const x_ = x + shape.wave_amplitude * Math.sin(this.progress * shape.wave_frequency) * shape.normal.x;
                 const y_ = y + shape.wave_amplitude * Math.sin(this.progress * shape.wave_frequency) * shape.normal.y;
-
                 this.ctx.translate(x_, y_);
                 this.ctx.rotate(curve.rotation * this.progress);
+                shape.polychrome_speed = curve.polychrome_speed;
                 shape.draw(this.ctx, 0, 0, curve.colour, this.progress);
                 this.ctx.restore();
                 if (this.mirrored) {
                     // Mirroring 4 ways; later refine this to allow individual reflections
                     this.ctx.save();
-                    this.ctx.translate(this.width - x_, y_);
-                    this.ctx.rotate(curve.rotation * this.progress);
+                    this.ctx.translate(this.width - x_, y_);        // left-right; reflect in y axis
+                    this.ctx.rotate(-curve.rotation * this.progress);
                     shape.draw(this.ctx, 0, 0, curve.colour, this.progress);
                     this.ctx.restore();
                     this.ctx.save();
-                    this.ctx.translate(x_, this.height - y_);
-                    this.ctx.rotate(curve.rotation * this.progress);
+                    this.ctx.translate(x_, this.height - y_);       // top-bottom; reflect in x axis
+                    this.ctx.rotate(-curve.rotation * this.progress);
                     shape.draw(this.ctx, 0, 0, curve.colour, this.progress);
                     this.ctx.restore();
                     this.ctx.save();
-                    this.ctx.translate(this.width - x_, y_);
-                    this.ctx.rotate(curve.rotation * this.progress);
-                    shape.draw(this.ctx, 0, 0, curve.colour, this.progress);
-                    this.ctx.restore();
-                    this.ctx.save();
-                    this.ctx.translate(this.width - x_, this.height - y_);
+                    this.ctx.translate(this.width - x_, this.height - y_);  // both ways; reflect in line y = x
                     this.ctx.rotate(curve.rotation * this.progress);
                     shape.draw(this.ctx, 0, 0, curve.colour, this.progress);
                     this.ctx.restore();
@@ -982,7 +995,12 @@ class Polygon extends Shape {
             ctx.fill();
         }
         else {
-            ctx.fillStyle = `hsl(${Math.sin(progress / 16) * 90 + 270 + this.order * r} 100% 50%)`;
+            const r = Math.sin(
+                (progress / 16)
+                * (this.polychrome_speed / 25)
+            )
+            * 170 + 170;
+            ctx.fillStyle = `hsl(${r + (r > 100 ? 20 : 0)} 100% 50%)`;    // just cut out 20 degrees of garish greens!
             ctx.fill();
         }
         ctx.restore();
@@ -1019,7 +1037,12 @@ class Moon extends Shape {
             ctx.fill();
         }
         else {
-            ctx.fillStyle = `hsl(${Math.sin(progress / 32) * 90 + 270 + this.id * r} 100% 50%)`;
+            const r = Math.sin(
+                (progress / 16)
+                * (this.polychrome_speed / 25)
+            )
+            * 170 + 170;
+            ctx.fillStyle = `hsl(${r + (r > 100 ? 20 : 0)} 100% 50%)`;    // just cut out 20 degrees of garish greens!
             ctx.fill();
         }
         ctx.restore();
@@ -1052,14 +1075,30 @@ class Ring extends HubbedShape {
         if (this.pulse) {
             r +=  Math.max(-r + 1, this.pulse * Math.sin(progress) * r);
         }
-        ctx.fillStyle = colour ?? `hsl(${Math.sin(progress / this.radius * (this.id + 1)) * 90 + 270} 100% 50%)`;
         ctx.beginPath();
         ctx.ellipse(x, y, r, r * this.eccentricity, 0, 0, 2 * Math.PI);
-        ctx.fill();
         ctx.fillStyle = 'hsla(0, 0%, 0%, 1)';
         ctx.beginPath();
         ctx.ellipse(x, y, this.hub, this.hub * this.eccentricity, 0, 0, 2 * Math.PI);
-        ctx.fill();
+
+        if (this.outline) {
+            ctx.strokeStyle = this.outline;
+            ctx.lineWidth = this.thickness;
+            ctx.stroke();
+        }
+        if (colour) {
+            ctx.fillStyle = colour;
+            ctx.fill();
+        }
+        else {
+            const r = Math.sin(
+                (progress / 16)
+                * (this.polychrome_speed / 25)
+            )
+            * 170 + 170;
+            ctx.fillStyle = `hsl(${r + (r > 100 ? 20 : 0)} 100% 50%)`;    // just cut out 20 degrees of garish greens!
+            ctx.fill();
+        }
     }
 }
 
