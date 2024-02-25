@@ -444,6 +444,17 @@ class ShapeScene extends Scene2d {
                         this.mirrored = false;
                         init();
                         break;
+                    case 'background':
+                        const cp = document.querySelector('section#colour-picker');
+                        const cpi = cp.querySelector('input');
+                        cpi.addEventListener('input', event => {
+                            this.canvas.style.backgroundColor = event.target.value;
+                        });
+                        cpi.addEventListener('change', event => {
+                            cp.hidden = true;    
+                        });                        
+                        cp.hidden = false;
+                        break;
                     case 'mirror':
                         this.mirrored = !this.mirrored;
                         event.target.textContent = this.mirrored ? 'Unmirror' : 'Mirror';
@@ -487,6 +498,12 @@ class ShapeScene extends Scene2d {
                         link.click();
                         link.delete;
                         break;
+                    case 'reload':
+                        location.reload();
+                        break;
+                    case 'help':
+                        help.hidden = false;
+                        break;
                     default:
                 }
             });
@@ -516,19 +533,15 @@ class ShapeScene extends Scene2d {
                         case ' ':
                             // Toggle play/pause
                             this.paused = !this.paused;
-                            if (!this.paused) {     // User clicked "Play"
-                                event.target.textContent = 'Pause';
+                            const button = this.buttons.filter(button => button.id == 'pause')[0];
+                            if (!this.paused) {     // User wants to continue playing
+                                button.textContent = 'Pause';
                                 this.frame_request = requestAnimationFrame(this.update.bind(this));
                             }
-                            else {                  // User clicked "Pause"
+                            else {                  // User wants to pause
                                 cancelAnimationFrame(this.frame_request);
-                                event.target.textContent = 'Play';
+                                button.textContent = 'Play';
                             }
-                            break;
-                        case 'h':
-                            // Show help
-                            event.preventDefault();
-                            help.style.display = help.style.display == 'none' ? 'block' : 'none';
                             break;
                         default:
                     }
@@ -1180,8 +1193,8 @@ const canvas = document.querySelector('canvas');
 const param_details = document.querySelector('#params-wrapper > #details');
 let scenes = [];
 
-document.querySelector('aside#help button').addEventListener('click', event => {
-    event.target.parentElement.style.display = 'none';
+document.querySelector('aside#help button#hide').addEventListener('click', event => {
+    help.hidden = true;
 });
 
 ['load', 'resize'].forEach(event => window.addEventListener(event, init));

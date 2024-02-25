@@ -13,9 +13,11 @@
 <body>
     <main id="main">
         <nav id="nav-top">
-            <span>Vermichrome</span>
-            <span>Another</span>
-            <span>This One</span>
+            <span><a href=# target="_blank">Vermichrome</a></span>
+            <span><a href="https://www.zeroundefined.net" target="_blank">Zero Undefined</a></span>
+            <span><a href="https://www.teraspora.net" target="_blank">Teraspora</a></span>
+            <span><a href="https://www.illegaloperation.net" target="_blank">Illegal Operation</a></span>
+
         </nav>
         <canvas></canvas>
         <section id="controls">
@@ -23,12 +25,12 @@
                 <button id="pause">Pause</button>
                 <button id="clear">Clear</button>
                 <button id="init">Init</button>
-                <button id="global-speed">Global Speed</button>
+                <button id="background">Background</button>
                 <button id="mirror">Mirror</button>
                 <button id="debug">Debug</button>
                 <button id="save">Save</button>
-                <button id="ganesh" disabled>Ganesh</button>
-                <button id="help" disabled>Help</button>
+                <button id="reload">Reload</button>
+                <button id="help">Help</button>
                 <button id="github" onclick=" window.open('https://github.com/teraspora/trig_worms','_blank')">Github</button>
                 <button id="ZU" onclick=" window.open('https://www.zeroundefined.net/','_blank')">ZU</button>
                 <button id="IO" onclick=" window.open('https://illegaloperation.net/','_blank')">IO</button>
@@ -168,7 +170,7 @@
             </div>
         </section>
     </main>
-    <aside id="help">
+    <aside id="help" hidden>
         <h2>Keyboard Shortcuts</h2>
 
         <table>
@@ -221,8 +223,15 @@
             <td><code>Space</code></td>
         </tr>
         </table>
-        <button>Hide</button>
+        <button id="hide">Hide</button>
     </aside>
+
+    <section id="colour-picker" hidden>
+        <div>
+            <input type="color" id="head" name="canvas-background" value="#000000" />
+            <label for="canvas-background">Canvas Background</label>
+        </div>
+    </section>
 
     <script src="scripts/main.js"></script>
 </body>

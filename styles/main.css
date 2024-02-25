@@ -95,9 +95,8 @@ input[type=checkbox].curve-check {
     background-color: #f04;
 }
 
-#buttons>button#global-speed {
+#buttons>button#background {
     background-color: #ff4800;
-    font-size: 0.6vw;
 }
 
 #buttons>button#mirror {
@@ -112,7 +111,7 @@ input[type=checkbox].curve-check {
     background-color: #ff80d9;
 }
 
-#buttons>button#ganesh {
+#buttons>button#reload {
     background-color: #a75aff;
 }
 
@@ -127,40 +126,17 @@ input[type=checkbox].curve-check {
 #buttons>button#ZU {
     color: var(--highlight-col);
     background-color: #000;
-    border: 1px solid #333;
+    border: 2px solid #333;
 }
 
 #buttons>button#IO {
     color: #00ff88;
     background-color: #000;
-    border: 1px solid #333;
+    border: 2px solid #333;
 }
 
 #buttons>button:hover {
     transform: scale(1.04);
-}
-
-aside#help {
-    display: none;
-    position: fixed;
-    background-color: #222;
-    color: var(--plain-text-col);
-    border: 1px solid #f04;
-    top: 5vh;
-    left: 50vw;
-    padding: 1vw;
-    margin: 5px;
-}
-aside#help button {
-    background-color: var(--highlight-col);
-    color: #000;
-    width: 3vw;
-    height: 3vh;
-    margin-top: 1vh;
-    font-size: 1vw;
-}
-aside#help table {
-    padding: 1vw;;
 }
 
 input[type="checkbox"] {
@@ -241,6 +217,37 @@ select, select > option {
     margin: 0.1vw;
     color: var(--plain-text-col);
     font-size: 0.7vw;
+}
+
+aside#help {
+    /* display: none; */
+    position: fixed;
+    background-color: #222;
+    color: var(--plain-text-col);
+    border: 1px solid #f04;
+    top: 5vh;
+    left: 50vw;
+    padding: 1vw;
+    margin: 5px;
+}
+aside#help button#hide {
+    background-color: var(--highlight-col);
+    color: #000;
+    width: 3vw;
+    height: 3vh;
+    margin-top: 1vh;
+    font-size: 1vw;
+}
+aside#help table {
+    padding: 1vw;;
+}
+
+section#colour-picker {
+    position: fixed;
+    top: 16vh;
+    left: 50vw;
+    padding: 1vw;
+    margin: 5px;
 }
 
 .hidden {
