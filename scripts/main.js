@@ -424,6 +424,7 @@ class ShapeScene extends Scene2d {
         this.current_curve = active_curves[0];
         
         // UI Controls
+        this.curve_select = document.querySelector('section#controls > #params-wrapper >select#curve-select');
         this.#create_curve_checkboxes();
         this.#create_params_section();
 
@@ -450,6 +451,9 @@ class ShapeScene extends Scene2d {
                         this.progress = 0;
                         break;
                     case 'init':
+                        cancelAnimationFrame(this.frame_request);
+                        this.curve_select.onchange = null;
+                        this.curve_select.innerHTML = '';
                         this.#initialise_buttons();
                         this.paused = false;
                         this.mirrored = false;
@@ -612,8 +616,7 @@ class ShapeScene extends Scene2d {
 
     #update_parameter_display() {
         this.#update_current_curve_styling();
-        const curve_select = document.querySelector('section#controls > #params-wrapper >select#curve-select');
-        const curve_options = curve_select.querySelectorAll('option');
+        const curve_options = this.curve_select.querySelectorAll('option');
         curve_options.forEach(option => {
             option.style.color = this.curves[option.value].colour;            
         });
@@ -703,24 +706,22 @@ class ShapeScene extends Scene2d {
     }
 
     #create_params_section() {
-        const curve_select = document.querySelector('section#controls > #params-wrapper >select#curve-select');
         this.curve_names.forEach(curve_name => {
             const option = new Option(curve_name, curve_name);
-            curve_select.add(option);
+            this.curve_select.add(option);
             option.style.color = this.curves[curve_name].colour;            
         });
-        curve_select.style.color = this.current_curve.colour;
-        curve_select.addEventListener('change', event => {
+        this.curve_select.style.color = this.current_curve.colour;
+        this.curve_select.onchange = event => {
             this.current_curve = this.curves[event.target.value];
             if (this.current_curve.hidden) {
                 this.current_curve.hidden = false;
-                this.#update_parameter_display();
-                this.#update_curve_checkboxes;
             }
             event.target.style.color = this.current_curve.colour;
             this.#update_parameter_display();
+            this.#update_curve_checkboxes();
             event.target.blur();
-        });
+        };
 
         param_details.addEventListener('change', event => {
             const param = event.target.id;
@@ -792,8 +793,7 @@ class ShapeScene extends Scene2d {
                     const hue_output = document.getElementById('hue-output');
                     hue_output.style.color = this.current_curve.colour ?? this.non_colour;
                     hue_output.value = value;
-                    const curve_select = document.querySelector('section#controls > #params-wrapper >select#curve-select');
-                    curve_select.style.color = this.current_curve.colour ?? this.non_colour;
+                    this.curve_select.style.color = this.current_curve.colour ?? this.non_colour;
                     // Whether hue is -1 or in [0, .., 359] determines whether we show the Polychrome Speed UI -
                     // But this gets handled in this.#update_parameter_display(), called after this switch
                     break;
@@ -875,17 +875,12 @@ class ShapeScene extends Scene2d {
     }
 
     #update_current_curve_styling() {
-        const chromute_button = document.querySelector('button#chromute');
         const curve_checkbox = document.querySelector(`input[name="${this.current_curve.name}"]`);
         const curve_label = document.querySelector(`label#${this.current_curve.name}-label`);
-        const curve_select = document.querySelector('section#controls > #params-wrapper > select#curve-select');
-        const curve_option = [...curve_select.options].filter(option => option.value == this.current_curve.name)[0];
-        curve_select.selectedIndex = curve_option.index;
+        const curve_option = [...this.curve_select.options].filter(option => option.value == this.current_curve.name)[0];
+        this.selectedIndex = curve_option.index;
         const colour = this.current_curve.colour;
-        curve_checkbox.style.background = 
-            colour 
-            ? '#000' 
-            : rg_0;
+        console.log(this.current_curve.name, this.current_curve.colour);
         curve_label.style.background =
             colour 
             ? '#000' 
@@ -900,7 +895,7 @@ class ShapeScene extends Scene2d {
         curve_option.style.Color =
             colour 
             ?? '#000';
-        curve_select.style.color = 
+        this.curve_select.style.color = 
             colour
             ?? this.non_colour;
     }
@@ -1168,10 +1163,13 @@ class Star extends HubbedShape {
 }
 
 function init() {
+    // document.body.outerHTML = document.body.outerHTML;
     if (scenes.length) {
         for (const scene of scenes) {
             cancelAnimationFrame(scene.frame_request);
             delete scene;
+            delete scene.curve;
+            delete scene.shape;
         }
         scenes = [];
     }
@@ -1201,7 +1199,7 @@ const canvas = document.querySelector('canvas');
 const param_details = document.querySelector('#params-wrapper > #details');
 let scenes = [];
 
-document.querySelector('aside#help button#hide').addEventListener('click', event => {
+document.querySelector('aside#help button#hide').addEventListener('click', _ => {
     help.hidden = true;
 });
 

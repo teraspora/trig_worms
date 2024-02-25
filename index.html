@@ -24,7 +24,6 @@
             <div id="buttons">
                 <button id="pause">Pause</button>
                 <button id="clear">Clear</button>
-                <button id="init">Init</button>
                 <button id="background">Background</button>
                 <button id="mirror">Mirror</button>
                 <button id="debug">Debug</button>
@@ -32,8 +31,6 @@
                 <button id="reload">Reload</button>
                 <button id="help">Help</button>
                 <button id="github" onclick=" window.open('https://github.com/teraspora/trig_worms','_blank')">Github</button>
-                <button id="ZU" onclick=" window.open('https://www.zeroundefined.net/','_blank')">ZU</button>
-                <button id="IO" onclick=" window.open('https://illegaloperation.net/','_blank')">IO</button>
             </div>
             <div id="curves">
                  
@@ -50,7 +47,6 @@
             <div id="params-wrapper">
                 <select id="curve-select"></select>
                 <div id="details">
-
                     <div>shape:</div> 
                     <select class="param" id="shape">
                         <option value="Star">Star</option>
@@ -171,7 +167,15 @@
         </section>
     </main>
     <aside id="help" hidden>
-        <h2>Keyboard Shortcuts</h2>
+        <h2>Vermichrome - very brief guide</h2>
+        <p>Vermichrome is a pure Javascript Web App that;s meant to be both fun and educational.</p>
+        <p>It gives you the facility to draw pretty patterns by iterating parametrically-defined 2d curves over time, with each "stroke of the pen" being a shape such as a polygon, a star or a ring.</p>
+        <p>It will start each time with three curves selected randomly from a total of about twenty currently, and randomly-deteremined shapes.   You are free to select and deselect curves as you please, by clicking the checkboxes.   Hit <strong>Clear</strong> to start afresh with your new selection.</p>
+        <p>You can control quite a few parameters, such as shape, order (number of sides or spokes), size, speed, colour, rotation etc..</p>
+        <p>Other effects like pulsing and waviness are there for you to experiment with.</p>
+        <p>To adjust the parameters for a curve, first select it from the dropdown bottom right.</p>
+        <p>Tip:  hit <strong>Pause</strong>, select your curves, adjust their parameters, then just select one of them before hitting <strong>Play</strong>.   When you are satisfied with the drawing, hit <strong>Pause</strong>, deselect the curve, select your next curve and hit <strong>Play</strong> again.   Proceeding like this you can layer patterns on top of one another.</p>
+        <p>Note:  to get changing colours, set the hue to -1.   Then you'll see the <strong>Polychrome Speed</strong> slider, which lets you control the rate of colour change.</p>
 
         <table>
         <tr>
@@ -179,48 +183,16 @@
             <th>Shortcut</th>
         </tr>
         <tr>
-            <td><pre>Toggle debug</pre></td>
-            <td><code>d</code></td>
-        </tr>
-        <tr>
-            <td><pre>Initialise all</pre></td>
-            <td><code>*</code></td>
-        </tr>
-        <tr>
-            <td><pre>Clear drawing</pre></td>
-            <td><code>Escape</code></td>
-        </tr>
-        <tr>
-            <td><pre>Cycle focused shape</pre></td>
-            <td><code>s</code></td>
-        </tr>
-        <tr>
-            <td><pre>Decrease radius</pre></td>
-            <td><code>&lt;</code></td>
-        </tr>
-        <tr>
-            <td><pre>Increase radius</pre></td>
-            <td><code>&gt;</code></td>
-        </tr>
-        <tr>
-            <td><pre>Decrease hub radius</pre></td>
-            <td><code>,</code></td>
-        </tr>
-        <tr>
-            <td><pre>Increase hub radius</pre></td>
-            <td><code>.</code></td>
-        </tr>
-        <tr>
-            <td><pre>Toggle mutating colours</pre></td>
-            <td><code>x</code></td>
-        </tr>
-        <tr>
-            <td><pre>Clear canvas & continue</pre></td>
+            <td><pre>Clear drawing & continue</pre></td>
             <td><code>Escape</code></td>
         </tr>
         <tr>
             <td><pre>Toggle play/pause</pre></td>
             <td><code>Space</code></td>
+        </tr>
+        <tr>
+            <td><pre>Reload</pre></td>
+            <td><code>*</code></td>
         </tr>
         </table>
         <button id="hide">Hide</button>
