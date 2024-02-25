@@ -9,6 +9,7 @@ html, body, * {
     --highlight-col: #ffc000;
     --plain-text-col: #ffe0b1;
     --border-grey: #7a7265;
+    --contrast-col: #00ffbf;
     /* outline: 2px solid red; */
 }
 
@@ -32,7 +33,7 @@ main#main {
 nav#nav-top {
     color: var(--plain-text-col);
     grid-column: 1 / -1;
-    margin: 1vh 1vw 0 1vw;
+    margin: 2vh 1vw 0 1vw;
 }
 
 nav#nav-top span{
@@ -41,6 +42,11 @@ nav#nav-top span{
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+}
+
+nav#nav-top span a.active{
+    text-decoration-line: underline;
+    text-decoration-color: var(--contrast-col);
 }
 
 canvas, #controls, #curves, #params-wrapper, #buttons {

@@ -383,9 +383,17 @@ class ShapeScene extends Scene2d {
         // Curves
         this.curves = curves;
         this.curve_names = Object.keys(this.curves);
-        if (!debug) {
-            this.current_curve = this.curves[this.curve_names[0]];
+        // Choose 3 curves randomly
+        let active_curves = [];
+        const curve_count = this.curve_names.length;
+        while (active_curves.length < 3) {
+            const n = rand_int(curve_count);
+            const curve = this.curves[this.curve_names[n]];
+            if (!active_curves.includes(curve)) {
+                active_curves.push(curve);
+            }
         }
+        
         for (const curve in this.curves) {
             this.curves[curve].default_colour = this.#get_random_colour();
             this.curves[curve].colour = this.curves[curve].default_colour;
@@ -395,6 +403,8 @@ class ShapeScene extends Scene2d {
             this.rotations = [...document.querySelector('select.param#rotation').options].map(option => Number(option.value));
             this.curves[curve].rotation = this.rotations[rand_int(this.rotations.length)];
             this.curves[curve].seed = Math.random() * 4095;
+            this.curves[curve].hidden = !active_curves.includes(this.curves[curve]);
+
             if (debug) {
                 if (this.curves[curve].name !=  debug) {
                     this.curves[curve].hidden = true;
@@ -411,6 +421,7 @@ class ShapeScene extends Scene2d {
                 }
             }
         }
+        this.current_curve = active_curves[0];
         
         // UI Controls
         this.#create_curve_checkboxes();
@@ -464,9 +475,6 @@ class ShapeScene extends Scene2d {
                     case 'ZU':
                         break;
                     case 'IO':
-                        break;
-                    case 'global-speed':
-                        console.log("In global speed case!");
                         break;
                     case 'debug':
                         // Set all curves hidden except current curve
@@ -722,8 +730,8 @@ class ShapeScene extends Scene2d {
                     value = event.target.selectedOptions[0].value;
                     // When user changes shape, carry forward as many attributes as possible from the old shape
                     const common_params = [
-                        '#111',
-                        1,
+                        '#111',     // outline colour
+                        1,          // outline thickness
                         this.current_curve.shape.pulse,
                         this.current_curve.shape.wave_amplitude,
                         this.current_curve.shape.wave_frequency
@@ -746,7 +754,7 @@ class ShapeScene extends Scene2d {
                             break;
                         case 'Ring':
                             this.current_curve.shape = new Ring(
-                                rand_int(5) / 5,    // eccentricity
+                                rand_int(5) / 5,    // eccentricity of ellipse
                                 this.current_curve.shape.radius,
                                 this.current_curve.shape.hub ?? Math.max(Math.floor(this.current_curve.shape.radius / 4), 1),
                                 ...common_params
@@ -1185,7 +1193,7 @@ const rand_int = n => Math.floor(n * Math.random());
 // ============================
 
 // Main code
-debug = false;//'concave_ex';//false;
+debug = false;
 const rg_0 = 'radial-gradient(#0000ff, #990029)';
 const main = document.getElementById('main');
 const help = document.querySelector('aside#help');
