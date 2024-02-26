@@ -239,11 +239,20 @@ aside#help table {
 }
 
 section#colour-picker {
+    background-color: var(--plain-text-col);
+    border: var(--contrast-col);
     position: fixed;
-    top: 16vh;
-    left: 50vw;
+    height: 12vh;
     padding: 1vw;
     margin: 5px;
+    font-size: 0.8vh;
+}
+
+section#colour-picker button#cp-hide {
+    background-color: var(--highlight-col);
+    width: 2vw;
+    height: 2vh;
+    margin-top: 0.5vh;
 }
 
 .hidden {

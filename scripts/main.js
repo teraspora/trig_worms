@@ -453,6 +453,8 @@ class ShapeScene extends Scene2d {
                         break;
                     case 'background':
                         const cp = document.querySelector('section#colour-picker');
+                        cp.style.left = `${event.target.getBoundingClientRect().left}px`;
+                        cp.style.top = `${event.target.getBoundingClientRect().top}px`;
                         const cpi = cp.querySelector('input');
                         cpi.addEventListener('input', event => {
                             this.canvas.style.backgroundColor = event.target.value;
@@ -461,6 +463,8 @@ class ShapeScene extends Scene2d {
                             cp.hidden = true;    
                         });                        
                         cp.hidden = false;
+                        const cpb = cp.querySelector('button#cp-hide');
+                        cpb.addEventListener('click', _ => cp.hidden = true);
                         break;
                     case 'mirror':
                         this.mirrored = !this.mirrored;
@@ -517,6 +521,7 @@ class ShapeScene extends Scene2d {
         
         // Keyboard shortcuts
         window.addEventListener('keyup', event => {
+            event.preventDefault();
             if (!event.ctrlKey && !event.altKey) {
                 const char = event.key;
                 const digit = char.match(/\d/)?.input;
