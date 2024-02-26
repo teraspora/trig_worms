@@ -1083,35 +1083,32 @@ class Ring extends HubbedShape {
         this.eccentricity = eccentricity;
     }
     draw(ctx, x, y, colour, progress) {
-        super.draw(x, y);
         let r = this.radius;
         if (this.pulse) {
             r +=  Math.max(-r + 1, this.pulse * Math.sin(progress) * r);
         }
+        
+        if (colour) {
+            ctx.fillStyle = colour;
+        }
+        else {
+            const r = Math.sin((progress / 16) * (this.polychrome_speed / 25)) * 170 + 170;
+            ctx.fillStyle = `hsl(${r + (r > 100 ? 20 : 0)} 100% 50%)`;    // just cut out 20 degrees of garish greens!
+        }
         ctx.beginPath();
         ctx.ellipse(x, y, r, r * this.eccentricity, 0, 0, 2 * Math.PI);
-        ctx.fillStyle = 'hsla(0, 0%, 0%, 1)';
-        ctx.beginPath();
-        ctx.ellipse(x, y, this.hub, this.hub * this.eccentricity, 0, 0, 2 * Math.PI);
+        ctx.fill();
 
         if (this.outline) {
             ctx.strokeStyle = this.outline;
             ctx.lineWidth = this.thickness;
             ctx.stroke();
         }
-        if (colour) {
-            ctx.fillStyle = colour;
-            ctx.fill();
-        }
-        else {
-            const r = Math.sin(
-                (progress / 16)
-                * (this.polychrome_speed / 25)
-            )
-            * 170 + 170;
-            ctx.fillStyle = `hsl(${r + (r > 100 ? 20 : 0)} 100% 50%)`;    // just cut out 20 degrees of garish greens!
-            ctx.fill();
-        }
+
+        ctx.fillStyle = 'hsla(0, 0%, 0%, 1)';
+        ctx.beginPath();
+        ctx.ellipse(x, y, this.hub, this.hub * this.eccentricity, 0, 0, 2 * Math.PI);
+        ctx.fill();
     }
 }
 
