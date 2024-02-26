@@ -445,6 +445,7 @@ class ShapeScene extends Scene2d {
                             cancelAnimationFrame(this.frame_request);
                             event.target.textContent = 'Play';
                         }
+                        button.blur();
                         break;
                     case 'clear':
                         // Clear drawing
@@ -548,6 +549,7 @@ class ShapeScene extends Scene2d {
                                 cancelAnimationFrame(this.frame_request);
                                 button.textContent = 'Play';
                             }
+                            button.blur();
                             break;
                         default:
                     }
