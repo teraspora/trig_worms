@@ -13,9 +13,12 @@ I also have many more features I intend to implement, and will do so soon.
 This `README` and the Help text will be expanded considerably in due course, so as to to document the app comprehensively.
 
 In the meantime here are a couple of screenshots:
-![](media/tw_00.png)
-![](media/tw_01.png)
-![](media/tw_02.png)
+![](media/app_snapshot_00.png)
+![](media/tw_05.png)
+![](media/tw_06.jpg)
+![](media/tw_07.jpg)
+![](media/tw_04.png)
+![](media/tw_10.png)
 
 
 Do please try it out at <https://teraspora.github.io/trig_worms/>, but don't complain or file issues at this point!   And don't expect it to work on mobile:  that's not a priority at the moment, large screens are the target.   If it crashes your browser, sorry, tough!

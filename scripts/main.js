@@ -734,7 +734,7 @@ class ShapeScene extends Scene2d {
                     param.textContent = this.current_curve.func;
                     break;
                 case 'params':
-                    param.textContent = this.current_curve.params;
+                    // param.textContent = this.current_curve.params;
                     break;
                 default:
             }

@@ -37,11 +37,17 @@ nav#nav-top {
 }
 
 nav#nav-top span{
+    display: inline-block;
     margin: 0 1vw 0 1vw;
     background: radial-gradient(#3ad1ff, #ff7297);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    transition: all 0.3s ease-out;
+}
+
+nav#nav-top span:hover {
+    transform: scale(1.1);
 }
 
 nav#nav-top span a.active{
@@ -205,7 +211,7 @@ select, select > option {
     border: 1px solid var(--border-grey);
     padding: 0.1vw;
     margin: 0.1vw;
-    color: var(--plain-text-col);
+    color: var(--contrast-col);
     font-size: 0.7vw;
 }
 
