@@ -825,7 +825,7 @@ class ShapeScene extends Scene2d {
                         (value == -1)
                             ? null
                             : `hsl(${value} 100% 50%)`;
-                    document.getElementById(`${this.current_curve.name}-label`).style.color = this.current_curve.colour;
+                    document.getElementById(this.current_curve.name).style.color = this.current_curve.colour;
                     const hue_output = document.getElementById('hue-output');
                     hue_output.style.color = this.current_curve.colour ?? this.non_colour;
                     hue_output.value = value;
