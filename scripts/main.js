@@ -384,13 +384,13 @@ class ShapeScene extends Scene2d {
         this.curves = curves;
         this.curve_names = Object.keys(this.curves);
         // Choose 3 curves randomly
-        let active_curves = [];
+        this.active_curves = [];
         const curve_count = this.curve_names.length;
-        while (active_curves.length < 3) {
+        while (this.active_curves.length < 3) {
             const n = rand_int(curve_count);
             const curve = this.curves[this.curve_names[n]];
-            if (!active_curves.includes(curve)) {
-                active_curves.push(curve);
+            if (!this.active_curves.includes(curve)) {
+                this.active_curves.push(curve);
             }
         }
         
@@ -403,7 +403,7 @@ class ShapeScene extends Scene2d {
             this.rotations = [...document.querySelector('select.param#rotation').options].map(option => Number(option.value));
             this.curves[curve].rotation = this.rotations[rand_int(this.rotations.length)];
             this.curves[curve].seed = Math.random() * 4095;
-            this.curves[curve].hidden = !active_curves.includes(this.curves[curve]);
+            this.curves[curve].hidden = !this.active_curves.includes(this.curves[curve]);
 
             if (debug) {
                 if (this.curves[curve].name !=  debug) {
@@ -421,7 +421,8 @@ class ShapeScene extends Scene2d {
                 }
             }
         }
-        this.current_curve = active_curves[0];
+        // Set current curve to be the first in the list of active curves
+        this.current_curve = this.active_curves[0];
         
         // UI Controls
         this.curve_select = document.querySelector('section#controls > #params-wrapper >select#curve-select');
@@ -449,15 +450,6 @@ class ShapeScene extends Scene2d {
                         // Clear drawing
                         this.ctx.clearRect(0, 0, this.width, this.height);
                         this.progress = 0;
-                        break;
-                    case 'init':
-                        cancelAnimationFrame(this.frame_request);
-                        this.curve_select.onchange = null;
-                        this.curve_select.innerHTML = '';
-                        this.#initialise_buttons();
-                        this.paused = false;
-                        this.mirrored = false;
-                        init();
                         break;
                     case 'background':
                         const cp = document.querySelector('section#colour-picker');
@@ -491,6 +483,7 @@ class ShapeScene extends Scene2d {
                                 this.curves[curve].colour = this.curves[curve].default_colour;
                             }
                         });
+                        this.active_curves =  [this.current_curve];
                         this.mirrored = false;
                         this.#initialise_buttons();
                         this.#update_parameter_display();
@@ -521,6 +514,7 @@ class ShapeScene extends Scene2d {
             });
         });
         
+        // Keyboard shortcuts
         window.addEventListener('keyup', event => {
             if (!event.ctrlKey && !event.altKey) {
                 const char = event.key;
@@ -540,7 +534,7 @@ class ShapeScene extends Scene2d {
                             break;
                         case '*':
                             // Start again from scratch
-                            init();
+                            location.reload();
                             break;
                         case ' ':
                             // Toggle play/pause
@@ -563,6 +557,7 @@ class ShapeScene extends Scene2d {
         });
     }
 
+    // Curve checkboxes
     #create_curve_checkboxes() {
         const checkbox_wrapper = document.querySelector('section#controls > #curves > fieldset');
         const checkbox = checkbox_wrapper.firstElementChild;
@@ -579,21 +574,22 @@ class ShapeScene extends Scene2d {
             label.id = `${curve_name}-label`;
             const input = curve_switch.querySelector('input');
             input.type = 'checkbox';
-            input.checked = !this.curves[curve_name].hidden;
+            input.checked = this.active_curves.includes(this.curves[curve_name]);
             input.name = curve_name;
+            this.checkboxes.push(input);
             // Create event listener for when user clicks a curve's checkbox to show/hide it
             input.addEventListener('change', event => {
                 const curve = this.curves[event.target.name];
                 curve.hidden = !curve.hidden;
-                const active_curves = this.curve_names
-                .filter(curve_name => !this.curves[curve_name].hidden)
-                .map(curve_name => this.curves[curve_name]);
+                this.active_curves = this.curve_names
+                    .filter(name => !this.curves[name].hidden)
+                    .map(name => this.curves[name]);
                 // If user hides current curve, set current curve to the next active one
                 if (curve.hidden && curve == this.current_curve) {
-                    if (active_curves.length) {
-                        this.current_curve = active_curves[0];
+                    if (this.active_curves.length) {
+                        this.current_curve = this.active_curves[0];
                     }
-                    else {
+                    else {      // unless that was the last active curve, in which case set it to the first of our curves
                         this.current_curve = this.curves[this.curve_names[0]];
                     }
                 }
@@ -601,10 +597,10 @@ class ShapeScene extends Scene2d {
                 else if (!curve.hidden) {
                     this.current_curve = curve;
                 }
-                // else... hmmm, if we set it to null, we'll have to include that value in the select...
+                // and if user has hidden a curve other than the current curve, all we do is update the checkboxes
+                this.#update_curve_checkboxes();
                 this.#update_parameter_display();
             });
-            this.checkboxes.push(input);
         }
     }
 
@@ -614,6 +610,33 @@ class ShapeScene extends Scene2d {
         });
     }
 
+    #update_current_curve_styling() {
+        // const curve_checkbox = document.querySelector(`input[name="${this.current_curve.name}"]`);
+        const curve_label = document.querySelector(`label#${this.current_curve.name}-label`);
+        const curve_option = [...this.curve_select.options].filter(option => option.value == this.current_curve.name)[0];
+        this.selectedIndex = curve_option.index;
+        const colour = this.current_curve.colour;
+        console.log(this.current_curve.name, this.current_curve.colour);
+        curve_label.style.background =
+            colour 
+            ? '#000' 
+            : rg_0;
+        curve_label.style.color =
+            colour 
+            ?? this.non_colour;
+        curve_option.style.backgroundColor =
+            colour 
+            ? '#000' 
+            : this.current_curve.default_colour;
+        curve_option.style.Color =
+            colour 
+            ?? '#000';
+        this.curve_select.style.color = 
+            colour
+            ?? this.non_colour;
+        this.curve_select.value = this.current_curve.name;
+    }
+    
     #update_parameter_display() {
         this.#update_current_curve_styling();
         const curve_options = this.curve_select.querySelectorAll('option');
@@ -874,32 +897,6 @@ class ShapeScene extends Scene2d {
         }
     }
 
-    #update_current_curve_styling() {
-        const curve_checkbox = document.querySelector(`input[name="${this.current_curve.name}"]`);
-        const curve_label = document.querySelector(`label#${this.current_curve.name}-label`);
-        const curve_option = [...this.curve_select.options].filter(option => option.value == this.current_curve.name)[0];
-        this.selectedIndex = curve_option.index;
-        const colour = this.current_curve.colour;
-        console.log(this.current_curve.name, this.current_curve.colour);
-        curve_label.style.background =
-            colour 
-            ? '#000' 
-            : rg_0;
-        curve_label.style.color =
-            colour 
-            ?? this.non_colour;
-        curve_option.style.backgroundColor =
-            colour 
-            ? '#000' 
-            : this.current_curve.default_colour;
-        curve_option.style.Color =
-            colour 
-            ?? '#000';
-        this.curve_select.style.color = 
-            colour
-            ?? this.non_colour;
-    }
-    
     #transform_to_canvas([x, y]) {
         return [
             Math.floor((x + 1) / 2 * this.width),
@@ -1163,22 +1160,10 @@ class Star extends HubbedShape {
 }
 
 function init() {
-    // document.body.outerHTML = document.body.outerHTML;
-    if (scenes.length) {
-        for (const scene of scenes) {
-            cancelAnimationFrame(scene.frame_request);
-            delete scene;
-            delete scene.curve;
-            delete scene.shape;
-        }
-        scenes = [];
-    }
     const {width: main_width, height: main_height} = main.getBoundingClientRect();
-    
     canvas.width = Math.floor(main_width - 200);
     canvas.height = main_height;
     const scene = new ShapeScene(canvas, Curves);
-    scenes.push(scene);
     scene.render();
 }
 
