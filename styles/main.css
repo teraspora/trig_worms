@@ -249,3 +249,8 @@ section#colour-picker {
 .hidden {
     display: none;
 }
+
+.emphasised {
+    text-decoration: underline;
+    transform: scale(1.1);
+}

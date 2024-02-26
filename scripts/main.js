@@ -487,7 +487,7 @@ class ShapeScene extends Scene2d {
                         this.mirrored = false;
                         this.#initialise_buttons();
                         this.#update_parameter_display();
-                        this.#update_curve_checkboxes();
+                        this.#update_curves_listing();
                         // Clear drawing
                         this.ctx.clearRect(0, 0, this.width, this.height);
                         this.progress = 0
@@ -565,7 +565,8 @@ class ShapeScene extends Scene2d {
         const checkbox = checkbox_wrapper.firstElementChild;
         const checkbox_clone = checkbox.cloneNode(true);
         checkbox_wrapper.innerHTML = '';
-        this.checkboxes = [];
+        this.curve_checkboxes = [];
+        this.curve_labels = [];
         for (const curve_name of this.curve_names){
             const curve_switch = checkbox_clone.cloneNode(true);
             checkbox_wrapper.appendChild(curve_switch);
@@ -573,12 +574,13 @@ class ShapeScene extends Scene2d {
             label.textContent = curve_name;
             const colour = this.curves[curve_name].colour;
             label.style.color = colour;
-            label.id = `${curve_name}-label`;
+            label.id = curve_name;
+            this.curve_labels.push(label);
             const input = curve_switch.querySelector('input');
             input.type = 'checkbox';
             input.checked = this.active_curves.includes(this.curves[curve_name]);
             input.name = curve_name;
-            this.checkboxes.push(input);
+            this.curve_checkboxes.push(input);
             // Create event listener for when user clicks a curve's checkbox to show/hide it
             input.addEventListener('change', event => {
                 const curve = this.curves[event.target.name];
@@ -600,21 +602,24 @@ class ShapeScene extends Scene2d {
                     this.current_curve = curve;
                 }
                 // and if user has hidden a curve other than the current curve, all we do is update the checkboxes
-                this.#update_curve_checkboxes();
+                this.#update_curves_listing();
                 this.#update_parameter_display();
             });
         }
     }
 
-    #update_curve_checkboxes() {
-        this.checkboxes.forEach(box => {
+    #update_curves_listing() {
+        this.curve_checkboxes.forEach(box => {
             box.checked = !this.curves[box.name].hidden;
         });
+        this.curve_labels
+            .filter(label => label.id != this.current_curve.name)
+            .forEach(label => label.classList.remove('emphasised'));
     }
 
     #update_current_curve_styling() {
         // const curve_checkbox = document.querySelector(`input[name="${this.current_curve.name}"]`);
-        const curve_label = document.querySelector(`label#${this.current_curve.name}-label`);
+        const curve_label = document.querySelector(`label#${this.current_curve.name}`);
         const curve_option = [...this.curve_select.options].filter(option => option.value == this.current_curve.name)[0];
         this.selectedIndex = curve_option.index;
         const colour = this.current_curve.colour;
@@ -626,6 +631,7 @@ class ShapeScene extends Scene2d {
         curve_label.style.color =
             colour 
             ?? this.non_colour;
+        curve_label.classList.add('emphasised');
         curve_option.style.backgroundColor =
             colour 
             ? '#000' 
@@ -744,7 +750,7 @@ class ShapeScene extends Scene2d {
             }
             event.target.style.color = this.current_curve.colour;
             this.#update_parameter_display();
-            this.#update_curve_checkboxes();
+            this.#update_curves_listing();
             event.target.blur();
         };
 
