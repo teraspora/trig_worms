@@ -20,25 +20,21 @@ In the meantime here are a couple of screenshots:
 ![](media/tw_04.png)
 ![](media/tw_10.png)
 
+- And check out this video I made from the app, adding my own piano accompaniment:
+- <https://www.youtube.com/watch?v=L64Ztsul7bA>
+
 
 Do please try it out at <https://teraspora.github.io/trig_worms/>, but don't complain or file issues at this point!   And don't expect it to work on mobile:  that's not a priority at the moment, large screens are the target.   If it crashes your browser, sorry, tough!
 
 ## TODO:
 
 ### Current
-- Fix bug where selecting a hidden curve messes the show/hide colours and that messes the active curve
 - Keyboard shortcuts
 - Update this `README` with full documentation
 - Update Help pane
-- Fix `init()` multiplying scenes
-- Fix curve select not updating properly when
-  - curve hidden
-  - curve shown when all were hidden
-  - etc.!
 - Allow user to vary curve parameters
 - Allow user to specify own functions
-- Allow mirroring
-- Allow save image and display all saved.   Local storage and user's local file system...
+- Allow save image to local storage
 - Bubbles
 - Other browsers - Safari showing sliders as black
 - Mobile
