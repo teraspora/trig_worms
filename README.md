@@ -19,6 +19,7 @@ In the meantime here are a couple of screenshots:
 ![](media/tw_07.jpg)
 ![](media/tw_04.png)
 ![](media/tw_10.png)
+![](media/tw_11.png)
 
 - And check out this video I made from the app, adding my own piano accompaniment:
 - <https://www.youtube.com/watch?v=L64Ztsul7bA>
@@ -35,6 +36,7 @@ Do please try it out at <https://teraspora.github.io/trig_worms/>, but don't com
 - Allow user to vary curve parameters
 - Allow user to specify own functions
 - Allow save image to local storage
+- Let user split canvas into 4, focus on current curve, with different parameters for each.
 - Bubbles
 - Other browsers - Safari showing sliders as black
 - Mobile
@@ -45,6 +47,7 @@ Do please try it out at <https://teraspora.github.io/trig_worms/>, but don't com
   - Organise inputs better
   - Use web components
 - Mutate using shader
+- Consider using Svelte
 
 ## Acknowledgements
 

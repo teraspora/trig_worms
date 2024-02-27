@@ -46,7 +46,10 @@
             </div>
             <div id="params-wrapper">
                 <select id="curve-select"></select>
-                <div id="details">
+
+                <!-- Normally show details div (below), so edit-params is hidden by default in CSS.
+                The table gets populated in JS when user clicks params edit button -->
+                <section id="details">
                     <div>shape:</div> 
                     <select class="param" id="shape">
                         <option value="Star">Star</option>
@@ -157,12 +160,30 @@
                         <option value="3">3</option>
                     </select>
                     
-                    <div>function:</div> 
-                    <div class="param" id="func"></div>
-                    
-                    <div>params:</div> 
-                    <button class="param" id="param_edit">Edit</button>
-                </div>
+                </section>
+
+                <section id="function">
+                    <h5>Function</h5>
+                </section>
+
+                <section id="params-editor">
+                    <table id="param-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>a</td>
+                                <td><input type="number" min="-64" max="64" step="0.1"></td>
+                            </tr>
+                            
+                        </tbody>
+                    </table>
+                </section>
+
             </div>
         </section>
     </main>

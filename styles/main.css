@@ -196,23 +196,66 @@ select, select > option {
     grid-template-columns: 1fr 1fr;
 }
 
-#details, #details > p {
+#params-editor {
+    justify-content: center;
+    margin: 1vh auto;
+}
+
+#params-wrapper {
+    display: grid;
+    justify-content: center;
+}
+
+table#param-table {
+    border: 1px solid #222;
+    padding: 1vw;
+    text-transform: none;
+}
+
+table#param-table th {
+    color: var(--highlight-col);
+}
+
+table#param-table tr {
+    color: var(--contrast-col);
+}
+
+table input {
+    color: var(--plain-text-col);
+    font-size: 1.2vw;
+    padding: 0.3vw;
+}
+
+section#details, section#details > p {
     color: var(--plain-text-col);
     padding: 0.5vw;
 }
 
-#details #func {
-    font-size: 0.7vw;
-    text-transform: none;
-    color: var(--highlight-col);
-}
-
-#details .param {
+section#details .param {
     border: 1px solid var(--border-grey);
     padding: 0.1vw;
     margin: 0.1vw;
     color: var(--contrast-col);
     font-size: 0.7vw;
+}
+
+section#function {
+    border-top: 1px solid var(--border-grey);
+    border-bottom: 1px solid var(--border-grey);
+    border-radius: 0;
+    padding: 0.5vw;
+    margin: 0.2vw;
+    font-size: 0.9vw;
+    text-transform: none;
+    color: var(--contrast-col);
+}
+
+section#function h5 {
+    color: var(--plain-text-col);
+}
+
+section#function pre {
+    overflow-x: scroll;
 }
 
 aside#help {

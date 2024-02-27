@@ -11,8 +11,7 @@ const Curves = {
             ];
         },
         params: [56, 12, 76, 102],  // good use of whole space
-        speed: 0.002,
-        hidden: false
+        speed: 0.002
     },
 
     curious: {
@@ -25,7 +24,7 @@ const Curves = {
             ];
         },
         params: [3, -5, 17, 5, -3.5, 3.4, .9],   // more beautiful loops!!
-        speed: 0.2,
+        speed: 0.2
         // params: [27, 291, 77, 5, 400, 512, 2239],
         // speed: 0.02,
         // params: [11, 3, 17, 5, 28, 64, 9], // ball of string
@@ -47,8 +46,7 @@ const Curves = {
         // params: [-2, 1.5, 5, 1.367, 2.5, -2.4, 1.707],   // beautiful loopy assymetry
         // speed: 0.4,
         // params: [-2.11, 1.4142, 3, 2.367, 2.5, -2.4, 1.707],   // complex ball of string
-        // speed: 0.4,
-        hidden: false
+        // speed: 0.4
     },
 
     dormouse: {
@@ -59,8 +57,7 @@ const Curves = {
             ];
         },
         params: [33, 11],   // electron rings
-        speed: 0.005,
-        hidden: true
+        speed: 0.005
     },
 
     epitrochoid: {
@@ -71,8 +68,7 @@ const Curves = {
             ];
         },
         params: [15, 23, -8],
-        speed: 0.1,
-        hidden: true
+        speed: 0.1
     },
 
     ovaloopy: {
@@ -83,8 +79,7 @@ const Curves = {
             ];
         },
         params: [51, 71],
-        speed: 0.002,
-        hidden: true
+        speed: 0.002
     },
 
     n_folium: {
@@ -95,8 +90,7 @@ const Curves = {
             ];
         },
         params: [11, 8],
-        speed: 0.02,
-        hidden: true
+        speed: 0.02
     },
 
     lissajous: {
@@ -107,8 +101,7 @@ const Curves = {
             ];
         },
         params: [-3.1, 4.61],
-        speed: 0.02,
-        hidden: true
+        speed: 0.02
     },
 
     rhodonea: {
@@ -117,8 +110,7 @@ const Curves = {
             Math.cos(k * t + t) * Math.sin(t),
         ],
         params: [27 / 11],
-        speed: 0.02,
-        hidden: true
+        speed: 0.02
     },
 
     hypotrochoid: {
@@ -129,8 +121,7 @@ const Curves = {
             ];
         },
         params: [13, 11, 1],
-        speed: 0.1,
-        hidden: true
+        speed: 0.1
     },
 
     hypocycloid: {
@@ -143,8 +134,7 @@ const Curves = {
             ];
         },
         params: [39.5, 37],
-        speed: 0.3,
-        hidden: true
+        speed: 0.3
     },
 
     concave: {
@@ -155,8 +145,7 @@ const Curves = {
             ];
         },
         params: [13, 41],
-        speed: 0.05,
-        hidden: false
+        speed: 0.05
     },
 
     concave_ex: {
@@ -175,8 +164,7 @@ const Curves = {
         // params: [3, 6, 9, 12],
         // params: [Math.PI, 3 * Math.PI, Math.PI, 7 * Math.PI],   // nice and twirly!
         params: [2, 3 * Math.PI, 4, 5 * Math.PI],   // nice and twirly!
-        speed: 0.01,
-        hidden: false
+        speed: 0.01
     },
 
     convoluted: {
@@ -191,8 +179,7 @@ const Curves = {
         // params: [51, 31],    // Twisty bananas
         // speed: 0.005,
         params: [-23, 13],  // unpredictable, all over
-        speed: 0.01,
-        hidden: true
+        speed: 0.01
     },
 
     trig_grid: {
@@ -203,8 +190,7 @@ const Curves = {
             ];
         },
         params: [13, 19],
-        speed: 0.01,
-        hidden: true
+        speed: 0.01
     },
     
     wacky_sin: {
@@ -215,8 +201,7 @@ const Curves = {
             ];
         },
         params: [13, 3],
-        speed: 0.02,
-        hidden: true
+        speed: 0.02
     },
 
     wacky_cos: {
@@ -227,8 +212,7 @@ const Curves = {
             ];
         },
         params: [19, 7],
-        speed: 0.02,
-        hidden: true
+        speed: 0.02
     },
 
     what: {
@@ -239,8 +223,7 @@ const Curves = {
             ];
         },
         params: [27, 23],   // 
-        speed: 0.0002,
-        hidden: true
+        speed: 0.0002
     },
 
     wobbly_hcrr: {
@@ -252,8 +235,7 @@ const Curves = {
             ];
         },
         params: [-67, -37],
-        speed: 0.1,
-        hidden: true
+        speed: 0.1
     },
 
     hcrr: {
@@ -265,8 +247,7 @@ const Curves = {
             ];
         },
         params: [7, -6],
-        speed: 0.1,
-        hidden: true
+        speed: 0.1
     },
 
     astroid: {
@@ -278,8 +259,7 @@ const Curves = {
             ];
         },
         params: [],
-        speed: 0.1,
-        hidden: true
+        speed: 0.1
     },
 
     loopy: {
@@ -290,8 +270,7 @@ const Curves = {
             ];
         },
         params: [13, 17],
-        speed: 0.04,
-        hidden: true
+        speed: 0.008
     },
 
     init: function() {
@@ -404,6 +383,7 @@ class ShapeScene extends Scene2d {
             this.curves[curve].rotation = this.rotations[rand_int(this.rotations.length)];
             this.curves[curve].seed = Math.random() * 4095;
             this.curves[curve].hidden = !this.active_curves.includes(this.curves[curve]);
+            this.curves[curve].param_names = this.curves[curve].func.toString().split(',').slice(0, this.curves[curve].params.length).map(t => t.slice(-1));
 
             if (debug) {
                 if (this.curves[curve].name !=  debug) {
@@ -426,6 +406,8 @@ class ShapeScene extends Scene2d {
         
         // UI Controls
         this.curve_select = document.querySelector('section#controls > #params-wrapper >select#curve-select');
+        this.tbody = document.querySelector('table#param-table>tbody');
+        this.row_template = this.tbody.firstElementChild.cloneNode(true);
         this.#create_curve_checkboxes();
         this.#create_params_section();
 
@@ -598,7 +580,7 @@ class ShapeScene extends Scene2d {
                     if (this.active_curves.length) {
                         this.current_curve = this.active_curves[0];
                     }
-                    else {      // unless that was the last active curve, in which case set it to the first of our curves
+                    else {      // unless that was the last active curve, in which case set it to the first of all curves
                         this.current_curve = this.curves[this.curve_names[0]];
                     }
                 }
@@ -628,7 +610,7 @@ class ShapeScene extends Scene2d {
         const curve_option = [...this.curve_select.options].filter(option => option.value == this.current_curve.name)[0];
         this.selectedIndex = curve_option.index;
         const colour = this.current_curve.colour;
-        console.log(this.current_curve.name, this.current_curve.colour);
+        // console.log(this.current_curve.name, this.current_curve.colour);
         curve_label.style.background =
             colour 
             ? '#000' 
@@ -647,7 +629,16 @@ class ShapeScene extends Scene2d {
         this.curve_select.style.color = 
             colour
             ?? this.non_colour;
+        // Set the dropdown's value to the current curve's name 
         this.curve_select.value = this.current_curve.name;
+        // Populate the function box
+        const func_box = document.querySelector('section#function');
+        const markup = `<code>${this.current_curve.func}</code>`;
+        const pre = func_box.querySelector('pre') ?? document.createElement('pre');
+        pre.innerHTML = markup;
+        func_box.querySelector('pre') ?? func_box.appendChild(pre); 
+        // Change params editor section for new current curve
+        this.#create_param_table();
     }
     
     #update_parameter_display() {
@@ -729,12 +720,6 @@ class ShapeScene extends Scene2d {
                     break;
                 case 'rotation':
                     param.value = this.current_curve.rotation;
-                    break;
-                case 'func':
-                    param.textContent = this.current_curve.func;
-                    break;
-                case 'params':
-                    // param.textContent = this.current_curve.params;
                     break;
                 default:
             }
@@ -915,6 +900,25 @@ class ShapeScene extends Scene2d {
             Math.floor((x + 1) / 2 * this.width),
             Math.floor((y + 1) / 2 * this.height)
         ];
+    }
+
+    #create_param_table() {
+        let i = 0;
+        this.tbody.innerHTML = '';
+        for (const param of this.current_curve.params) {
+            const row = this.row_template.cloneNode(true);
+            row.firstElementChild.textContent = this.current_curve.param_names[i];
+            const input = row.querySelector('input');
+            input.id = `param-${i++}`;
+            input.value = param;
+            this.tbody.appendChild(row);
+            input.onchange = event => this.current_curve.params[~~(event.target.id.slice(5))] = ~~input.value;
+        }
+    }
+
+    #get_param_name() {
+        // temp stub
+        return ['a', 'b', 'c', 'd'][rand_int(4)];
     }
 
     render() {
