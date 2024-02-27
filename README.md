@@ -25,7 +25,8 @@ In the meantime here are a couple of screenshots:
 - <https://www.youtube.com/watch?v=L64Ztsul7bA>
 
 
-Do please try it out at <https://teraspora.github.io/trig_worms/>, but don't complain or file issues at this point!   And don't expect it to work on mobile:  that's not a priority at the moment, large screens are the target.   If it crashes your browser, sorry, tough!
+Do please try it out at <https://teraspora.github.io/trig_worms/>!   But don't expect it to work great on iPhones:  that's not a priority at the moment, large screens are the target.   It seems to work reasonably on Android, but I have not checked in detail.
+If it crashes your browser, sorry, tough!
 
 ## TODO:
 

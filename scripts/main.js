@@ -14,7 +14,7 @@ const Curves = {
         speed: 0.002
     },
 
-    curious: {
+    oyster: {
         func: (a, b, c, d, e, f, g, t) => {
             const t_ = t / 10;
             const [ad, ae, af, ag] = [d, e, f, g].map(w => Math.abs(w));
@@ -78,7 +78,7 @@ const Curves = {
                 (Math.cos(a * t) / (y = Math.sin(b * t)) ? y : 0.00000000000000000001),
             ];
         },
-        params: [51, 71],
+        params: [48, 61],
         speed: 0.002
     },
 
@@ -100,7 +100,7 @@ const Curves = {
                 Math.sin(ky * t)
             ];
         },
-        params: [-3.1, 4.61],
+        params: [-3.1, 4.6],
         speed: 0.02
     },
 
@@ -137,7 +137,7 @@ const Curves = {
         speed: 0.3
     },
 
-    concave: {
+    termite: {
         func: (a, b, t) => {
             return [
                 (a * Math.cos(-t) + Math.cos(b * t)) / (a + 1),
@@ -148,7 +148,7 @@ const Curves = {
         speed: 0.05
     },
 
-    concave_ex: {
+    dragonfly: {
         func: (a, b, c, d, t) => {
             return [
                 (a * Math.cos(-t) + Math.cos(b * t)) / (a + 1),
@@ -167,7 +167,7 @@ const Curves = {
         speed: 0.01
     },
 
-    convoluted: {
+    convolvulus: {
         func: (a, b, t) => {
             return [
                 (Math.sin(a * Math.cos(t)) + Math.cos(b * Math.sin(t))) / 2,
@@ -182,7 +182,7 @@ const Curves = {
         speed: 0.01
     },
 
-    trig_grid: {
+    crisscross: {
         func: (p, q, t) => {
             return [            
                 Math.sin(p * Math.PI * t / 10),
@@ -193,7 +193,7 @@ const Curves = {
         speed: 0.01
     },
     
-    wacky_sin: {
+    sinovial: {
         func: (a, b, t) => {
             return [
                 (Math.sin(a * t) + Math.sin(b * t)) / 2,
@@ -204,7 +204,7 @@ const Curves = {
         speed: 0.02
     },
 
-    wacky_cos: {
+    cosy: {
         func: (a, b, t) => {
             return [
                 (Math.cos(a * t) + Math.cos(b * t)) / 2,
@@ -215,7 +215,7 @@ const Curves = {
         speed: 0.02
     },
 
-    what: {
+    pancake: {
         func: (a, b, t) => {
             return [
                 (Math.sin(a * Math.cos(b * t))),
@@ -226,7 +226,7 @@ const Curves = {
         speed: 0.0002
     },
 
-    wobbly_hcrr: {
+    zigzag: {
         func: (R, r, t) => {
             const s = R - r;
             return [
@@ -234,11 +234,11 @@ const Curves = {
                 (s * Math.sin(t) - r * Math.sin(s / r * t)) / R - 0.04 * Math.cos(t * 11)
             ];
         },
-        params: [-67, -37],
+        params: [63, 36],
         speed: 0.1
     },
 
-    hcrr: {
+    ribbon: {
         func: (R, r, t) => {
             const s = R - r;
             return [
@@ -251,25 +251,26 @@ const Curves = {
     },
 
     astroid: {
-        func: (t) => {
-            const [c, s] = [Math.cos(t) , Math.sin(t)];
-            return [
-                c ** 5,
-                s ** 5
-            ];
-        },
-        params: [],
+        func: (p, t) => [Math.cos(t) ** p , Math.sin(t) ** p],
+        params: [5],
         speed: 0.1
     },
 
-    loopy: {
-        func: (a, b, t) => {
-            return [
+    squiggle: {
+        func: (a, b, t) => [
                 (Math.sin(a * t) + Math.cos(b * t)) / 2,
                 (Math.cos(a * t) - Math.sin(b * t)) / 2,
-            ];
-        },
+            ],
         params: [13, 17],
+        speed: 0.008
+    },
+
+    richard: {
+        func: (a, b, c, d, t) => [
+                Math.sin(a * t + b * Math.cos(c * t * Math.sin(d * t))),
+                Math.cos(a * t + b * Math.sin(c * t * Math.cos(d * t))),
+            ],
+        params: [0, 17, -9, 42],
         speed: 0.008
     },
 
