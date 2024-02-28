@@ -4,12 +4,10 @@
 const Curves = {
 
     merlin: {
-        func: (a, b, c, d, t) => {
-            return [
+        func: (a, b, c, d, t) => [
                 Math.cos(a * Math.cos(b + Math.cos(t))),
                 Math.sin(c * Math.sin(d + Math.sin(t))),
-            ];
-        },
+            ],
         params: [56, 12, 76, 102],  // good use of whole space
         speed: 0.002
     },
@@ -19,8 +17,10 @@ const Curves = {
             const t_ = t / 10;
             const [ad, ae, af, ag] = [d, e, f, g].map(w => Math.abs(w));
             return [
-                (Math.cos(a * t_) + Math.cos(b * t_) / d + Math.sin(c * t_) / e) * ad * ae / (ad * ae + ad + ae),
-                (Math.sin(a * t_) + Math.sin(b * t_) / f + Math.cos(c * t_) / g) * af * ag / (af * ag + af + ag)
+                (Math.cos(a * t_) + Math.cos(b * t_) / d + Math.sin(c * t_)/ e)
+                    * ad * ae / (ad * ae + ad + ae),
+                (Math.sin(a * t_) + Math.sin(b * t_) / f + Math.cos(c * t_)/ g)
+                    * af * ag / (af * ag + af + ag)
             ];
         },
         params: [3, -5, 17, 5, -3.5, 3.4, .9],   // more beautiful loops!!
@@ -50,56 +50,48 @@ const Curves = {
     },
 
     dormouse: {
-        func: (a, b, t) => {
-            return [
+        func: (a, b, t) => [
                 (Math.sin(a * Math.cos(t)) + Math.cos(b * Math.sin(t))) / 2,
                 (Math.cos(a * Math.sin(t)) - Math.sin(b * Math.cos(t))) / 2,
-            ];
-        },
+            ],
         params: [33, 11],   // electron rings
         speed: 0.005
     },
 
     epitrochoid: {
-        func: (a, b, c, t) => {
-            return [
-                ((a + b) * Math.cos(t) - c * Math.cos((a / b + 1) * t)) / (Math.abs(a) + Math.abs(b) + Math.abs(c)),
-                ((a + b) * Math.sin(t) - c * Math.sin((a / b + 1) * t)) / (Math.abs(a) + Math.abs(b) + Math.abs(c)),
-            ];
-        },
+        func: (a, b, c, t) => [
+                ((a + b) * Math.cos(t) - c * Math.cos((a / b + 1) * t))
+                    / (Math.abs(a) + Math.abs(b) + Math.abs(c)),
+                ((a + b) * Math.sin(t) - c * Math.sin((a / b + 1) * t))
+                    / (Math.abs(a) + Math.abs(b) + Math.abs(c)),
+            ],
         params: [15, 23, -8],
         speed: 0.1
     },
 
     ovaloopy: {
-        func: (a, b, t) => {
-            return [
-                (Math.sin(a * t) * Math.cos(b * t)),
-                (Math.cos(a * t) / (y = Math.sin(b * t)) ? y : 0.00000000000000000001),
-            ];
-        },
+        func: (a, b, t) => [
+            (Math.sin(a * t) * Math.cos(b * t)),
+            (Math.cos(a * t) / (y = Math.sin(b * t)) ? y : 0.00000000000000000001),
+        ],
         params: [48, 61],
         speed: 0.002
     },
 
-    n_folium: {
-        func: (a, b, t) => {
-            return [
-                (Math.sin(a * t) + Math.sin(b * t)) / 2,
-                (Math.cos(a * t) - Math.cos(b * t)) / 2,
-            ];
-        },
+    polyfolium: {
+        func: (a, b, t) => [
+            (Math.sin(a * t) + Math.sin(b * t)) / 2,
+            (Math.cos(a * t) - Math.cos(b * t)) / 2,
+        ],
         params: [11, 8],
         speed: 0.02
     },
 
     lissajous: {
-        func: (kx, ky, t) => {
-            return [
-                Math.cos(kx * t),
-                Math.sin(ky * t)
-            ];
-        },
+        func: (kx, ky, t) => [
+            Math.cos(kx * t),
+            Math.sin(ky * t)
+        ],
         params: [-3.1, 4.6],
         speed: 0.02
     },
@@ -114,12 +106,10 @@ const Curves = {
     },
 
     hypotrochoid: {
-        func: (R, r, d, t) => {
-            return [
-                ((R - r) * Math.cos(t) + d * Math.cos((R - r) / r * t)) / (R - r + d),
-                ((R - r) * Math.sin(t) - d * Math.sin((R - r) / r * t)) / (R - r + d)
-            ];
-        },
+        func: (R, r, d, t) => [
+            ((R - r) * Math.cos(t) + d * Math.cos((R - r) / r * t)) / (R - r + d),
+            ((R - r) * Math.sin(t) - d * Math.sin((R - r) / r * t)) / (R - r + d)
+        ],
         params: [13, 11, 1],
         speed: 0.1
     },
@@ -138,23 +128,19 @@ const Curves = {
     },
 
     termite: {
-        func: (a, b, t) => {
-            return [
-                (a * Math.cos(-t) + Math.cos(b * t)) / (a + 1),
-                (a * Math.sin(-t) + Math.sin(b * t)) / (a + 1)
-            ];
-        },
+        func: (a, b, t) => [
+            (a * Math.cos(-t) + Math.cos(b * t)) / (a + 1),
+            (a * Math.sin(-t) + Math.sin(b * t)) / (a + 1)
+        ],
         params: [13, 41],
         speed: 0.05
     },
 
     dragonfly: {
-        func: (a, b, c, d, t) => {
-            return [
-                (a * Math.cos(-t) + Math.cos(b * t)) / (a + 1),
-                (c * Math.sin(-t) + Math.sin(d * t)) / (c + 1)
-            ];
-        },
+        func: (a, b, c, d, t) => [
+            (a * Math.cos(-t) + Math.cos(b * t)) / (a + 1),
+            (c * Math.sin(-t) + Math.sin(d * t)) / (c + 1)
+        ],
         // params: [13, 15, 17, 19],
         // params: [1, 4, 2, 7],
         // params: [2 * Math.PI, 7 * Math.PI, 13 * Math.PI, 37 * Math.PI],
@@ -168,12 +154,10 @@ const Curves = {
     },
 
     convolvulus: {
-        func: (a, b, t) => {
-            return [
-                (Math.sin(a * Math.cos(t)) + Math.cos(b * Math.sin(t))) / 2,
-                (Math.cos(a * Math.sin(t)) - Math.sin(b * Math.cos(t))) / 2,
-            ];
-        },
+        func: (a, b, t) => [
+            (Math.sin(a * Math.cos(t)) + Math.cos(b * Math.sin(t))) / 2,
+            (Math.cos(a * Math.sin(t)) - Math.sin(b * Math.cos(t))) / 2,
+        ],
         // params: [137, 19],   // Great string jumble!
         // speed: 0.001,
         // params: [51, 31],    // Twisty bananas
@@ -183,45 +167,37 @@ const Curves = {
     },
 
     crisscross: {
-        func: (p, q, t) => {
-            return [            
-                Math.sin(p * Math.PI * t / 10),
-                Math.cos(q * Math.PI * t / 10)
-            ];
-        },
+        func: (p, q, t) => [            
+            Math.sin(p * Math.PI * t / 10),
+            Math.cos(q * Math.PI * t / 10)
+        ],
         params: [13, 19],
         speed: 0.01
     },
     
     sinovial: {
-        func: (a, b, t) => {
-            return [
-                (Math.sin(a * t) + Math.sin(b * t)) / 2,
-                (Math.sin(a * t) - Math.sin(b * t)) / 2,
-            ];
-        },
+        func: (a, b, t) => [
+            (Math.sin(a * t) + Math.sin(b * t)) / 2,
+            (Math.sin(a * t) - Math.sin(b * t)) / 2,
+        ],
         params: [13, 3],
         speed: 0.02
     },
 
     cosy: {
-        func: (a, b, t) => {
-            return [
-                (Math.cos(a * t) + Math.cos(b * t)) / 2,
-                (Math.cos(a * t) - Math.cos(b * t)) / 2,
-            ];
-        },
+        func: (a, b, t) => [
+            (Math.cos(a * t) + Math.cos(b * t)) / 2,
+            (Math.cos(a * t) - Math.cos(b * t)) / 2,
+        ],
         params: [19, 7],
         speed: 0.02
     },
 
     pancake: {
-        func: (a, b, t) => {
-            return [
-                (Math.sin(a * Math.cos(b * t))),
-                (Math.cos(b * Math.sin(a * t))),
-            ];
-        },
+        func: (a, b, t) => [
+            (Math.sin(a * Math.cos(b * t))),
+            (Math.cos(b * Math.sin(a * t))),
+        ],
         params: [27, 23],   // 
         speed: 0.0002
     },
@@ -251,25 +227,28 @@ const Curves = {
     },
 
     astroid: {
-        func: (p, t) => [Math.cos(t) ** p , Math.sin(t) ** p],
+        func: (p, t) => [
+            Math.cos(t) ** p , 
+            Math.sin(t) ** p
+        ],
         params: [5],
         speed: 0.1
     },
 
     squiggle: {
         func: (a, b, t) => [
-                (Math.sin(a * t) + Math.cos(b * t)) / 2,
-                (Math.cos(a * t) - Math.sin(b * t)) / 2,
-            ],
+            (Math.sin(a * t) + Math.cos(b * t)) / 2,
+            (Math.cos(a * t) - Math.sin(b * t)) / 2,
+        ],
         params: [13, 17],
         speed: 0.008
     },
 
-    richard: {
+    dust: {
         func: (a, b, c, d, t) => [
-                Math.sin(a * t + b * Math.cos(c * t * Math.sin(d * t))),
-                Math.cos(a * t + b * Math.sin(c * t * Math.cos(d * t))),
-            ],
+            Math.sin(a * t + b * Math.cos(c * t * Math.sin(d * t))),
+            Math.cos(a * t + b * Math.sin(c * t * Math.cos(d * t))),
+        ],
         params: [0, 17, -9, 42],
         speed: 0.008
     },
@@ -376,6 +355,7 @@ class ShapeScene extends Scene2d {
         
         for (const curve in this.curves) {
             this.curves[curve].default_colour = this.#get_random_colour();
+            this.default_stroke_colour = '#111111';
             this.curves[curve].colour = this.curves[curve].default_colour;
             this.curves[curve].polychrome_speed = 25;       // we'll have a range [0, .., 100] and set the normal to 25, so user can speed up 4x and slow down 25x
             this.curves[curve].shape = this.#get_random_shape();
@@ -672,14 +652,14 @@ class ShapeScene extends Scene2d {
                 case 'shape':
                     param.value = this.current_curve.shape.constructor.name;
                     break;
-                case 'order':
-                    param.value = this.current_curve.shape.order;
-                    break;
-                case 'eccentricity':
-                    param.value = this.current_curve.shape.eccentricity;
-                    break;
                 case 'speed':
                     param.value = this.current_curve.speed;
+                    break;
+                case 'rotation':
+                    param.value = this.current_curve.rotation;
+                    break;
+                case 'fill':
+                    param.checked = this.current_curve.shape.fill;
                     break;
                 case 'hue':
                     const hue_output = param.previousElementSibling.firstElementChild;
@@ -689,10 +669,24 @@ class ShapeScene extends Scene2d {
                             : -1
                     hue_output.style.color = this.current_curve.colour ?? this.non_colour;
                     break;
+                case 'stroke-thickness':
+                    param.value = this.current_curve.shape.thickness;
+                    const stroke_thickness_output = param.previousElementSibling.firstElementChild;
+                    stroke_thickness_output.value = this.current_curve.shape.thickness;
+                    break;
+                case 'stroke-colour':
+                    param.value = this.current_curve.shape.outline;
+                    break;
                 case 'polychrome-speed':
                     param.value = this.current_curve.polychrome_speed;
                     const polychrome_speed_output = param.previousElementSibling.firstElementChild;
                     polychrome_speed_output.value = this.current_curve.polychrome_speed;
+                    break;
+                case 'order':
+                    param.value = this.current_curve.shape.order;
+                    break;
+                case 'eccentricity':
+                    param.value = this.current_curve.shape.eccentricity;
                     break;
                 case 'radius':
                     param.value = this.current_curve.shape.radius;
@@ -718,9 +712,6 @@ class ShapeScene extends Scene2d {
                     param.value = this.current_curve.shape.wave_frequency;
                     const wave_freq_output = param.previousElementSibling.firstElementChild;
                     wave_freq_output.value = this.current_curve.shape.wave_frequency;
-                    break;
-                case 'rotation':
-                    param.value = this.current_curve.rotation;
                     break;
                 default:
             }
@@ -753,40 +744,41 @@ class ShapeScene extends Scene2d {
                     value = event.target.selectedOptions[0].value;
                     // When user changes shape, carry forward as many attributes as possible from the old shape
                     const common_params = [
-                        '#111',     // outline colour
-                        1,          // outline thickness
+                        this.current_curve.shape.fill,
+                        this.current_curve.shape.outline,     // outline colour
+                        this.current_curve.shape.thickness,   // outline thickness
                         this.current_curve.shape.pulse,
                         this.current_curve.shape.wave_amplitude,
                         this.current_curve.shape.wave_frequency
                     ];
                     switch (value) {
-                        case 'Star':
-                            this.current_curve.shape = new Star(
-                                this.current_curve.shape.order ?? 3, 
-                                this.current_curve.shape.radius, 
-                                this.current_curve.shape.hub ?? Math.max(Math.floor(this.current_curve.shape.radius / 4), 1),
-                                ...common_params
-                            );
-                            break;
                         case 'Polygon':
                             this.current_curve.shape = new Polygon(
+                                ...common_params,
+                                this.current_curve.shape.radius,
                                 this.current_curve.shape.order ?? 5, 
-                                this.current_curve.shape.radius,
-                                ...common_params
-                            );
-                            break;
-                        case 'Ring':
-                            this.current_curve.shape = new Ring(
-                                rand_int(5) / 5,    // eccentricity of ellipse
-                                this.current_curve.shape.radius,
-                                this.current_curve.shape.hub ?? Math.max(Math.floor(this.current_curve.shape.radius / 4), 1),
-                                ...common_params
                             );
                             break;
                         case 'Moon':
                             this.current_curve.shape = new Moon(
+                                ...common_params,
                                 this.current_curve.shape.radius,
-                                ...common_params
+                            );
+                            break;
+                        case 'Ring':
+                            this.current_curve.shape = new Ring(
+                                ...common_params,
+                                this.current_curve.shape.radius,
+                                this.current_curve.shape.hub ?? Math.max(Math.floor(this.current_curve.shape.radius / 4), 1),
+                                rand_int(5) / 5,    // eccentricity of ellipse
+                            );
+                            break;
+                        case 'Star':
+                            this.current_curve.shape = new Star(
+                                ...common_params,
+                                this.current_curve.shape.radius, 
+                                this.current_curve.shape.hub ?? Math.max(Math.floor(this.current_curve.shape.radius / 4), 1),
+                                this.current_curve.shape.order ?? 3,
                             );
                             break;
                         default:
@@ -800,6 +792,20 @@ class ShapeScene extends Scene2d {
                 case 'eccentricity':
                     value = event.target.selectedOptions[0].value;
                     this.current_curve.shape.eccentricity = Number(value);
+                    break;
+                case 'fill':
+                    value = event.target.checked;
+                    this.current_curve.shape.fill = value;
+                    break;
+                case 'stroke-thickness':
+                    value = event.target.value;
+                    this.current_curve.shape.thickness = Number(value);
+                    const stroke_thickness_output = document.getElementById('stroke-thickness-output');
+                    stroke_thickness_output.value = value;
+                    break;
+                case 'stroke-colour':
+                    value = event.target.value;
+                    this.current_curve.shape.outline = value;
                     break;
                 case 'speed':
                     value = event.target.selectedOptions[0].value;
@@ -882,16 +888,19 @@ class ShapeScene extends Scene2d {
 
     #get_random_shape() {
         const shapes = ['Star', 'Polygon', 'Ring', 'Moon'];
+        const common_params = [true, this.default_stroke_colour, 1, 0, 0, 0.3];
+        let r;
         switch(rand_int(shapes.length)) {
             case 0:
-                return new Star(rand_in_range(3, 9), rand_in_range(6, 36), rand_in_range(1, 16), '#111', 1, 0, 0, 4);
+                return new Polygon(...common_params, rand_in_range(6, 64), rand_in_range(3, 12));
             case 1:
-                return new Polygon(rand_in_range(3, 9), rand_in_range(6, 64), '#111', 1, 0, 0, 4);
+                return new Moon(...common_params, rand_in_range(6, 64));            
             case 2:
-                const r = rand_in_range(8, 40);
-                return new Ring(rand_int(6) / 5, r, Math.floor(r / 4), '#111', 1, 0, 0, 4);
+                r = rand_in_range(6, 64);
+                return new Ring(...common_params, r, Math.floor(r / 4), rand_int(10) / 10);
             case 3:
-                return new Moon(rand_in_range(6, 64), '#111', 1, 0, 0, 4);            
+                r = rand_in_range(6, 64);
+                return new Star(...common_params, r, Math.floor(r / 4), rand_in_range(3, 12));
             default:
         }
     }
@@ -915,11 +924,6 @@ class ShapeScene extends Scene2d {
             this.tbody.appendChild(row);
             input.onchange = event => this.current_curve.params[~~(event.target.id.slice(5))] = ~~input.value;
         }
-    }
-
-    #get_param_name() {
-        // temp stub
-        return ['a', 'b', 'c', 'd'][rand_int(4)];
     }
 
     render() {
@@ -976,8 +980,9 @@ class ShapeScene extends Scene2d {
 }
 
 class Shape {
-    constructor(outline, thickness, pulse, wave_amplitude, wave_frequency) {
+    constructor(fill, outline, thickness, pulse, wave_amplitude, wave_frequency) {
         this.type = this.constructor.name;
+        this.fill = fill;
         this.outline = outline;
         this.thickness = thickness;
         this.hidden = false;
@@ -994,11 +999,11 @@ class Shape {
 
 class Polygon extends Shape {
     static instance_count = 0;
-    constructor(order, radius, outline, thickness, pulse, wave_amplitude, wave_frequency) {
-        super(outline, thickness, pulse, wave_amplitude, wave_frequency);
+    constructor(fill, outline, thickness, pulse, wave_amplitude, wave_frequency, radius, order) {
+        super(fill, outline, thickness, pulse, wave_amplitude, wave_frequency);
         this.id = Polygon.instance_count++;
-        this.order = order;
         this.radius = radius;
+        this.order = order;
     }
     draw(ctx, x, y, colour, progress) {
         super.draw(x, y);
@@ -1016,23 +1021,25 @@ class Polygon extends Shape {
         }
         ctx.closePath();
 
-        if (this.outline) {
+        if (this.thickness) {
             ctx.strokeStyle = this.outline;
             ctx.lineWidth = this.thickness;
             ctx.stroke();
         }
-        if (colour) {
-            ctx.fillStyle = colour;
-            ctx.fill();
-        }
-        else {
-            const r = Math.sin(
-                (progress / 16)
-                * (this.polychrome_speed / 25)
-            )
-            * 170 + 170;
-            ctx.fillStyle = `hsl(${r + (r > 100 ? 20 : 0)} 100% 50%)`;    // just cut out 20 degrees of garish greens!
-            ctx.fill();
+        if (this.fill) {
+            if (colour) {
+                ctx.fillStyle = colour;
+                ctx.fill();
+            }
+            else {
+                const r = Math.sin(
+                    (progress / 16)
+                    * (this.polychrome_speed / 25)
+                )
+                * 170 + 170;
+                ctx.fillStyle = `hsl(${r + (r > 100 ? 20 : 0)} 100% 50%)`;    // just cut out 20 degrees of garish greens!
+                ctx.fill();
+            }
         }
         ctx.restore();
     }
@@ -1040,8 +1047,8 @@ class Polygon extends Shape {
 
 class Moon extends Shape {
     static instance_count = 0;
-    constructor(radius, outline, thickness, pulse, wave_amplitude, wave_frequency) {
-        super(outline, thickness, pulse, wave_amplitude, wave_frequency);
+    constructor(fill, outline, thickness, pulse, wave_amplitude, wave_frequency, radius) {
+        super(fill, outline, thickness, pulse, wave_amplitude, wave_frequency);
         this.id = Moon.instance_count++;
         this.radius = radius;
     }
@@ -1058,23 +1065,25 @@ class Moon extends Shape {
         ctx.arcTo(- r / 2, 0, 0, -r, 2 * r);
         ctx.closePath();
 
-        if (this.outline) {
+        if (this.thickness) {
             ctx.strokeStyle = this.outline;
             ctx.lineWidth = this.thickness;
             ctx.stroke();
         }
-        if (colour) {
-            ctx.fillStyle = colour;
-            ctx.fill();
-        }
-        else {
-            const r = Math.sin(
-                (progress / 16)
-                * (this.polychrome_speed / 25)
-            )
-            * 170 + 170;
-            ctx.fillStyle = `hsl(${r + (r > 100 ? 20 : 0)} 100% 50%)`;    // just cut out 20 degrees of garish greens!
-            ctx.fill();
+        if (this.fill) {
+            if (colour) {
+                ctx.fillStyle = colour;
+                ctx.fill();
+            }
+            else {
+                const r = Math.sin(
+                    (progress / 16)
+                    * (this.polychrome_speed / 25)
+                )
+                * 170 + 170;
+                ctx.fillStyle = `hsl(${r + (r > 100 ? 20 : 0)} 100% 50%)`;    // just cut out 20 degrees of garish greens!
+                ctx.fill();
+            }
         }
         ctx.restore();
     }
@@ -1083,8 +1092,8 @@ class Moon extends Shape {
 class HubbedShape extends Shape {
     // Meant to be an abstract class, don't instantiate!
     static instance_count = 0;
-    constructor(radius_outer, radius_inner, outline, thickness, pulse, wave_amplitude, wave_frequency) {
-        super(outline, thickness, pulse, wave_amplitude, wave_frequency);
+    constructor(fill, outline, thickness, pulse, wave_amplitude, wave_frequency, radius_outer, radius_inner) {
+        super(fill, outline, thickness, pulse, wave_amplitude, wave_frequency);
         this.radius = radius_outer;
         this.hub = radius_inner;
     }
@@ -1095,8 +1104,8 @@ class HubbedShape extends Shape {
 
 class Ring extends HubbedShape {
     static instance_count = 0;
-    constructor(eccentricity, radius_outer, radius_inner, outline, thickness, pulse, wave_amplitude, wave_frequency) {
-        super(radius_outer, radius_inner, outline, thickness, pulse, wave_amplitude, wave_frequency);
+    constructor(fill, outline, thickness, pulse, wave_amplitude, wave_frequency, radius_outer, radius_inner, eccentricity) {
+        super(fill, outline, thickness, pulse, wave_amplitude, wave_frequency, radius_outer, radius_inner);
         this.id = Ring.instance_count++;
         this.eccentricity = eccentricity;
     }
@@ -1115,9 +1124,9 @@ class Ring extends HubbedShape {
         }
         ctx.beginPath();
         ctx.ellipse(x, y, r, r * this.eccentricity, 0, 0, 2 * Math.PI);
-        ctx.fill();
+        if (this.fill) ctx.fill();
 
-        if (this.outline) {
+        if (this.thickness) {
             ctx.strokeStyle = this.outline;
             ctx.lineWidth = this.thickness;
             ctx.stroke();
@@ -1126,14 +1135,14 @@ class Ring extends HubbedShape {
         ctx.fillStyle = 'hsla(0, 0%, 0%, 1)';
         ctx.beginPath();
         ctx.ellipse(x, y, this.hub, this.hub * this.eccentricity, 0, 0, 2 * Math.PI);
-        ctx.fill();
+        if (this.fill) ctx.fill();
     }
 }
 
 class Star extends HubbedShape {
     static instance_count = 0;
-    constructor(order, radius_outer, radius_inner, outline, thickness, pulse, wave_amplitude, wave_frequency) {
-        super(radius_outer, radius_inner, outline, thickness, pulse, wave_amplitude, wave_frequency);
+    constructor(fill, outline, thickness, pulse, wave_amplitude, wave_frequency, radius_outer, radius_inner, order) {
+        super(fill, outline, thickness, pulse, wave_amplitude, wave_frequency, radius_outer, radius_inner);
         this.id = Star.instance_count++;
         this.order = order;
     }
@@ -1156,18 +1165,20 @@ class Star extends HubbedShape {
             }
             ctx.closePath();
 
-            if (this.outline) {
+            if (this.thickness) {
                 ctx.strokeStyle = this.outline;
                 ctx.lineWidth = this.thickness;
                 ctx.stroke();
             }
-            if (colour) {
-                ctx.fillStyle = colour;
-                ctx.fill();
-            }
-            else {
-                ctx.fillStyle = `hsl(${Math.sin(progress / (this.order * this.radius / 4)) * 90 + 270} 100% 50%)`
-                ctx.fill();
+            if (this.fill) {
+                if (colour) {
+                    ctx.fillStyle = colour;
+                    ctx.fill();
+                }
+                else {
+                    ctx.fillStyle = `hsl(${Math.sin(progress / (this.order * this.radius / 4)) * 90 + 270} 100% 50%)`
+                    ctx.fill();
+                }
             }
         }
         ctx.restore();

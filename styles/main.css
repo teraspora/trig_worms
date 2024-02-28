@@ -61,6 +61,10 @@ canvas, #controls, #curves, #params-wrapper, #buttons {
     background-color: #000000;
 }
 
+canvas {
+    background-color: ##111;
+}
+
 #controls {
     display: grid;
     grid-template-columns: 1fr;
@@ -222,7 +226,7 @@ table#param-table tr {
 
 table input {
     color: var(--plain-text-col);
-    font-size: 1.2vw;
+    font-size: 1vw;
     padding: 0.3vw;
 }
 
@@ -236,6 +240,10 @@ section#details .param {
     padding: 0.1vw;
     margin: 0.1vw;
     color: var(--contrast-col);
+    font-size: 0.5vw;
+}
+
+section#details input, section#details .param {
     font-size: 0.7vw;
 }
 
@@ -245,17 +253,20 @@ section#function {
     border-radius: 0;
     padding: 0.5vw;
     margin: 0.2vw;
-    font-size: 0.9vw;
+    font-size: 0.7vw;
     text-transform: none;
     color: var(--contrast-col);
 }
 
-section#function h5 {
+section#function h3 {
     color: var(--plain-text-col);
+    text-decoration: underline;
+    padding-bottom: 1vh;
 }
 
 section#function pre {
-    overflow-x: scroll;
+    overflow-x: auto;
+    padding-bottom: 2vh;
 }
 
 aside#help {

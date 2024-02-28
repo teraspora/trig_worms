@@ -13,13 +13,17 @@ I also have many more features I intend to implement, and will do so soon.
 This `README` and the Help text will be expanded considerably in due course, so as to to document the app comprehensively.
 
 In the meantime here are a couple of screenshots:
-![](media/app_snapshot_00.png)
-![](media/tw_05.png)
-![](media/tw_06.jpg)
-![](media/tw_07.jpg)
-![](media/tw_04.png)
-![](media/tw_10.png)
-![](media/tw_11.png)
+![](media/app_snapshot_01.jpg)
+<img src="media/tw_12.png" width=300 alt=""> <img src="media/tw_13.png" width=320 alt=""> <img src="media/tw_14.png" width=300 alt="">
+
+<img src="media/tw_15.png" width=300 alt=""> <img src="media/tw_16.png" width=320 alt=""> <img src="media/tw_17.png" width=300 alt="">
+
+<img src="media/tw_18.png" width=300 alt=""> <img src="media/tw_19.png" width=320 alt=""> <img src="media/tw_20.png" width=300 alt="">
+
+<img src="media/tw_21.png" width=300 alt=""> <img src="media/tw_22.png" width=320 alt=""> <img src="media/tw_23.png" width=300 alt="">
+
+<img src="media/tw_24.png" width=300 alt="">
+
 
 - And check out this video I made from the app, adding my own piano accompaniment:
 - <https://www.youtube.com/watch?v=L64Ztsul7bA>
