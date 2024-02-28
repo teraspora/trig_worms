@@ -269,7 +269,7 @@ class Scene {
         this.width = this.canvas.width;
         this.height = this.canvas.height;
         this.progress = 0;
-        this.progress_delta = 0.1;
+        this.progress_delta = 0.05;
         this.paused = false;
         this.non_colour = 'hsl(36 100% 90%)';
         this.debug_colour = 'hsl(206 100% 50%)';
@@ -300,9 +300,9 @@ class ShapeScene extends Scene2d {
         super(canvas);
         
         // Global effects
-        this.ctx.shadowOffsetX = 2;
-        this.ctx.shadowOffsetY = 2;
-        this.ctx.shadowBlur = 8;
+        this.ctx.shadowOffsetX = 4;
+        this.ctx.shadowOffsetY = 4;
+        this.ctx.shadowBlur = 4;
         this.ctx.shadowColor = '#000';
         this.mirrored = true;
 
@@ -1185,6 +1185,8 @@ class Star extends HubbedShape {
         ctx.restore();
     }
 }
+// end of classes and functions
+// ============================
 
 function init() {
     const {width: main_width, height: main_height} = main.getBoundingClientRect();
@@ -1198,11 +1200,7 @@ function init() {
 const rand_in_range = (m, n) => Math.floor((n - m) * Math.random() + m);
 const rand_int = n => Math.floor(n * Math.random());
 
-
-// end of classes and functions
-// ============================
-
-// Main code
+// Main (top-level) code
 debug = false;
 const rg_0 = 'radial-gradient(#0000ff, #990029)';
 const main = document.getElementById('main');
