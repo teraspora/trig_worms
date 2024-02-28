@@ -304,7 +304,7 @@ class ShapeScene extends Scene2d {
         this.ctx.shadowOffsetY = 2;
         this.ctx.shadowBlur = 8;
         this.ctx.shadowColor = '#000';
-        this.mirrored = false;
+        this.mirrored = true;
 
         // CanvasRenderingContext2D: globalCompositeOperation property
         // see https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation
@@ -384,6 +384,7 @@ class ShapeScene extends Scene2d {
         }
         // Set current curve to be the first in the list of active curves
         this.current_curve = this.active_curves[0];
+        this.current_curve.colour = null;   // Start with current curve multicoloured
         
         // UI Controls
         this.curve_select = document.querySelector('section#controls > #params-wrapper >select#curve-select');

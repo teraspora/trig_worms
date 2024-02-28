@@ -34,6 +34,7 @@ nav#nav-top {
     color: var(--plain-text-col);
     grid-column: 1 / -1;
     margin: 2vh 1vw 0 1vw;
+    justify-self: left;
 }
 
 nav#nav-top span{
