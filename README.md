@@ -14,15 +14,12 @@ This `README` and the Help text will be expanded considerably in due course, so 
 
 In the meantime here are a couple of screenshots:
 ![](media/app_snapshot_01.jpg)
-<img src="media/tw_12.png" width=300 alt=""> <img src="media/tw_13.png" width=320 alt=""> <img src="media/tw_14.png" width=300 alt="">
+<img src="media/tw_12_small.png" width=300 alt=""> <img src="media/tw_07.jpg" width=320 alt=""> <img src="media/tw_17_small.png" width=300 alt="">
 
-<img src="media/tw_15.png" width=300 alt=""> <img src="media/tw_16.png" width=320 alt=""> <img src="media/tw_17.png" width=300 alt="">
-
-<img src="media/tw_18.png" width=300 alt=""> <img src="media/tw_19.png" width=320 alt=""> <img src="media/tw_20.png" width=300 alt="">
-
-<img src="media/tw_21.png" width=300 alt=""> <img src="media/tw_22.png" width=320 alt=""> <img src="media/tw_23.png" width=300 alt="">
-
-<img src="media/tw_24.png" width=300 alt="">
+<img src="media/tw_15_small.png" width=300 alt=""> <img src="media/tw_16_small.png" width=320 alt=""> <img src="media/tw_14_small.png" width=300 alt="">
+<img src="media/tw_23_small.png" width=300 alt=""> <img src="media/tw_18_small.png" width=300 alt=""> <img src="media/tw_19_small.png" width=320 alt="">
+<img src="media/tw_21_small.png" width=300 alt=""> <img src="media/tw_20_small.png" width=300 alt=""> <img src="media/tw_22_small.png" width=320 alt=""> 
+<img src="media/tw_24_small.png" width=300 alt=""> <img src="media/knotted_rope.png" width=300 alt="">
 
 
 - And check out this video I made from the app, adding my own piano accompaniment:
@@ -38,8 +35,6 @@ If it crashes your browser, sorry, tough!
 - Keyboard shortcuts
 - Update this `README` with full documentation
 - Update Help pane
-- Allow user to vary curve parameters
-- Allow user to specify own functions
 - Allow save image to local storage
 - Let user split canvas into 4, focus on current curve, with different parameters for each.
 - Bubbles
