@@ -689,12 +689,12 @@ class ShapeScene extends Scene2d {
     }
 
     #update_current_curve_styling() {
-        // const curve_checkbox = document.querySelector(`input[name="${this.current_curve.name}"]`);
         const curve_label = document.querySelector(`label#${this.current_curve.name}`);
         const curve_option = [...this.curve_select.options].filter(option => option.value == this.current_curve.name)[0];
-        this.selectedIndex = curve_option.index;
+        const aux_option = [...this.aux_select.options].filter(option => option.value == this.current_curve.aux.name)[0];
+        this.curve_select.selectedIndex = curve_option.index;
+        this.aux_select.selectedIndex = aux_option.index;
         const colour = this.current_curve.colour;
-        // console.log(this.current_curve.name, this.current_curve.colour);
         curve_label.style.background =
             colour 
             ? '#000' 
@@ -721,7 +721,7 @@ class ShapeScene extends Scene2d {
         const pre = func_box.querySelector('pre') ?? document.createElement('pre');
         pre.innerHTML = markup;
         func_box.querySelector('pre') ?? func_box.appendChild(pre); 
-        // Change params editor section for new current curve
+        // Change params editor section to that for the new current curve
         this.#create_param_table();
     }
     
@@ -817,7 +817,7 @@ class ShapeScene extends Scene2d {
                     wave_freq_output.value = this.current_curve.shape.wave_frequency;
                     break;
                 case 'aux':
-                    param.value = this.current_curve.aux;
+                    param.value = this.current_curve.aux.name;
                     break;
                 default:
             }
@@ -825,10 +825,13 @@ class ShapeScene extends Scene2d {
     }
 
     #create_params_section() {
+        this.aux_select = document.getElementById('aux');
         this.curve_names.forEach(curve_name => {
             const option = new Option(curve_name, curve_name);
             option.style.color = this.curves[curve_name].colour;            
             this.curve_select.add(option);
+            const aux_option = option.cloneNode(true);
+            this.aux_select.add(aux_option);            
         });
         this.curve_select.style.color = this.current_curve.colour;
         this.curve_select.onchange = event => {
@@ -973,7 +976,7 @@ class ShapeScene extends Scene2d {
                     break;
                 case 'aux':
                     value = event.target.selectedOptions[0].value;
-                    this.current_curve.aux = Number(value);
+                    this.current_curve.aux = this.curves[value];
                     break;
                 default:
                     break;

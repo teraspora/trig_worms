@@ -56,8 +56,6 @@
                 <div id="active-curve-settings" class="hidden">
                     <select id="curve-select"></select>
 
-                    <!-- Normally show details div (below), so edit-params is hidden by default in CSS.
-                    The table gets populated in JS when user clicks params edit button -->
                     <section id="details">
                         <div class="shape-ui">shape:</div> 
                         <select class="param" id="shape">
@@ -212,7 +210,7 @@
                         <div class="wave-freq-ui">wave-freq: <output id="wave-freq-output"></output></div> 
                         <input type="range" min="0" max="10" step="0.1" value="0" class="param wave-freq-ui" id="wave-freq">
 
-                        <div class="aux-ui">aux:</div> 
+                        <div class="aux-ui">auxiliary curve:</div> 
                         <select class="param" id="aux">
                             <!-- Options - all curves - to be added in Javascript -->
                         </select>
