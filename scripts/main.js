@@ -290,6 +290,15 @@ const Curves = {
         speed: 0.008
     },
 
+    ellipse: {
+        func: (a, b, t) => [
+            a * Math.cos(t) / Math.max(a, b),
+            b * Math.sin(t) / Math.max(a, b)
+        ],
+        params: [5, 3],
+        speed: 0.005
+    },
+
     init: function() {
         Object.keys(this).forEach(key => this[key].name = key);
         delete this.init;
@@ -495,8 +504,7 @@ class ShapeScene extends Scene2d {
                         break;
                     case 'clear':
                         // Clear drawing
-                        this.ctx.clearRect(0, 0, this.width, this.height);
-                        this.progress = 0;
+                        this.#clear_canvas();
                         break;
                     case 'background':
                         const cp = document.querySelector('section#colour-picker');
@@ -507,7 +515,8 @@ class ShapeScene extends Scene2d {
                             this.canvas.style.backgroundColor = event.target.value;
                         });
                         cpi.addEventListener('change', event => {
-                            cp.hidden = true;    
+                            cp.hidden = true;
+                            this.#clear_canvas();    
                         });                        
                         cp.hidden = false;
                         const cpb = cp.querySelector('button#cp-hide');
@@ -582,8 +591,7 @@ class ShapeScene extends Scene2d {
                     switch(char) {
                         case 'Escape':
                             // Clear drawing
-                            this.ctx.clearRect(0, 0, this.width, this.height);
-                            this.progress = 0;
+                            this.#clear_canvas();
                             break;
                         case '*':
                             // Start again from scratch
@@ -1015,6 +1023,13 @@ class ShapeScene extends Scene2d {
         ];
     }
 
+    #clear_canvas() {
+        this.ctx.fillStyle = this.canvas.style.backgroundColor;
+        this.ctx.fillRect(0, 0, this.width, this.height);
+        this.progress = 0;
+        return;
+    }
+
     #create_param_table() {
         let i = 0;
         this.tbody.innerHTML = '';
@@ -1287,7 +1302,7 @@ class Star extends HubbedShape {
         ctx.restore();
     }
 }
-// end of classes and functions
+// end of classes
 // ============================
 
 function init() {
