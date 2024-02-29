@@ -1303,7 +1303,7 @@ const rand_in_range = (m, n) => Math.floor((n - m) * Math.random() + m);
 const rand_int = n => Math.floor(n * Math.random());
 
 // Main (top-level) code
-debug = false;
+let debug = false;
 const rg_0 = 'radial-gradient(#0000ff, #990029)';
 const main = document.getElementById('main');
 const help = document.querySelector('aside#help');
