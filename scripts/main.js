@@ -3,16 +3,7 @@
 
 const Curves = {
 
-    merlin: {
-        func: (a, b, c, d, t) => [
-                Math.cos(a * Math.cos(b + Math.cos(t))),
-                Math.sin(c * Math.sin(d + Math.sin(t))),
-            ],
-        params: [56, 12, 76, 102],  // good use of whole space
-        speed: 0.002
-    },
-
-    oyster: {
+    oysteroid: {
         func: (a, b, c, d, e, f, g, t) => {
             const t_ = t / 10;
             const [ad, ae, af, ag] = [d, e, f, g].map(w => Math.abs(w));
@@ -49,7 +40,44 @@ const Curves = {
         // speed: 0.4
     },
 
-    dormouse: {
+    chitonoid: {   // copy of oyster with different params
+        func: (a, b, c, d, e, f, g, t) => {
+            const t_ = t / 10;
+            const [ad, ae, af, ag] = [d, e, f, g].map(w => Math.abs(w));
+            return [
+                (Math.cos(a * t_) + Math.cos(b * t_) / d + Math.sin(c * t_)/ e)
+                    * ad * ae / (ad * ae + ad + ae),
+                (Math.sin(a * t_) + Math.sin(b * t_) / f + Math.cos(c * t_)/ g)
+                    * af * ag / (af * ag + af + ag)
+            ];
+        },
+        params: [-2.5, 2.5, 19, -4, -28, -64, -9],   // mirror frame, woven
+        speed: 0.4,
+        // params: [3, -5, 17, 5, -3.5, 3.4, .9],   // more beautiful loops!!
+        // speed: 0.2
+        // params: [27, 291, 77, 5, 400, 512, 2239],
+        // speed: 0.02,
+        // params: [11, 3, 17, 5, 28, 64, 9], // ball of string
+        // speed: 0.1,
+        // params: [3, -3, 17, 5, 28, 64, 9],  // twisted oval frame
+        // speed: 0.4,
+        // params: [-5, 7, 2, -1, 2, -5, 1],    // wide bowtie
+        // speed: 0.4,
+        // params: [-2.5, 2.5, 8, -2, -28, -64, -9],   // hoop of wire
+        // speed: 0.4,
+        // params: [3, -3, 17, 5, 5, 64, 9],   // oval frame
+        // speed: 0.4,
+        // params: [3, -3, 17, 5, -3.5, 3.4, .9],   // beautiful loops!!
+        // speed: 0.2,
+        // params: [3, -5, 19, 5, -4.5, 2.4, .707],   // yet more beautiful loops!!
+        // speed: 0.2,
+        // params: [-2, 1.5, 5, 1.367, 2.5, -2.4, 1.707],   // beautiful loopy assymetry
+        // speed: 0.4,
+        // params: [-2.11, 1.4142, 3, 2.367, 2.5, -2.4, 1.707],   // complex ball of string
+        // speed: 0.4
+    },
+
+    zappoid: {
         func: (a, b, t) => [
                 (Math.sin(a * Math.cos(t)) + Math.cos(b * Math.sin(t))) / 2,
                 (Math.cos(a * Math.sin(t)) - Math.sin(b * Math.cos(t))) / 2,
@@ -69,7 +97,16 @@ const Curves = {
         speed: 0.1
     },
 
-    ovaloopy: {
+    merlinium: {
+        func: (a, b, c, d, t) => [
+                Math.cos(a * Math.cos(b + Math.cos(t))),
+                Math.sin(c * Math.sin(d + Math.sin(t))),
+            ],
+        params: [56, 12, 76, 102],  // good use of whole space
+        speed: 0.002
+    },
+
+    loopoid: {
         func: (a, b, t) => [
             (Math.sin(a * t) * Math.cos(b * t)),
             (Math.cos(a * t) / (y = Math.sin(b * t)) ? y : 0.00000000000000000001),
@@ -123,11 +160,11 @@ const Curves = {
                 (r * Math.sin(t) - b * Math.sin(p * t)) / a
             ];
         },
-        params: [39.5, 37],
+        params: [42, 16],
         speed: 0.3
     },
 
-    termite: {
+    anonoid: {
         func: (a, b, t) => [
             (a * Math.cos(-t) + Math.cos(b * t)) / (a + 1),
             (a * Math.sin(-t) + Math.sin(b * t)) / (a + 1)
@@ -193,7 +230,7 @@ const Curves = {
         speed: 0.02
     },
 
-    pancake: {
+    ubiquitoid: {
         func: (a, b, t) => [
             (Math.sin(a * Math.cos(b * t))),
             (Math.cos(b * Math.sin(a * t))),
@@ -302,7 +339,7 @@ class ShapeScene extends Scene2d {
         // Global effects
         this.ctx.shadowOffsetX = 4;
         this.ctx.shadowOffsetY = 4;
-        this.ctx.shadowBlur = 4;
+        this.ctx.shadowBlur = 4;    // quantity of blur applied; dimensionless; must be non-negative
         this.ctx.shadowColor = '#000';
         this.mirrored = true;
 
@@ -387,11 +424,19 @@ class ShapeScene extends Scene2d {
         this.current_curve.colour = null;   // Start with current curve multicoloured
         
         // UI Controls
-        this.curve_select = document.querySelector('section#controls > #params-wrapper >select#curve-select');
+        this.curve_select = document.getElementById('curve-select');
         this.tbody = document.querySelector('table#param-table>tbody');
         this.row_template = this.tbody.firstElementChild.cloneNode(true);
         this.#create_curve_checkboxes();
         this.#create_params_section();
+
+        // Show/Hide Active Curve settings
+        const active_curve_toggler = document.getElementById('active-curve-toggler');
+        const curve_settings = document.getElementById('active-curve-settings');
+        active_curve_toggler.addEventListener('click', event => {
+            const hidden = curve_settings.classList.toggle('hidden');
+            active_curve_toggler.textContent = hidden ? '▼' : '►';
+        });
 
         // Buttons
         this.buttons = [...document.querySelectorAll('#buttons>button')];
@@ -448,7 +493,7 @@ class ShapeScene extends Scene2d {
                             }
                             else {
                                 this.curves[curve].hidden = false;
-                                this.curves[curve].colour = this.curves[curve].default_colour;
+                                this.curves[curve].colour = this.debug_colour;
                             }
                         });
                         this.active_curves =  [this.current_curve];
@@ -530,7 +575,7 @@ class ShapeScene extends Scene2d {
 
     // Curve checkboxes
     #create_curve_checkboxes() {
-        const checkbox_wrapper = document.querySelector('section#controls > #curves > fieldset');
+        const checkbox_wrapper = document.querySelector('section#controls #curves fieldset');
         const checkbox = checkbox_wrapper.firstElementChild;
         const checkbox_clone = checkbox.cloneNode(true);
         checkbox_wrapper.innerHTML = '';
@@ -575,6 +620,11 @@ class ShapeScene extends Scene2d {
                 this.#update_parameter_display();
             });
         }
+        const curves_toggler = document.getElementById('curves-toggler');
+        curves_toggler.addEventListener('click', event => {
+            const hidden = checkbox_wrapper.classList.toggle('hidden');
+            curves_toggler.textContent = hidden ? '▼' : '►';
+        });
     }
 
     #update_curves_listing() {
@@ -1206,7 +1256,7 @@ const rg_0 = 'radial-gradient(#0000ff, #990029)';
 const main = document.getElementById('main');
 const help = document.querySelector('aside#help');
 const canvas = document.querySelector('canvas');
-const param_details = document.querySelector('#params-wrapper > #details');
+const param_details = document.querySelector('#params-wrapper #details');
 let scenes = [];
 
 document.querySelector('aside#help button#hide').addEventListener('click', _ => {

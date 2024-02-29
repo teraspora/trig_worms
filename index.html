@@ -12,6 +12,7 @@
 
 <body>
     <main id="main">
+
         <nav id="nav-top">
             <span><a href=# target="_blank" class="active">Vermichrome</a></span>
             <span><a href="https://www.teraspora.net" target="_blank">Teraspora</a></span>
@@ -19,8 +20,11 @@
             <span><a href="https://www.illegaloperation.net" target="_blank">Illegal Operation</a></span>
 
         </nav>
+
         <canvas></canvas>
+        
         <section id="controls">
+            
             <div id="buttons">
                 <button id="pause">Pause</button>
                 <button id="clear">Clear</button>
@@ -32,180 +36,184 @@
                 <button id="help">Help</button>
                 <button id="github" onclick=" window.open('https://github.com/teraspora/trig_worms','_blank')">Github</button>
             </div>
+            
             <div id="curves">
-                 
-                    <fieldset>
-                        <div>
-                            <input type="checkbox" name="---" checked/>
-                            <label>---</label>
-                            <span></span>
-                            <!-- More checkboxes to be added in JS -->
-                        </div>
-                    </fieldset>
-
+                <h3 id="curves-header">Curves <span id="curves-toggler">▼</span></h3>
+                
+                <fieldset>
+                    <div>
+                        <input type="checkbox" name="---" checked/>
+                        <label>---</label>
+                        <span></span>
+                        <!-- More checkboxes to be added in JS -->
+                    </div>
+                </fieldset>
             </div>
+
             <div id="params-wrapper">
-                <select id="curve-select"></select>
+                <h3 id="active-curve-header">Active Curve <span id="active-curve-toggler">▼</span></h3>
+                <div id="active-curve-settings" class="hidden">
+                    <select id="curve-select"></select>
 
-                <!-- Normally show details div (below), so edit-params is hidden by default in CSS.
-                The table gets populated in JS when user clicks params edit button -->
-                <section id="details">
-                    <div class="shape-ui">shape:</div> 
-                    <select class="param" id="shape">
-                        <option value="Star">Star</option>
-                        <option value="Polygon">Polygon</option>
-                        <option value="Ring">Ring</option>
-                        <option value="Moon">Moon</option>
-                    </select>       
+                    <!-- Normally show details div (below), so edit-params is hidden by default in CSS.
+                    The table gets populated in JS when user clicks params edit button -->
+                    <section id="details">
+                        <div class="shape-ui">shape:</div> 
+                        <select class="param" id="shape">
+                            <option value="Star">Star</option>
+                            <option value="Polygon">Polygon</option>
+                            <option value="Ring">Ring</option>
+                            <option value="Moon">Moon</option>
+                        </select>       
+                        
+                        <div class="speed-ui">speed:</div> 
+                        <select class="param speed-ui" id="speed">
+                            <option value="-0.5">-0.5</option>
+                            <option value="-0.4">-0.4</option>
+                            <option value="-0.3">-0.3</option>
+                            <option value="-0.2">-0.2</option>
+                            <option value="-0.15">-0.15</option>
+                            <option value="-0.1">-0.1</option>
+                            <option value="-0.08">-0.08</option>
+                            <option value="-0.06">-0.06</option>
+                            <option value="-0.05">-0.05</option>
+                            <option value="-0.04">-0.04</option>
+                            <option value="-0.02">-0.02</option>
+                            <option value="-0.01">-0.01</option>
+                            <option value="-0.008">-0.008</option>
+                            <option value="-0.005">-0.005</option>
+                            <option value="-0.002">-0.002</option>
+                            <option value="-0.001">-0.001</option>
+                            <option value="-0.0005">-0.0005</option>
+                            <option value="-0.0002">-0.0002</option>
+                            <option value="-0.0001">-0.0001</option>
+                            <option value="-0.00005">-0.00005</option>                        
+                            <option value="0.00005">0.00005</option>
+                            <option value="0.0001">0.0001</option>
+                            <option value="0.0002">0.0002</option>
+                            <option value="0.0005">0.0005</option>
+                            <option value="0.001">0.001</option>
+                            <option value="0.002">0.002</option>
+                            <option value="0.005">0.005</option>
+                            <option value="0.008">0.008</option>
+                            <option value="0.01">0.01</option>
+                            <option value="0.02">0.02</option>
+                            <option value="0.04">0.04</option>
+                            <option value="0.05">0.05</option>
+                            <option value="0.06">0.06</option>
+                            <option value="0.08">0.08</option>
+                            <option value="0.1">0.1</option>
+                            <option value="0.15">0.15</option>
+                            <option value="0.2">0.2</option>
+                            <option value="0.3">0.3</option>
+                            <option value="0.4">0.4</option>
+                            <option value="0.5">0.5</option>
+                        </select>
+                        
+                        <div class="rotation-ui">rotation:</div>
+                        <select class="param" id="rotation">
+                            <option value="-3">-3</option>
+                            <option value="-2">-2</option>
+                            <option value="-1.5">-1.5</option>
+                            <option value="-1">-1</option>
+                            <option value="-0.8">-0.8</option>
+                            <option value="-0.6">-0.6</option>
+                            <option value="-0.4">-0.4</option>
+                            <option value="-0.2">-0.2</option>
+                            <option value="0">0</option>
+                            <option value="0.2">0.2</option>
+                            <option value="0.4">0.4</option>
+                            <option value="0.6">0.6</option>
+                            <option value="0.8">0.8</option>
+                            <option value="1">1</option>
+                            <option value="1.5">1.5</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                        </select>
+                                            
+                        <div class="fill-ui">fill:</div> 
+                        <input type="checkbox" name="fill" class="param fill-ui" id="fill" checked/>
                     
-                    <div class="speed-ui">speed:</div> 
-                    <select class="param speed-ui" id="speed">
-                        <option value="-0.5">-0.5</option>
-                        <option value="-0.4">-0.4</option>
-                        <option value="-0.3">-0.3</option>
-                        <option value="-0.2">-0.2</option>
-                        <option value="-0.15">-0.15</option>
-                        <option value="-0.1">-0.1</option>
-                        <option value="-0.08">-0.08</option>
-                        <option value="-0.06">-0.06</option>
-                        <option value="-0.05">-0.05</option>
-                        <option value="-0.04">-0.04</option>
-                        <option value="-0.02">-0.02</option>
-                        <option value="-0.01">-0.01</option>
-                        <option value="-0.008">-0.008</option>
-                        <option value="-0.005">-0.005</option>
-                        <option value="-0.002">-0.002</option>
-                        <option value="-0.001">-0.001</option>
-                        <option value="-0.0005">-0.0005</option>
-                        <option value="-0.0002">-0.0002</option>
-                        <option value="-0.0001">-0.0001</option>
-                        <option value="-0.00005">-0.00005</option>                        
-                        <option value="0.00005">0.00005</option>
-                        <option value="0.0001">0.0001</option>
-                        <option value="0.0002">0.0002</option>
-                        <option value="0.0005">0.0005</option>
-                        <option value="0.001">0.001</option>
-                        <option value="0.002">0.002</option>
-                        <option value="0.005">0.005</option>
-                        <option value="0.008">0.008</option>
-                        <option value="0.01">0.01</option>
-                        <option value="0.02">0.02</option>
-                        <option value="0.04">0.04</option>
-                        <option value="0.05">0.05</option>
-                        <option value="0.06">0.06</option>
-                        <option value="0.08">0.08</option>
-                        <option value="0.1">0.1</option>
-                        <option value="0.15">0.15</option>
-                        <option value="0.2">0.2</option>
-                        <option value="0.3">0.3</option>
-                        <option value="0.4">0.4</option>
-                        <option value="0.5">0.5</option>
-                    </select>
+                        <div class="hue-ui">hue: <output id="hue-output"></output></div> 
+                        <input type="range" min="-1" max="359" value="0" class="param hue-ui" id="hue">
+                        
+                        <div class="stroke-thickness-ui">stroke thickness: <output id="stroke-thickness-output"></output></div> 
+                        <input type="range" min="0" max="8" value="2" class="param stroke-thickness-ui" id="stroke-thickness"/>
+                        
+                        <div class="stroke-colour-ui">stroke colour:</div> 
+                        <input type="color" name="stroke-colour" class="param stroke-colour-ui" id="stroke-colour"/>
                     
-                    <div class="rotation-ui">rotation:</div>
-                    <select class="param" id="rotation">
-                        <option value="-3">-3</option>
-                        <option value="-2">-2</option>
-                        <option value="-1.5">-1.5</option>
-                        <option value="-1">-1</option>
-                        <option value="-0.8">-0.8</option>
-                        <option value="-0.6">-0.6</option>
-                        <option value="-0.4">-0.4</option>
-                        <option value="-0.2">-0.2</option>
-                        <option value="0">0</option>
-                        <option value="0.2">0.2</option>
-                        <option value="0.4">0.4</option>
-                        <option value="0.6">0.6</option>
-                        <option value="0.8">0.8</option>
-                        <option value="1">1</option>
-                        <option value="1.5">1.5</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                    </select>
-                                        
-                    <div class="fill-ui">fill:</div> 
-                    <input type="checkbox" name="fill" class="param fill-ui" id="fill" checked/>
-                   
-                    <div class="hue-ui">hue: <output id="hue-output"></output></div> 
-                    <input type="range" min="-1" max="359" value="0" class="param hue-ui" id="hue">
-                    
-                    <div class="stroke-thickness-ui">stroke thickness: <output id="stroke-thickness-output"></output></div> 
-                    <input type="range" min="0" max="8" value="2" class="param stroke-thickness-ui" id="stroke-thickness"/>
-                    
-                    <div class="stroke-colour-ui">stroke colour:</div> 
-                    <input type="color" name="stroke-colour" class="param stroke-colour-ui" id="stroke-colour"/>
-                   
-                    <div class="polychrome-speed-ui hidden">polychrome speed: <output id="polychrome-speed-output"></output></div> 
-                    <input type="range" min="0" max="100" value="0" class="param polychrome-speed-ui hidden" id="polychrome-speed">
-                    
-                    <div class="order-ui">order:</div> 
-                    <select class="param order-ui" id="order">
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="8">8</option>
-                        <option value="9">9</option>
-                        <option value="10">10</option>
-                        <option value="11">11</option>
-                        <option value="12">12</option>
-                    </select>
-                    
-                    <div class="eccentricity-ui">eccentricity:</div> 
-                    <select class="param eccentricity-ui" id="eccentricity">
-                        <option value="0">0</option>
-                        <option value="0.1">0.1</option>
-                        <option value="0.2">0.2</option>
-                        <option value="0.3">0.3</option>
-                        <option value="0.4">0.4</option>
-                        <option value="0.5">0.5</option>
-                        <option value="0.6">0.6</option>
-                        <option value="0.7">0.7</option>
-                        <option value="0.8">0.8</option>
-                        <option value="0.9">0.9</option>
-                        <option value="1">1</option>
-                    </select>
+                        <div class="polychrome-speed-ui hidden">polychrome speed: <output id="polychrome-speed-output"></output></div> 
+                        <input type="range" min="0" max="100" value="0" class="param polychrome-speed-ui hidden" id="polychrome-speed">
+                        
+                        <div class="order-ui">order:</div> 
+                        <select class="param order-ui" id="order">
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                        </select>
+                        
+                        <div class="eccentricity-ui">eccentricity:</div> 
+                        <select class="param eccentricity-ui" id="eccentricity">
+                            <option value="0">0</option>
+                            <option value="0.1">0.1</option>
+                            <option value="0.2">0.2</option>
+                            <option value="0.3">0.3</option>
+                            <option value="0.4">0.4</option>
+                            <option value="0.5">0.5</option>
+                            <option value="0.6">0.6</option>
+                            <option value="0.7">0.7</option>
+                            <option value="0.8">0.8</option>
+                            <option value="0.9">0.9</option>
+                            <option value="1">1</option>
+                        </select>
 
-                    <div class="radius-ui">radius: <output id="radius-output"></output></div> 
-                    <input type="range" min="1" max="512" value="0" class="param radius-ui" id="radius">
-                    
-                    <div class="hub-ui">hub: <output id="hub-output"></output></div> 
-                    <input type="range" min="1" max="512" value="0" class="param hub-ui" id="hub">
-                    
-                    <div class="pulse-ui">pulse: <output id="pulse-output"></output></div> 
-                    <input type="range" min="0" max="3" step="0.1" value="0" class="param pulse-ui" id="pulse">
-                    
-                    <div class="wave-amp-ui">wave-amp: <output id="wave-amp-output"></output></div> 
-                    <input type="range" min="0" max="100" step="1" value="0" class="param wave-amp-ui" id="wave-amp">
+                        <div class="radius-ui">radius: <output id="radius-output"></output></div> 
+                        <input type="range" min="1" max="512" value="0" class="param radius-ui" id="radius">
+                        
+                        <div class="hub-ui">hub: <output id="hub-output"></output></div> 
+                        <input type="range" min="1" max="512" value="0" class="param hub-ui" id="hub">
+                        
+                        <div class="pulse-ui">pulse: <output id="pulse-output"></output></div> 
+                        <input type="range" min="0" max="3" step="0.1" value="0" class="param pulse-ui" id="pulse">
+                        
+                        <div class="wave-amp-ui">wave-amp: <output id="wave-amp-output"></output></div> 
+                        <input type="range" min="0" max="100" step="1" value="0" class="param wave-amp-ui" id="wave-amp">
 
-                    <div class="wave-freq-ui">wave-freq: <output id="wave-freq-output"></output></div> 
-                    <input type="range" min="0" max="10" step="0.1" value="0" class="param wave-freq-ui" id="wave-freq">
-                    
-                </section>
+                        <div class="wave-freq-ui">wave-freq: <output id="wave-freq-output"></output></div> 
+                        <input type="range" min="0" max="10" step="0.1" value="0" class="param wave-freq-ui" id="wave-freq">
+                        
+                    </section>
 
-                <section id="function">
-                    <h3>Function</h3>
-                </section>
+                    <section id="function">
+                        <h3>Function</h3>
+                    </section>
 
-                <section id="params-editor">
-                    <table id="param-table">
-                        <thead>
-                            <tr>
-                                <th>Parameter</th>
-                                <th>Value</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>a</td>
-                                <td><input type="number" min="-64" max="64" step="0.1"></td>
-                            </tr>
-                            
-                        </tbody>
-                    </table>
-                </section>
-
+                    <section id="params-editor">
+                        <table id="param-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>a</td>
+                                    <td><input type="number" min="-64" max="64" step="0.1"></td>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                    </section>
+                </div>
             </div>
         </section>
     </main>

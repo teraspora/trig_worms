@@ -63,7 +63,7 @@ canvas, #controls, #curves, #params-wrapper, #buttons {
 }
 
 canvas {
-    background-color: ##111;
+    background-color: #111;
 }
 
 #controls {
@@ -164,12 +164,23 @@ input[type="checkbox"]:checked::before {
 
 input[type="checkbox"]:disabled {
     border-color: #000;
-    /* background: #ddd; */
     color: gray;
 }
 
 input[type="range"]:hover {
     cursor: grab;
+}
+
+h3#curves-header, h3#active-curve-header {
+    padding: 0.3vw;
+    font-weight: normal;
+    font-variant: petite-caps;
+    text-align: center;
+}
+
+#curves-toggler, #active-curve-toggler {
+    cursor: pointer;
+    font-size: 1em;
 }
 
 fieldset {
