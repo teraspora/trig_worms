@@ -480,7 +480,7 @@ class ShapeScene extends Scene2d {
         const curve_settings = document.getElementById('active-curve-settings');
         active_curve_toggler.addEventListener('click', _ => {
             const hidden = curve_settings.classList.toggle('hidden');
-            active_curve_toggler.textContent = hidden ? '▼' : (this.controls.scroll(0, this.controls.offsetHeight), '►');
+            active_curve_toggler.textContent = hidden ? '▼' : (this.controls.scroll(0, curve_settings.offsetHeight), '►');
         });
 
         // Show/Hide Advanced settings
@@ -1076,7 +1076,7 @@ class ShapeScene extends Scene2d {
             const shape = curve.shape;
             if (!curve.hidden) {
                 let x, y;
-                if (!curve.aux) {
+                if (curve.aux === curve) {
                     [x, y] = this.#transform_to_canvas(curve.func(...curve.params, this.progress * curve.speed + curve.seed));
                 }
                 else {
