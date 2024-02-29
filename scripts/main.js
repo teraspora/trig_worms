@@ -341,7 +341,35 @@ class ShapeScene extends Scene2d {
         this.ctx.shadowOffsetY = 4;
         this.ctx.shadowBlur = 4;    // quantity of blur applied; dimensionless; must be non-negative
         this.ctx.shadowColor = '#000';
+        this.ctx.globalAlpha = 1.0;
         this.mirrored = true;
+
+        this.property_map = {  // maps ids of input elements to canvas context properties
+            'shadow-colour': val => {
+                if (!val) return this.ctx.shadowColor;
+                    this.ctx.shadowColor = val;
+                },
+            'global-alpha' : val => {
+                if (!val) return this.ctx.globalAlpha;
+                    this.ctx.globalAlpha = val;
+                },
+            'shadow-offset-x' : val => {
+                if (!val) return this.ctx.shadowOffsetX;
+                    this.ctx.shadowOffsetX = val;
+                },
+            'shadow-offset-y' : val => {
+                if (!val) return this.ctx.shadowOffsetY;
+                    this.ctx.shadowOffsetY = val;
+                },
+            'shadow-blur' : val => {
+                if (!val) return this.ctx.shadowBlur;
+                    this.ctx.shadowBlur = val;
+                },
+            'global-speed' : val => {
+                if (!val) return this.progress_delta * 500;
+                    this.progress_delta = val * 0.002;
+                },
+        }
 
         // CanvasRenderingContext2D: globalCompositeOperation property
         // see https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation
@@ -424,18 +452,28 @@ class ShapeScene extends Scene2d {
         this.current_curve.colour = null;   // Start with current curve multicoloured
         
         // UI Controls
+        this.controls = document.querySelector('section#controls');
         this.curve_select = document.getElementById('curve-select');
         this.tbody = document.querySelector('table#param-table>tbody');
         this.row_template = this.tbody.firstElementChild.cloneNode(true);
         this.#create_curve_checkboxes();
         this.#create_params_section();
+        this.#create_advanced_section();
 
         // Show/Hide Active Curve settings
         const active_curve_toggler = document.getElementById('active-curve-toggler');
         const curve_settings = document.getElementById('active-curve-settings');
-        active_curve_toggler.addEventListener('click', event => {
+        active_curve_toggler.addEventListener('click', _ => {
             const hidden = curve_settings.classList.toggle('hidden');
-            active_curve_toggler.textContent = hidden ? '▼' : '►';
+            active_curve_toggler.textContent = hidden ? '▼' : (this.controls.scroll(0, this.controls.offsetHeight), '►');
+        });
+
+        // Show/Hide Advanced settings
+        const advanced_toggler = document.getElementById('advanced-toggler');
+        const advanced_settings = document.getElementById('advanced-settings');
+        advanced_toggler.addEventListener('click', _ => {
+            const hidden = advanced_settings.classList.toggle('hidden');
+            advanced_toggler.textContent = hidden ? '▼' : (this.controls.scroll(0, this.controls.offsetHeight), '►');
         });
 
         // Buttons
@@ -621,7 +659,7 @@ class ShapeScene extends Scene2d {
             });
         }
         const curves_toggler = document.getElementById('curves-toggler');
-        curves_toggler.addEventListener('click', event => {
+        curves_toggler.addEventListener('click', _ => {
             const hidden = checkbox_wrapper.classList.toggle('hidden');
             curves_toggler.textContent = hidden ? '▼' : '►';
         });
@@ -921,6 +959,20 @@ class ShapeScene extends Scene2d {
             this.#update_parameter_display();
         });
         this.#update_parameter_display();
+    }
+
+    #create_advanced_section() {
+        const inputs = [...document.querySelectorAll('#advanced-table input')];
+        inputs.forEach(input => {
+            input.value = this.property_map[input.id]();
+            input.parentElement.previousElementSibling.firstElementChild.textContent = input.value;   // targets the <output> element
+            input.addEventListener('change', _ => {
+                const value = input.value;
+                this.property_map[input.id](value);
+                input.style.backgroundColor = value;
+                input.parentElement.previousElementSibling.firstElementChild.textContent = value;   // as above
+            });
+        });
     }
 
     #initialise_buttons() {

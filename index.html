@@ -38,7 +38,7 @@
             </div>
             
             <div id="curves">
-                <h3 id="curves-header">Curves <span id="curves-toggler">▼</span></h3>
+                <h3 id="curves-header">Curves <span id="curves-toggler">►</span></h3>
                 
                 <fieldset>
                     <div>
@@ -213,6 +213,51 @@
                             </tbody>
                         </table>
                     </section>
+                </div>
+            </div>
+            <div id="advanced-wrapper">
+                <h3 id="advanced-header">Advanced <span id="advanced-toggler">▼</span></h3>
+                <div id="advanced-settings" class="hidden">
+                    <table id="advanced-table">
+                        <thead>
+                            <tr>
+                                <th>Property</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>shadow colour</td>
+                                <td><output></output></td>
+                                <td><input type="color" id="shadow-colour"></td>
+                            </tr>
+                            <tr>
+                                <td>global alpha</td>
+                                <td><output></output></td>
+                                <td><input type="range" min="0" max="1" step="0.01" id="global-alpha"></td>
+                            </tr>
+                            <tr>
+                                <td>shadow offset x</td>
+                                <td><output></output></td>
+                                <td><input type="range" min="-16" max="16" step="1" id="shadow-offset-x"></td>
+                            </tr>
+                            <tr>
+                                <td>shadow offset y</td>
+                                <td><output></output></td>
+                                <td><input type="range" min="-16" max="16" step="1" id="shadow-offset-y"></td>
+                            </tr>
+                            <tr>
+                                <td>shadow blur</td>
+                                <td><output></output></td>
+                                <td><input type="range" min="0" max="256" step="1" id="shadow-blur"></td>
+                            </tr>
+                            <tr>
+                                <td>global speed</td>
+                                <td><output></output></td>
+                                <td><input type="range" min="0" max="128" step="1" id="global-speed"></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </section>
