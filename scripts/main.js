@@ -40,7 +40,7 @@ const Curves = {
         // speed: 0.4
     },
 
-    chitonoid: {   // copy of oyster with different params
+    chitonoid: {   // copy of oysteroid with different params
         func: (a, b, c, d, e, f, g, t) => {
             const t_ = t / 10;
             const [ad, ae, af, ag] = [d, e, f, g].map(w => Math.abs(w));
@@ -51,7 +51,7 @@ const Curves = {
                     * af * ag / (af * ag + af + ag)
             ];
         },
-        params: [-2.5, 2.5, 19, -4, -28, -64, -9],   // mirror frame, woven
+        params: [4, 2, 19, -4, -28, -64, -9],   // mirror frame, woven
         speed: 0.4,
         // params: [3, -5, 17, 5, -3.5, 3.4, .9],   // more beautiful loops!!
         // speed: 0.2
@@ -263,15 +263,6 @@ const Curves = {
         speed: 0.1
     },
 
-    astroid: {
-        func: (p, t) => [
-            Math.cos(t) ** p , 
-            Math.sin(t) ** p
-        ],
-        params: [5],
-        speed: 0.1
-    },
-
     squiggle: {
         func: (a, b, t) => [
             (Math.sin(a * t) + Math.cos(b * t)) / 2,
@@ -288,6 +279,15 @@ const Curves = {
         ],
         params: [0, 17, -9, 42],
         speed: 0.008
+    },
+
+    astroid: {
+        func: (p, t) => [
+            Math.cos(t) ** p , 
+            Math.sin(t) ** p
+        ],
+        params: [5],
+        speed: 0.1
     },
 
     ellipse: {
@@ -317,7 +317,7 @@ class Scene {
         this.progress = 0;
         this.progress_delta = 0.05;
         this.paused = false;
-        this.non_colour = 'hsl(36 100% 90%)';
+        this.plain_colour = 'hsl(36 100% 90%)';
         this.debug_colour = 'hsl(206 100% 50%)';
     }
     render() {
@@ -426,26 +426,31 @@ class ShapeScene extends Scene2d {
                 this.active_curves.push(curve);
             }
         }
+
+        // TESTING NEW FEATURE: AUX CURVES
+        // this.curves.chitonoid.aux_curve = this.curves.astroid;
         
-        for (const curve in this.curves) {
-            this.curves[curve].default_colour = this.#get_random_colour();
+        for (const c in this.curves) {
+            const curve = this.curves[c];
+            curve.default_colour = this.#get_random_colour();
             this.default_stroke_colour = '#111111';
-            this.curves[curve].colour = this.curves[curve].default_colour;
-            this.curves[curve].polychrome_speed = 25;       // we'll have a range [0, .., 100] and set the normal to 25, so user can speed up 4x and slow down 25x
-            this.curves[curve].shape = this.#get_random_shape();
-            this.curves[curve].shape.polychrome_speed = this.curves[curve].polychrome_speed;
+            curve.colour = curve.default_colour;
+            curve.polychrome_speed = 25;       // we'll have a range [0, .., 100] and set the normal to 25, so user can speed up 4x and slow down 25x
+            curve.shape = this.#get_random_shape();
+            curve.shape.polychrome_speed = curve.polychrome_speed;
             this.rotations = [...document.querySelector('select.param#rotation').options].map(option => Number(option.value));
-            this.curves[curve].rotation = this.rotations[rand_int(this.rotations.length)];
-            this.curves[curve].seed = Math.random() * 4095;
-            this.curves[curve].hidden = !this.active_curves.includes(this.curves[curve]);
-            this.curves[curve].param_names = this.curves[curve].func.toString().split(',').slice(0, this.curves[curve].params.length).map(t => t.slice(-1));
+            curve.rotation = this.rotations[rand_int(this.rotations.length)];
+            curve.seed = Math.random() * 4095;
+            curve.hidden = !this.active_curves.includes(curve);
+            curve.param_names = curve.func.toString().split(',').slice(0, curve.params.length).map(t => t.slice(-1));
+            curve.aux = curve;
 
             if (debug) {
-                if (this.curves[curve].name !=  debug) {
-                    this.curves[curve].hidden = true;
+                if (curve.name !=  debug) {
+                    curve.hidden = true;
                 }
                 else {
-                    this.current_curve = this.curves[curve];
+                    this.current_curve = curve;
                     this.current_curve.hidden = false;
                     this.current_curve.shape.radius = 8;
                     if (this.current_curve.shape instanceof HubbedShape) {
@@ -456,6 +461,7 @@ class ShapeScene extends Scene2d {
                 }
             }
         }
+
         // Set current curve to be the first in the list of active curves
         this.current_curve = this.active_curves[0];
         this.current_curve.colour = null;   // Start with current curve multicoloured
@@ -516,7 +522,7 @@ class ShapeScene extends Scene2d {
                         });
                         cpi.addEventListener('change', event => {
                             cp.hidden = true;
-                            this.#clear_canvas();    
+                            this.#clear_canvas();   // need to remove previous background, which of course is opaque    
                         });                        
                         cp.hidden = false;
                         const cpb = cp.querySelector('button#cp-hide');
@@ -695,7 +701,7 @@ class ShapeScene extends Scene2d {
             : rg_0;
         curve_label.style.color =
             colour 
-            ?? this.non_colour;
+            ?? this.plain_colour;
         curve_label.classList.add('emphasised');
         curve_option.style.backgroundColor =
             colour 
@@ -706,7 +712,7 @@ class ShapeScene extends Scene2d {
             ?? '#000';
         this.curve_select.style.color = 
             colour
-            ?? this.non_colour;
+            ?? this.plain_colour;
         // Set the dropdown's value to the current curve's name 
         this.curve_select.value = this.current_curve.name;
         // Populate the function box
@@ -764,7 +770,7 @@ class ShapeScene extends Scene2d {
                         this.current_curve.colour
                             ? this.#get_hue_from_hsl(this.current_curve.colour)
                             : -1
-                    hue_output.style.color = this.current_curve.colour ?? this.non_colour;
+                    hue_output.style.color = this.current_curve.colour ?? this.plain_colour;
                     break;
                 case 'stroke-thickness':
                     param.value = this.current_curve.shape.thickness;
@@ -810,6 +816,9 @@ class ShapeScene extends Scene2d {
                     const wave_freq_output = param.previousElementSibling.firstElementChild;
                     wave_freq_output.value = this.current_curve.shape.wave_frequency;
                     break;
+                case 'aux':
+                    param.value = this.current_curve.aux;
+                    break;
                 default:
             }
         });
@@ -818,8 +827,8 @@ class ShapeScene extends Scene2d {
     #create_params_section() {
         this.curve_names.forEach(curve_name => {
             const option = new Option(curve_name, curve_name);
-            this.curve_select.add(option);
             option.style.color = this.curves[curve_name].colour;            
+            this.curve_select.add(option);
         });
         this.curve_select.style.color = this.current_curve.colour;
         this.curve_select.onchange = event => {
@@ -882,17 +891,31 @@ class ShapeScene extends Scene2d {
                             console.log('Invalid shape!');
                     }
                     break;
-                case 'order':
+                case 'speed':
                     value = event.target.selectedOptions[0].value;
-                    this.current_curve.shape.order = Number(value);
+                    this.current_curve.speed = Number(value);
                     break;
-                case 'eccentricity':
+                case 'rotation':
                     value = event.target.selectedOptions[0].value;
-                    this.current_curve.shape.eccentricity = Number(value);
+                    this.current_curve.rotation = Number(value);
                     break;
                 case 'fill':
                     value = event.target.checked;
                     this.current_curve.shape.fill = value;
+                    break;
+                case 'hue':
+                    value = Number(event.target.value);
+                    this.current_curve.colour =
+                        (value == -1)
+                            ? null
+                            : `hsl(${value} 100% 50%)`;
+                    document.getElementById(this.current_curve.name).style.color = this.current_curve.colour;
+                    const hue_output = document.getElementById('hue-output');
+                    hue_output.style.color = this.current_curve.colour ?? this.plain_colour;
+                    hue_output.value = value;
+                    this.curve_select.style.color = this.current_curve.colour ?? this.plain_colour;
+                    // Whether hue is -1 or in [0, .., 359] determines whether we show the Polychrome Speed UI -
+                    // But this gets handled in this.#update_parameter_display(), called after this switch
                     break;
                 case 'stroke-thickness':
                     value = event.target.value;
@@ -904,29 +927,19 @@ class ShapeScene extends Scene2d {
                     value = event.target.value;
                     this.current_curve.shape.outline = value;
                     break;
-                case 'speed':
-                    value = event.target.selectedOptions[0].value;
-                    this.current_curve.speed = Number(value);
-                    break;
-                case 'hue':
-                    value = Number(event.target.value);
-                    this.current_curve.colour =
-                        (value == -1)
-                            ? null
-                            : `hsl(${value} 100% 50%)`;
-                    document.getElementById(this.current_curve.name).style.color = this.current_curve.colour;
-                    const hue_output = document.getElementById('hue-output');
-                    hue_output.style.color = this.current_curve.colour ?? this.non_colour;
-                    hue_output.value = value;
-                    this.curve_select.style.color = this.current_curve.colour ?? this.non_colour;
-                    // Whether hue is -1 or in [0, .., 359] determines whether we show the Polychrome Speed UI -
-                    // But this gets handled in this.#update_parameter_display(), called after this switch
-                    break;
                 case 'polychrome-speed':
                     value = event.target.value;
                     this.current_curve.polychrome_speed = Number(value);
                     const polychrome_speed_output = document.getElementById('pulse-output');
                     polychrome_speed_output.value = value;
+                    break;
+                case 'eccentricity':
+                    value = event.target.selectedOptions[0].value;
+                    this.current_curve.shape.eccentricity = Number(value);
+                    break;
+                case 'order':
+                    value = event.target.selectedOptions[0].value;
+                    this.current_curve.shape.order = Number(value);
                     break;
                 case 'radius':
                     value = event.target.value;
@@ -958,9 +971,10 @@ class ShapeScene extends Scene2d {
                     const wave_freq_output = document.getElementById('wave-freq-output');
                     wave_freq_output.value = value;
                     break;
-                case 'rotation':
+                case 'aux':
                     value = event.target.selectedOptions[0].value;
-                    this.current_curve.rotation = Number(value);
+                    this.current_curve.aux = Number(value);
+                    break;
                 default:
                     break;
             }
@@ -1051,14 +1065,22 @@ class ShapeScene extends Scene2d {
         this.update();
     }
 
+    // Critical method called each frame by requestAnimationFrame()
     update() {
         super.update();
         for (let i = 0; i < this.curve_names.length; i++) {
             const curve = this.curves[this.curve_names[i]];
             const shape = curve.shape;
             if (!curve.hidden) {
-                
-                const [x, y] = this.#transform_to_canvas(curve.func(...curve.params, this.progress * curve.speed + curve.seed));
+                let x, y;
+                if (!curve.aux) {
+                    [x, y] = this.#transform_to_canvas(curve.func(...curve.params, this.progress * curve.speed + curve.seed));
+                }
+                else {
+                    const [x_a, y_a] = this.#transform_to_canvas(curve.func(...curve.params, this.progress * curve.speed + curve.seed));
+                    const [x_b, y_b] = this.#transform_to_canvas(curve.aux.func(...curve.aux.params, this.progress * curve.speed + curve.seed));    // use speed and seed from base curve
+                    [x, y] = [(x_a + x_b) / 2, (y_a + y_b) / 2];
+                }
                 this.ctx.save();
                 const [nx, ny] = [shape.y_last - y, x - shape.x_last];
                 const mag = Math.sqrt(nx * nx + ny * ny);

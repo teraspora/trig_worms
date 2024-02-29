@@ -15,7 +15,7 @@ This `README` and the Help text will be expanded considerably in due course, so 
 In the meantime here are a couple of screenshots:
 ![](media/app_snapshot_01.jpg)
 <img src="media/tw_12_small.png" width=300 alt=""> <img src="media/tw_07.jpg" width=320 alt=""> <img src="media/tw_17_small.png" width=300 alt="">
-
+<img src="media/golden_net_small.png" width=300 alt=""> <img src="media/knitted_mat_small.png" width=300 alt=""> <img src="media/doily_00_small.png" width=300 alt="">
 <img src="media/tw_15_small.png" width=300 alt=""> <img src="media/tw_16_small.png" width=320 alt=""> <img src="media/tw_14_small.png" width=300 alt="">
 <img src="media/tw_23_small.png" width=300 alt=""> <img src="media/tw_18_small.png" width=300 alt=""> <img src="media/tw_19_small.png" width=320 alt="">
 <img src="media/tw_21_small.png" width=300 alt=""> <img src="media/tw_20_small.png" width=300 alt=""> <img src="media/tw_22_small.png" width=320 alt=""> 
