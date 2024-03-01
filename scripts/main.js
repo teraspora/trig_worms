@@ -501,7 +501,7 @@ class ShapeScene extends Scene2d {
         const curve_settings = document.getElementById('active-curve-settings');
         active_curve_toggler.addEventListener('click', _ => {
             const hidden = curve_settings.classList.toggle('hidden');
-            active_curve_toggler.textContent = hidden ? '▼' : (this.controls.scroll(0, curve_settings.offsetHeight), '►');
+            active_curve_toggler.textContent = hidden ? '►' : (this.controls.scroll(0, curve_settings.offsetHeight), '▼');
         });
 
         // Show/Hide Advanced settings
@@ -509,7 +509,7 @@ class ShapeScene extends Scene2d {
         const advanced_settings = document.getElementById('advanced-settings');
         advanced_toggler.addEventListener('click', _ => {
             const hidden = advanced_settings.classList.toggle('hidden');
-            advanced_toggler.textContent = hidden ? '▼' : (this.controls.scroll(0, this.controls.offsetHeight), '►');
+            advanced_toggler.textContent = hidden ? '►' : (this.controls.scroll(0, this.controls.offsetHeight), '▼');
         });
 
          // Show/Hide Function settings
@@ -517,7 +517,7 @@ class ShapeScene extends Scene2d {
          const function_settings = document.getElementById('function-settings');
          function_toggler.addEventListener('click', _ => {
              const hidden = function_settings.classList.toggle('hidden');
-             function_toggler.textContent = hidden ? '▼' : (this.controls.scroll(0, this.controls.offsetHeight), '►');
+             function_toggler.textContent = hidden ? '►' : (this.controls.scroll(0, this.controls.offsetHeight), '▼');
          });
  
          // Buttons
@@ -705,7 +705,7 @@ class ShapeScene extends Scene2d {
         const curves_toggler = document.getElementById('curves-toggler');
         curves_toggler.addEventListener('click', _ => {
             const hidden = checkbox_wrapper.classList.toggle('hidden');
-            curves_toggler.textContent = hidden ? '▼' : '►';
+            curves_toggler.textContent = hidden ? '►' : '▼';
         });
     }
 
