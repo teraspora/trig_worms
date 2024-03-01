@@ -251,7 +251,7 @@ const Curves = {
         speed: 0.1
     },
 
-    ribbon: {
+    floroid: {
         func: (R, r, t) => {
             const s = R - r;
             return [
@@ -438,6 +438,7 @@ class ShapeScene extends Scene2d {
             curve.polychrome_speed = 25;       // we'll have a range [0, .., 100] and set the normal to 25, so user can speed up 4x and slow down 25x
             curve.shape = this.#get_random_shape();
             curve.shape.polychrome_speed = curve.polychrome_speed;
+            curve.shape.polychrome_stroke = false;
             this.rotations = [...document.querySelector('select.param#rotation').options].map(option => Number(option.value));
             curve.rotation = this.rotations[rand_int(this.rotations.length)];
             curve.seed = Math.random() * 4095;
@@ -777,6 +778,9 @@ class ShapeScene extends Scene2d {
                     const stroke_thickness_output = param.previousElementSibling.firstElementChild;
                     stroke_thickness_output.value = this.current_curve.shape.thickness;
                     break;
+                case 'polychrome-stroke':
+                    param.checked = this.current_curve.shape.polychrome_stroke;
+                    break;
                 case 'stroke-colour':
                     param.value = this.current_curve.shape.outline;
                     break;
@@ -925,6 +929,10 @@ class ShapeScene extends Scene2d {
                     this.current_curve.shape.thickness = Number(value);
                     const stroke_thickness_output = document.getElementById('stroke-thickness-output');
                     stroke_thickness_output.value = value;
+                    break;
+                case 'polychrome-stroke':
+                    value = event.target.checked;
+                    this.current_curve.shape.polychrome_stroke = value;
                     break;
                 case 'stroke-colour':
                     value = event.target.value;
@@ -1136,7 +1144,37 @@ class Shape {
         this.wave_amplitude = wave_amplitude;
         this.wave_frequency = wave_frequency;
     }
-    draw(x, y) {
+    draw(ctx, progress, colour) {
+        // Conditionally do the filling and stroking after the child classes have drawn their stuff
+        if (this.thickness) {
+            ctx.lineWidth = this.thickness;
+            if (!this.polychrome_stroke) {
+                ctx.strokeStyle = this.outline;
+            }
+            else {
+                const r = Math.sin(
+                    (progress / 16)
+                    * (this.polychrome_speed / 25)
+                )
+                * 170 + 170;
+                ctx.strokeStyle = `hsl(${r + (r > 100 ? 20 : 0)} 100% 50%)`;    // too much of garish greens!
+            }
+            ctx.stroke();
+        }
+        if (this.fill) {
+            if (colour) {
+                ctx.fillStyle = colour;
+            }
+            else {
+                const r = Math.sin(
+                    (progress / 16)
+                    * (this.polychrome_speed / 25)
+                )
+                * 170 + 170;
+                ctx.fillStyle = `hsl(${r + (r > 100 ? 20 : 0)} 100% 50%)`;    // just cut out 20 degrees of garish greens!
+            }
+            ctx.fill();
+        }
     }
 }
 
@@ -1149,7 +1187,6 @@ class Polygon extends Shape {
         this.order = order;
     }
     draw(ctx, x, y, colour, progress) {
-        super.draw(x, y);
         let r = this.radius;
         if (this.pulse) {
             r +=  Math.max(-r + 1, this.pulse * Math.sin(progress) * r);
@@ -1163,27 +1200,7 @@ class Polygon extends Shape {
             ctx.lineTo(0, r);
         }
         ctx.closePath();
-
-        if (this.thickness) {
-            ctx.strokeStyle = this.outline;
-            ctx.lineWidth = this.thickness;
-            ctx.stroke();
-        }
-        if (this.fill) {
-            if (colour) {
-                ctx.fillStyle = colour;
-                ctx.fill();
-            }
-            else {
-                const r = Math.sin(
-                    (progress / 16)
-                    * (this.polychrome_speed / 25)
-                )
-                * 170 + 170;
-                ctx.fillStyle = `hsl(${r + (r > 100 ? 20 : 0)} 100% 50%)`;    // just cut out 20 degrees of garish greens!
-                ctx.fill();
-            }
-        }
+        super.draw(ctx, progress, colour);
         ctx.restore();
     }
 }
@@ -1196,7 +1213,6 @@ class Moon extends Shape {
         this.radius = radius;
     }
     draw(ctx, x, y, colour, progress) {
-        super.draw(x, y);
         let r = this.radius;
         if (this.pulse) {
             r +=  Math.max(-r + 1, this.pulse * Math.sin(progress) * r);
@@ -1207,27 +1223,7 @@ class Moon extends Shape {
         ctx.arc(0, 0, r, -Math.PI / 2, Math.PI / 2, true);
         ctx.arcTo(- r / 2, 0, 0, -r, 2 * r);
         ctx.closePath();
-
-        if (this.thickness) {
-            ctx.strokeStyle = this.outline;
-            ctx.lineWidth = this.thickness;
-            ctx.stroke();
-        }
-        if (this.fill) {
-            if (colour) {
-                ctx.fillStyle = colour;
-                ctx.fill();
-            }
-            else {
-                const r = Math.sin(
-                    (progress / 16)
-                    * (this.polychrome_speed / 25)
-                )
-                * 170 + 170;
-                ctx.fillStyle = `hsl(${r + (r > 100 ? 20 : 0)} 100% 50%)`;    // just cut out 20 degrees of garish greens!
-                ctx.fill();
-            }
-        }
+        super.draw(ctx, progress, colour);
         ctx.restore();
     }
 }
@@ -1240,8 +1236,8 @@ class HubbedShape extends Shape {
         this.radius = radius_outer;
         this.hub = radius_inner;
     }
-    draw(x, y) {
-        super.draw(x, y);
+    draw(ctx, progress, colour) {
+        super.draw(ctx, progress, colour);
     }
 }
 
@@ -1257,24 +1253,10 @@ class Ring extends HubbedShape {
         if (this.pulse) {
             r +=  Math.max(-r + 1, this.pulse * Math.sin(progress) * r);
         }
-        
-        if (colour) {
-            ctx.fillStyle = colour;
-        }
-        else {
-            const r = Math.sin((progress / 16) * (this.polychrome_speed / 25)) * 170 + 170;
-            ctx.fillStyle = `hsl(${r + (r > 100 ? 20 : 0)} 100% 50%)`;    // just cut out 20 degrees of garish greens!
-        }
         ctx.beginPath();
-        ctx.ellipse(x, y, r, r * this.eccentricity, 0, 0, 2 * Math.PI);
-        if (this.fill) ctx.fill();
-
-        if (this.thickness) {
-            ctx.strokeStyle = this.outline;
-            ctx.lineWidth = this.thickness;
-            ctx.stroke();
-        }
-
+        ctx.ellipse(x, y, r, r * this.eccentricity, 0, 0, 2 * Math.PI);        
+        super.draw(ctx, progress, colour);
+        // Finally, draw the hub
         ctx.fillStyle = 'hsla(0, 0%, 0%, 1)';
         ctx.beginPath();
         ctx.ellipse(x, y, this.hub, this.hub * this.eccentricity, 0, 0, 2 * Math.PI);
@@ -1290,40 +1272,22 @@ class Star extends HubbedShape {
         this.order = order;
     }
     draw(ctx, x, y, colour, progress) {
-        super.draw(x, y);
         let r = this.radius;
         if (this.pulse) {
             r +=  Math.max(-r + 1, this.pulse * Math.sin(progress) * r);
         }
         ctx.save();
-        {
-            ctx.beginPath();
-            ctx.translate(x, y);
-            ctx.moveTo(0, r);
-            for (let i = 0; i < this.order; i++) {
-                ctx.lineTo(0, r);
-                ctx.rotate(Math.PI / this.order);
-                ctx.lineTo(0, this.hub);
-                ctx.rotate(Math.PI / this.order);
-            }
-            ctx.closePath();
-
-            if (this.thickness) {
-                ctx.strokeStyle = this.outline;
-                ctx.lineWidth = this.thickness;
-                ctx.stroke();
-            }
-            if (this.fill) {
-                if (colour) {
-                    ctx.fillStyle = colour;
-                    ctx.fill();
-                }
-                else {
-                    ctx.fillStyle = `hsl(${Math.sin(progress / (this.order * this.radius / 4)) * 90 + 270} 100% 50%)`
-                    ctx.fill();
-                }
-            }
+        ctx.beginPath();
+        ctx.translate(x, y);
+        ctx.moveTo(0, r);
+        for (let i = 0; i < this.order; i++) {
+            ctx.lineTo(0, r);
+            ctx.rotate(Math.PI / this.order);
+            ctx.lineTo(0, this.hub);
+            ctx.rotate(Math.PI / this.order);
         }
+        ctx.closePath();
+        super.draw(ctx, progress, colour);
         ctx.restore();
     }
 }
