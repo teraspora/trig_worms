@@ -56,7 +56,7 @@ nav#nav-top span a.active{
     text-decoration-color: var(--contrast-col);
 }
 
-canvas, #controls, #curves, #params-wrapper, #buttons, #advanced-wrapper {
+canvas, #controls, #curves, #params-wrapper, #buttons, #advanced-wrapper, #function-wrapper {
     border: 1px ridge var(--border-grey);
     margin: 0.5vw;
     background-color: #000000;
@@ -171,14 +171,14 @@ input[type="range"]:hover {
     cursor: grab;
 }
 
-h3#curves-header, h3#active-curve-header, h3#advanced-header {
+h3#curves-header, h3#active-curve-header, h3#advanced-header, h3#function-header {
     padding: 0.3vw;
     font-weight: normal;
     font-variant: petite-caps;
     text-align: center;
 }
 
-#curves-toggler, #active-curve-toggler, #advanced-toggler {
+#curves-toggler, #active-curve-toggler, #advanced-toggler, #function-toggler {
     cursor: pointer;
     font-size: 1em;
 }

@@ -512,7 +512,15 @@ class ShapeScene extends Scene2d {
             advanced_toggler.textContent = hidden ? '▼' : (this.controls.scroll(0, this.controls.offsetHeight), '►');
         });
 
-        // Buttons
+         // Show/Hide Function settings
+         const function_toggler = document.getElementById('function-toggler');
+         const function_settings = document.getElementById('function-settings');
+         function_toggler.addEventListener('click', _ => {
+             const hidden = function_settings.classList.toggle('hidden');
+             function_toggler.textContent = hidden ? '▼' : (this.controls.scroll(0, this.controls.offsetHeight), '►');
+         });
+ 
+         // Buttons
         this.buttons = [...document.querySelectorAll('#buttons>button')];
         this.buttons.forEach(button => {
             button.addEventListener('click', event => {
@@ -688,6 +696,7 @@ class ShapeScene extends Scene2d {
                 else if (!curve.hidden) {
                     this.current_curve = curve;
                 }
+                event.target.blur();
                 // and if user has hidden a curve other than the current curve, all we do is update the checkboxes
                 this.#update_curves_listing();
                 this.#update_parameter_display();
@@ -870,6 +879,7 @@ class ShapeScene extends Scene2d {
         };
 
         param_details.addEventListener('change', event => {
+            event.preventDefault();
             const param = event.target.id;
             let value;
             switch(param) {
