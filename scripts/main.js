@@ -88,13 +88,24 @@ const Curves = {
 
     epitrochoid: {
         func: (a, b, c, t) => [
+                ((a + b) * Math.cos(t) - c * Math.cos(((a - b) / b) * t))
+                    / (Math.abs(a) + Math.abs(b) + Math.abs(c)),
+                ((a + b) * Math.sin(t) - c * Math.sin(((a - b) / b) * t))
+                    / (Math.abs(a) + Math.abs(b) + Math.abs(c)),
+            ],
+        params: [5, 3, 5],
+        speed: 0.2
+    },
+    
+    quasi_epitrochoid: {
+        func: (a, b, c, t) => [
                 ((a + b) * Math.cos(t) - c * Math.cos((a / b + 1) * t))
                     / (Math.abs(a) + Math.abs(b) + Math.abs(c)),
                 ((a + b) * Math.sin(t) - c * Math.sin((a / b + 1) * t))
                     / (Math.abs(a) + Math.abs(b) + Math.abs(c)),
             ],
-        params: [15, 23, -8],
-        speed: 0.1
+        params: [5, 3, 5],
+        speed: 0.2
     },
 
     merlinium: {
@@ -138,8 +149,17 @@ const Curves = {
             Math.cos(k * t + t) * Math.cos(t),
             Math.cos(k * t + t) * Math.sin(t),
         ],
-        params: [27 / 11],
+        params: [1.16666666667],
         speed: 0.02
+    },
+
+    rose: {
+        func: (n, t) => [
+            Math.cos(n * t) * Math.cos(t),
+            Math.cos(n * t) * Math.sin(t),
+        ],
+        params: [1.166666666667],
+        speed: 0.2
     },
 
     hypotrochoid: {
@@ -749,7 +769,7 @@ class ShapeScene extends Scene2d {
         });
         // Hide polychrome-speed slider unless hue is -1 / colour is null
         [...document.getElementsByClassName('polychrome-speed-ui')].forEach(el => {
-            this.current_curve.colour ? el.classList.add('hidden') : el.classList.remove('hidden');
+            this.current_curve.colour && !this.current_curve.shape.polychrome_stroke ? el.classList.add('hidden') : el.classList.remove('hidden');
         });
         param_elements.forEach(param => {
             switch(param.id) {
@@ -1145,6 +1165,7 @@ class Shape {
         this.wave_frequency = wave_frequency;
     }
     draw(ctx, progress, colour) {
+        // Must be called by child class draw() methods to do filling and stroking!
         // Conditionally do the filling and stroking after the child classes have drawn their stuff
         if (this.thickness) {
             ctx.lineWidth = this.thickness;
@@ -1152,11 +1173,8 @@ class Shape {
                 ctx.strokeStyle = this.outline;
             }
             else {
-                const r = Math.sin(
-                    (progress / 16)
-                    * (this.polychrome_speed / 25)
-                )
-                * 170 + 170;
+                const r = (370 - (Math.sin((progress / 16) * (this.polychrome_speed / 25))
+                * 170 + 170) % 340);    // desync from polychrome fill
                 ctx.strokeStyle = `hsl(${r + (r > 100 ? 20 : 0)} 100% 50%)`;    // too much of garish greens!
             }
             ctx.stroke();
@@ -1166,10 +1184,7 @@ class Shape {
                 ctx.fillStyle = colour;
             }
             else {
-                const r = Math.sin(
-                    (progress / 16)
-                    * (this.polychrome_speed / 25)
-                )
+                const r = Math.sin((progress / 16) * (this.polychrome_speed / 25))
                 * 170 + 170;
                 ctx.fillStyle = `hsl(${r + (r > 100 ? 20 : 0)} 100% 50%)`;    // just cut out 20 degrees of garish greens!
             }
