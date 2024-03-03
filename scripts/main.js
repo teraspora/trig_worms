@@ -219,8 +219,8 @@ const Curves = {
         // speed: 0.001,
         // params: [51, 31],    // Twisty bananas
         // speed: 0.005,
-        params: [-23, 13],  // unpredictable, all over
-        speed: 0.01
+        params: [18, 7],  // unpredictable, all over
+        speed: 0.02
     },
 
     crisscross: {
@@ -316,7 +316,7 @@ const Curves = {
             b * Math.sin(t) / Math.max(a, b)
         ],
         params: [5, 3],
-        speed: 0.005
+        speed: 0.05
     },
 
     init: function() {
@@ -338,7 +338,7 @@ class Scene {
         this.progress_delta = 0.05;
         this.paused = false;
         this.plain_colour = 'hsl(36 100% 90%)';
-        this.debug_colour = 'hsl(206 100% 50%)';
+        this.debug_colour = 'hsl(19 100% 50%)';
     }
     render() {
     }
@@ -361,6 +361,86 @@ class Scene2d extends Scene {
     }
 }
 
+class TestScene extends Scene2d {
+    constructor(canvas) {
+        super(canvas);
+    }
+    render() {
+        super.render();
+        this.ctx.clearRect(0, 0, this.width, this.height);
+        this.update();
+    }
+    update() {
+        super.update();
+        // Draw stuff
+        this.ctx.fillStyle = '#ff9922';
+        this.ctx.arc(Math.floor(200 + 8 * this.progress), Math.floor(200 + 8 * this.progress), 100, 0, 2 * Math.PI);
+        this.ctx.fill();
+        if (!this.paused) {
+            this.frame_request = requestAnimationFrame(this.update.bind(this));
+        }
+    }
+}
+
+class VoronoiScene extends Scene2d {
+    constructor(canvas) {
+        super(canvas);
+        this.func = (a, b, t) => [
+            (Math.sin(a * Math.cos(t)) + Math.cos(b * Math.sin(t))) / 2,
+            (Math.cos(a * Math.sin(t)) - Math.sin(b * Math.cos(t))) / 2,
+        ];
+        this.params = [18, 7];
+        this.point_count = 24;
+        const angles = new Set();
+        while (angles.size < this.point_count) {
+            angles.add(Math.random() * 1024);
+        }
+        this.angles = [...angles];
+        this.colours = Array(this.point_count).fill(1).map((n, i) => `hsl(${i * 360 / this.point_count} 100% 50%)`);
+    }
+    render() {
+        super.render();
+        this.ctx.clearRect(0, 0, this.width, this.height);
+        this.update();
+    }
+    update() {
+        super.update();
+        let indices = new Set();
+        for (let j = 0; j < this.height; j++) {
+            console.log(`Row ${j}...`);
+            for (let i = 0; i < this.width; i++) {
+                let [p, q, k, min_dist_sqd] = [-1, -1, -1, 1_000_000];
+
+                // DEBUG
+                if (j > 255 && i > 384 && !(i % 89) && !(j % 17)) debugger;
+
+                for (const index in this.angles) {
+                    const [x_, y_] = this.func(...this.params, this.angles[index] + this.progress);
+                    const [x, y] = this.#transform_to_canvas([x_, y_]);
+                    const d_sqd = (x - i) * (x - i) + (y - j) * (y - j);
+                    if (d_sqd < min_dist_sqd) {
+                        [p, q, k] = [i, j, index];
+                    }
+                }
+                this.ctx.fillStyle = this.colours[k];
+                indices.add(k);
+                this.ctx.fillRect(p, q, 1, 1);
+            }                
+        }
+        console.log(indices);
+        if (!this.paused) {
+            this.frame_request = requestAnimationFrame(this.update.bind(this));
+        }
+    }
+
+    #transform_to_canvas([x, y]) {
+        return [
+            Math.floor((x + 1) / 2 * this.width),
+            Math.floor((y + 1) / 2 * this.height)
+        ];
+    }
+}
+
 class ShapeScene extends Scene2d {
     constructor(canvas, curves) {
         super(canvas);
@@ -372,6 +452,7 @@ class ShapeScene extends Scene2d {
         this.ctx.shadowColor = '#000';
         this.ctx.globalAlpha = 1.0;
         this.mirrored = true;
+        this.shapes = ['Star', 'Polygon', 'Ring', 'Moon', 'Windmill'];
 
         this.property_map = {  // maps ids of input elements to canvas context properties
             'shadow-colour': val => {
@@ -780,6 +861,11 @@ class ShapeScene extends Scene2d {
         [...document.getElementsByClassName('polychrome-speed-ui')].forEach(el => {
             this.current_curve.colour && !this.current_curve.shape.polychrome_stroke ? el.classList.add('hidden') : el.classList.remove('hidden');
         });
+        // Hide quadratic curve settings for non-windmills
+        [...document.querySelectorAll("[class*=control-ui]")].forEach(el => {
+            this.current_curve.shape instanceof Windmill ? el.classList.remove('hidden') : el.classList.add('hidden');
+        });
+        
         param_elements.forEach(param => {
             switch(param.id) {
                 case 'shape':
@@ -790,6 +876,16 @@ class ShapeScene extends Scene2d {
                     break;
                 case 'rotation':
                     param.value = this.current_curve.rotation;
+                    break;
+                case 'x-control':
+                    param.value = this.current_curve.shape.x_control;
+                    const x_control_output = param.previousElementSibling.firstElementChild;
+                    x_control_output.value = this.current_curve.shape.x_control;
+                    break;
+                case 'y-control':
+                    param.value = this.current_curve.shape.y_control;
+                    const y_control_output = param.previousElementSibling.firstElementChild;
+                    y_control_output.value = this.current_curve.shape.y_control;
                     break;
                 case 'fill':
                     param.checked = this.current_curve.shape.fill;
@@ -924,6 +1020,13 @@ class ShapeScene extends Scene2d {
                                 this.current_curve.shape.order ?? 3,
                             );
                             break;
+                        case 'Windmill':
+                            this.current_curve.shape = new Windmill(
+                                ...common_params,
+                                this.current_curve.shape.radius,
+                                this.current_curve.shape.order ?? 5, 
+                            );
+                            break;
                         default:
                             console.log('Invalid shape!');
                     }
@@ -935,6 +1038,18 @@ class ShapeScene extends Scene2d {
                 case 'rotation':
                     value = event.target.selectedOptions[0].value;
                     this.current_curve.rotation = Number(value);
+                    break;
+                case 'x-control':
+                    value = event.target.value;
+                    this.current_curve.shape.x_control = Number(value);
+                    const x_control_output = document.getElementById('x-control-output');
+                    x_control_output.value = value;
+                    break;
+                case 'y-control':
+                    value = event.target.value;
+                    this.current_curve.shape.y_control = Number(value);
+                    const y_control_output = document.getElementById('y-control-output');
+                    y_control_output.value = value;
                     break;
                 case 'fill':
                     value = event.target.checked;
@@ -1053,10 +1168,9 @@ class ShapeScene extends Scene2d {
     }
 
     #get_random_shape() {
-        const shapes = ['Star', 'Polygon', 'Ring', 'Moon'];
         const common_params = [true, this.default_stroke_colour, 1, 0, 0, 0.3];
         let r;
-        switch(rand_int(shapes.length)) {
+        switch(rand_int(this.shapes.length)) {
             case 0:
                 return new Polygon(...common_params, rand_in_range(6, 64), rand_in_range(3, 12));
             case 1:
@@ -1067,6 +1181,9 @@ class ShapeScene extends Scene2d {
             case 3:
                 r = rand_in_range(6, 64);
                 return new Star(...common_params, r, Math.floor(r / 4), rand_in_range(3, 12));
+            case 4:
+                r = rand_in_range(6, 64);
+                return new Windmill(...common_params, r, Math.floor(r / 4), rand_in_range(3, 12));
             default:
         }
     }
@@ -1230,6 +1347,34 @@ class Polygon extends Shape {
     }
 }
 
+class Windmill extends Shape {
+    static instance_count = 0;
+    constructor(fill, outline, thickness, pulse, wave_amplitude, wave_frequency, radius, order) {
+        super(fill, outline, thickness, pulse, wave_amplitude, wave_frequency);
+        this.id = Windmill.instance_count++;
+        this.radius = radius;
+        this.order = order;
+        this.x_control = 0;
+        this.y_control = -1;
+    }
+    draw(ctx, x, y, colour, progress) {
+        let r = this.radius;
+        if (this.pulse) {
+            r +=  Math.max(-r + 1, this.pulse * Math.sin(progress) * r);
+        }
+        ctx.save();
+        ctx.beginPath();
+        ctx.translate(x, y);
+        ctx.moveTo(0, r);
+        for (let i = 0; i < this.order; i++) {
+            ctx.rotate(2 * Math.PI / this.order);
+            ctx.quadraticCurveTo(this.x_control * r, this.y_control * r, 0, r);
+        }
+        super.draw(ctx, progress, colour);
+        ctx.restore();
+    }
+}
+
 class Moon extends Shape {
     static instance_count = 0;
     constructor(fill, outline, thickness, pulse, wave_amplitude, wave_frequency, radius) {
@@ -1324,6 +1469,7 @@ function init() {
     canvas.width = Math.floor(main_width - 200);
     canvas.height = main_height;
     const scene = new ShapeScene(canvas, Curves);
+    // const scene = new VoronoiScene(canvas);
     scene.render();
 }
 

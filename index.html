@@ -63,6 +63,7 @@
                             <option value="Polygon">Polygon</option>
                             <option value="Ring">Ring</option>
                             <option value="Moon">Moon</option>
+                            <option value="Windmill">Windmill</option>
                         </select>
                         
                         <div class="speed-ui">speed:</div> 
@@ -152,6 +153,12 @@
                             <option value="3">3</option>
                         </select>
                                             
+                        <div class="x-control-ui">x-control: <output id="x-control-output"></output></div> 
+                        <input type="range" min="-4" max="4" step="0.1" value="0" class="param x-control-ui" id="x-control">
+                        
+                        <div class="y-control-ui">y-control: <output id="y-control-output"></output></div> 
+                        <input type="range" min="-4" max="4" step="0.1" value="0" class="param y-control-ui" id="y-control">
+                        
                         <div class="fill-ui">fill:</div> 
                         <input type="checkbox" name="fill" class="param fill-ui" id="fill" checked/>
                     
