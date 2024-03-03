@@ -5,8 +5,16 @@
 
 // First we define our curves. Just add a function to this object, and it will work,
 // provided it returns a two-element array [x, y] in the range [-1 .. 1].
-// 
-
+// Next, we define Scene class, and a child Scene2d class, then a CurveScene class which inherits from Scene2d.
+// This class encapsulates the whole kaboodle.
+// We instantiate this class and call its render() method, which then calls update(),
+// which calls requestAnimationLoop(this.update.bind(this))).
+// The CurveScene instance is the king.   It has curves, and each curve has a shape.
+// Shapes inherit from a base class Shape, and include Polygon, Star, Ring etc..
+// The user can vary a rake of parameters determining the curve, the shape, etc..
+// The scene can have many curves, but a curve can have only one shape at a given time.
+// The user can determine whether to fill/stroke the shapes, the radius, hue, stroke colour, waviness etc..
+// Further documentation on Github.
 
 const Curves = {
 
@@ -464,9 +472,6 @@ class CurveScene extends Scene2d {
             }
         }
 
-        // TESTING NEW FEATURE: AUX CURVES
-        // this.curves.chitonoid.aux_curve = this.curves.astroid;
-        
         for (const c in this.curves) {
             const curve = this.curves[c];
             curve.default_colour = this.#get_random_colour();
@@ -569,7 +574,8 @@ class CurveScene extends Scene2d {
                         });
                         cpi.addEventListener('change', event => {
                             cp.hidden = true;
-                            this.#clear_canvas();   // need to remove previous background, which of course is opaque    
+                            // need to remove previous background, which of course is opaque.
+                            this.#clear_canvas();
                         });                        
                         cp.hidden = false;
                         const cpb = cp.querySelector('button#cp-hide');
@@ -946,7 +952,7 @@ class CurveScene extends Scene2d {
                                 ...common_params,
                                 this.current_curve.shape.radius,
                                 this.current_curve.shape.hub ?? Math.max(Math.floor(this.current_curve.shape.radius / 4), 1),
-                                rand_int(5) / 5,    // eccentricity of ellipse
+                                rand_int(10) / 10,    // eccentricity of ellipse
                             );
                             break;
                         case 'Star':
@@ -1189,7 +1195,6 @@ class CurveScene extends Scene2d {
                 shape.draw(this.ctx, 0, 0, curve.colour, this.progress);
                 this.ctx.restore();
                 if (this.mirrored) {
-                    // Mirroring 4 ways; later refine this to allow individual reflections
                     this.ctx.save();
                     this.ctx.translate(this.width - x_, y_);        // left-right; reflect in y axis
                     this.ctx.rotate(-curve.rotation * this.progress);
@@ -1213,6 +1218,7 @@ class CurveScene extends Scene2d {
         }    
     }
 }
+// End of CurveScene class.   Now we define Shape class and its children...
 
 class Shape {
     constructor(fill, outline, thickness, pulse, wave_amplitude, wave_frequency) {
@@ -1406,7 +1412,6 @@ function init() {
     canvas.width = Math.floor(main_width - 200);
     canvas.height = main_height;
     const scene = new CurveScene(canvas, Curves);
-    // const scene = new VoronoiScene(canvas);
     scene.render();
 }
 

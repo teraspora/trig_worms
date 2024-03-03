@@ -1,3 +1,8 @@
+/* 
+// Main CSS file for Trig Worms, alias Vermichrome
+// ©John Lynch - January 2024
+*/
+
 html, body, * {
     background-color: #000;
     margin: 0;
@@ -10,7 +15,6 @@ html, body, * {
     --plain-text-col: #ffe0b1;
     --border-grey: #7a7265;
     --contrast-col: #00ffbf;
-    /* outline: 2px solid red; */
 }
 
 a {
