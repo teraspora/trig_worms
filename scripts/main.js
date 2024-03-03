@@ -13,8 +13,11 @@
 // Shapes inherit from a base class Shape, and include Polygon, Star, Ring etc..
 // The user can vary a rake of parameters determining the curve, the shape, etc..
 // The scene can have many curves, but a curve can have only one shape at a given time.
-// The user can determine whether to fill/stroke the shapes, the radius, hue, stroke colour, waviness etc..
+// The user can determine whether to fill/stroke the shapes, the radius, hue, stroke colour, rotation, waviness etc..
 // Further documentation on Github.
+
+// Some curves have their proper names.
+// Others are ones I have invented or adapted, so I have just made up names for them.
 
 const Curves = {
 
@@ -166,6 +169,25 @@ const Curves = {
         ],
         params: [11, 8],
         speed: 0.02
+    },
+
+    spaceship: {
+        func: (a, k, t) => [
+            (Math.sin(a) * Math.cos(t) * Math.sin(k * t) - Math.cos(t) * Math.cos(k * t)) * 0.5,
+            (Math.sin(a) * Math.sin(t) * Math.sin(k * t) + Math.sin(t) * Math.cos(k * t)) * 0.5
+        ],
+        params: [27, 11],
+        speed: 0.05
+    },
+
+    polygasteroid: {
+        func: (a, p, q, t) => [
+            Math.cos(q * t) * (a + Math.sin(p * t)) / (a + 1),
+            Math.sin(q * t) * (a + Math.sin(p * t)) / (a + 1),
+        ],
+        // params: [5, 7, 3],
+        params: [1, 8, 11],
+        speed: 0.1
     },
 
     lissajous: {
@@ -865,6 +887,8 @@ class CurveScene extends Scene2d {
                     break;
                 case 'stroke-colour':
                     param.value = this.current_curve.shape.outline;
+                    const stroke_colour_output = param.previousElementSibling.firstElementChild;
+                    stroke_colour_output.value = this.current_curve.shape.outline;
                     break;
                 case 'polychrome-speed':
                     param.value = this.current_curve.polychrome_speed;
@@ -1045,6 +1069,8 @@ class CurveScene extends Scene2d {
                     break;
                 case 'stroke-colour':
                     value = event.target.value;
+                    const stroke_colour_output = document.getElementById('stroke-colour-output')
+                    stroke_colour_output.value = value;
                     this.current_curve.shape.outline = value;
                     break;
                 case 'polychrome-speed':
@@ -1176,7 +1202,7 @@ class CurveScene extends Scene2d {
             input.id = `param-${i++}`;
             input.value = param;
             this.tbody.appendChild(row);
-            input.onchange = event => this.current_curve.params[~~(event.target.id.slice(5))] = ~~input.value;
+            input.onchange = event => this.current_curve.params[~~(event.target.id.slice(6))] = ~~input.value;
         }
     }
 

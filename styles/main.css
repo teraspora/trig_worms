@@ -175,8 +175,13 @@ input[type="range"]:hover {
     cursor: grab;
 }
 
+output {
+    text-transform: none;
+}
+
 h3#curves-header, h3#active-curve-header, h3#advanced-header, h3#function-header {
     padding: 0.3vw;
+    font-size: 1vw;
     font-weight: normal;
     font-variant: petite-caps;
     text-align: center;
@@ -242,7 +247,7 @@ table#param-table tr {
 
 table input {
     color: var(--plain-text-col);
-    font-size: 0.7vw;
+    font-size: 1vw;
     padding: 0.3vw;
 }
 
@@ -287,7 +292,8 @@ section#function pre {
 }
 
 #advanced-wrapper, #advanced-wrapper td {
-    padding: 0.5vw;
+    font-size: 0.7vw;
+    padding: 0.2vw;
 }
 
 aside#help {
