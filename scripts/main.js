@@ -1,5 +1,12 @@
-// Main Javascript file for Trig Worms
-// John Lynch - January 2024
+// Main Javascript file for Trig Worms, alias Vermichrome (must think of a better name!)
+// ©John Lynch - January 2024
+// Pushing to https://teraspora.github.io/trig_worms/ - this will always be the latest version
+// Feb. 2024 - once ok at github.io, pushing to https://www.zeroundefined.net/vermichrome/
+
+// First we define our curves. Just add a function to this object, and it will work,
+// provided it returns a two-element array [x, y] in the range [-1 .. 1].
+// 
+
 
 const Curves = {
 
@@ -86,6 +93,15 @@ const Curves = {
         speed: 0.005
     },
 
+    cardioid: {
+        func: (a, t) => [
+                a * (2 * Math.cos(t) - Math.cos(2 * t)),
+                a * (2 * Math.sin(t) - Math.sin(2 * t))
+            ],
+        params: [0.33],   // electron rings
+        speed: 0.05
+    },
+
     epitrochoid: {
         func: (a, b, c, t) => [
                 ((a + b) * Math.cos(t) - c * Math.cos(((a - b) / b) * t))
@@ -150,7 +166,7 @@ const Curves = {
             Math.cos(k * t + t) * Math.sin(t),
         ],
         params: [1.16666666667],
-        speed: 0.02
+        speed: 0.05
     },
 
     rose: {
@@ -361,7 +377,7 @@ class Scene2d extends Scene {
     }
 }
 
-class ShapeScene extends Scene2d {
+class CurveScene extends Scene2d {
     constructor(canvas, curves) {
         super(canvas);
         
@@ -493,6 +509,7 @@ class ShapeScene extends Scene2d {
         this.curve_select = document.getElementById('curve-select');
         this.tbody = document.querySelector('table#param-table>tbody');
         this.row_template = this.tbody.firstElementChild.cloneNode(true);
+        this.param_details = document.querySelector('#params-wrapper #details');
         this.#create_curve_checkboxes();
         this.#create_params_section();
         this.#create_advanced_section();
@@ -894,7 +911,7 @@ class ShapeScene extends Scene2d {
             event.target.blur();
         };
 
-        param_details.addEventListener('change', event => {
+        this.param_details.addEventListener('change', event => {
             event.preventDefault();
             const param = event.target.id;
             let value;
@@ -1388,7 +1405,7 @@ function init() {
     const {width: main_width, height: main_height} = main.getBoundingClientRect();
     canvas.width = Math.floor(main_width - 200);
     canvas.height = main_height;
-    const scene = new ShapeScene(canvas, Curves);
+    const scene = new CurveScene(canvas, Curves);
     // const scene = new VoronoiScene(canvas);
     scene.render();
 }
@@ -1401,11 +1418,9 @@ const rand_int = n => Math.floor(n * Math.random());
 let debug = false;
 const rg_0 = 'radial-gradient(#0000ff, #990029)';
 const main = document.getElementById('main');
-const help = document.querySelector('aside#help');
 const canvas = document.querySelector('canvas');
-const param_details = document.querySelector('#params-wrapper #details');
-let scenes = [];
 
+const help = document.querySelector('aside#help');
 document.querySelector('aside#help button#hide').addEventListener('click', _ => {
     help.hidden = true;
 });
