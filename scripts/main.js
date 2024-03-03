@@ -1194,15 +1194,13 @@ class CurveScene extends Scene2d {
             const curve = this.curves[this.curve_names[i]];
             const shape = curve.shape;
             if (!curve.hidden) {
-                let [x, y] = curve.func(...curve.params, this.progress * curve.speed + curve.seed);
-                [x, y] = [x * shape.scale, y * shape.scale];
-                if (curve.aux === curve) {
-                    [x, y] = this.#transform_to_canvas([x, y]);
-                }
-                else {
+                let [x_raw, y_raw] = curve.func(...curve.params, this.progress * curve.speed + curve.seed);
+                [x_raw, y_raw] = [x_raw * shape.scale, y_raw * shape.scale];
+                let [x, y] = this.#transform_to_canvas([x_raw, y_raw]);
+                if (curve.aux !== curve) {
                     let [x_aux, y_aux] = curve.aux.func(...curve.aux.params, this.progress * curve.speed + curve.seed);
                     [x_aux, y_aux] = [x_aux * shape.scale, y_aux * shape.scale];
-                    [x_aux, y_aux] = this.#transform_to_canvas([x_aux, y_aux]);    // use speed and seed from base curve
+                    [x_aux, y_aux] = this.#transform_to_canvas([x_aux, y_aux]);
                     [x, y] = [(x + x_aux) / 2, (y + y_aux) / 2];
                 }
                 this.ctx.save();
