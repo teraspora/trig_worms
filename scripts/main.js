@@ -361,86 +361,6 @@ class Scene2d extends Scene {
     }
 }
 
-class TestScene extends Scene2d {
-    constructor(canvas) {
-        super(canvas);
-    }
-    render() {
-        super.render();
-        this.ctx.clearRect(0, 0, this.width, this.height);
-        this.update();
-    }
-    update() {
-        super.update();
-        // Draw stuff
-        this.ctx.fillStyle = '#ff9922';
-        this.ctx.arc(Math.floor(200 + 8 * this.progress), Math.floor(200 + 8 * this.progress), 100, 0, 2 * Math.PI);
-        this.ctx.fill();
-        if (!this.paused) {
-            this.frame_request = requestAnimationFrame(this.update.bind(this));
-        }
-    }
-}
-
-class VoronoiScene extends Scene2d {
-    constructor(canvas) {
-        super(canvas);
-        this.func = (a, b, t) => [
-            (Math.sin(a * Math.cos(t)) + Math.cos(b * Math.sin(t))) / 2,
-            (Math.cos(a * Math.sin(t)) - Math.sin(b * Math.cos(t))) / 2,
-        ];
-        this.params = [18, 7];
-        this.point_count = 24;
-        const angles = new Set();
-        while (angles.size < this.point_count) {
-            angles.add(Math.random() * 1024);
-        }
-        this.angles = [...angles];
-        this.colours = Array(this.point_count).fill(1).map((n, i) => `hsl(${i * 360 / this.point_count} 100% 50%)`);
-    }
-    render() {
-        super.render();
-        this.ctx.clearRect(0, 0, this.width, this.height);
-        this.update();
-    }
-    update() {
-        super.update();
-        let indices = new Set();
-        for (let j = 0; j < this.height; j++) {
-            console.log(`Row ${j}...`);
-            for (let i = 0; i < this.width; i++) {
-                let [p, q, k, min_dist_sqd] = [-1, -1, -1, 1_000_000];
-
-                // DEBUG
-                if (j > 255 && i > 384 && !(i % 89) && !(j % 17)) debugger;
-
-                for (const index in this.angles) {
-                    const [x_, y_] = this.func(...this.params, this.angles[index] + this.progress);
-                    const [x, y] = this.#transform_to_canvas([x_, y_]);
-                    const d_sqd = (x - i) * (x - i) + (y - j) * (y - j);
-                    if (d_sqd < min_dist_sqd) {
-                        [p, q, k] = [i, j, index];
-                    }
-                }
-                this.ctx.fillStyle = this.colours[k];
-                indices.add(k);
-                this.ctx.fillRect(p, q, 1, 1);
-            }                
-        }
-        console.log(indices);
-        if (!this.paused) {
-            this.frame_request = requestAnimationFrame(this.update.bind(this));
-        }
-    }
-
-    #transform_to_canvas([x, y]) {
-        return [
-            Math.floor((x + 1) / 2 * this.width),
-            Math.floor((y + 1) / 2 * this.height)
-        ];
-    }
-}
-
 class ShapeScene extends Scene2d {
     constructor(canvas, curves) {
         super(canvas);
@@ -1490,4 +1410,5 @@ document.querySelector('aside#help button#hide').addEventListener('click', _ => 
     help.hidden = true;
 });
 
-['load', 'resize'].forEach(event => window.addEventListener(event, init));
+window.addEventListener('load', init);
+window.addEventListener('resize', _ => location.reload());
