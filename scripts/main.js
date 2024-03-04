@@ -151,6 +151,15 @@ const Curves = {
         speed: 0.2
     },
     
+    rabbit_ears: {
+        func: (t) => [
+                Math.sin(t) * Math.log(Math.sin(t) * Math.sin(t)),
+                Math.cos(4 * t)
+            ],
+        params: [],
+        speed: 0.05
+    },
+
     quasi_epitrochoid: {
         func: (a, b, c, t) => [
                 ((a + b) * Math.cos(t) - c * Math.cos((a / b + 1) * t))
@@ -162,6 +171,27 @@ const Curves = {
         speed: 0.2
     },
 
+    epicycloid: {
+        func: (a, q, t) => [
+                a / q * ((q + 1) * Math.cos(t) - Math.cos((q + 1) * t)),
+                a / q * ((q + 1) * Math.sin(t) - Math.sin((q + 1) * t)),
+            ],
+        params: [0.7, 11.5],
+        speed: 0.2
+    },
+    
+    folioid: {
+        func: (a, e, p, q, t) => {
+            const tmp = a * (e * Math.cos(p / q * t) + Math.sqrt(1 - (e * e * Math.sin(p / q * t) * Math.sin(p / q * t))));
+            return [
+               tmp * Math.cos(t),
+               tmp * Math.sin(t)
+            ];
+        },
+        params: [0.3, 2, 5, 2],
+        speed: 0.1
+    },
+    
     merlinium: {
         func: (a, b, c, d, t) => [
                 Math.cos(a * Math.cos(b + Math.cos(t))),
@@ -176,8 +206,8 @@ const Curves = {
             (Math.sin(a * t) * Math.cos(b * t)),
             (Math.cos(a * t) / (y = Math.sin(b * t)) ? y : 0.00000000000000000001),
         ],
-        params: [48, 61],
-        speed: 0.002
+        params: [5, 3],
+        speed: 0.05
     },
 
     polyfolium: {
@@ -253,7 +283,7 @@ const Curves = {
                 (r * Math.sin(t) - b * Math.sin(p * t)) / a
             ];
         },
-        params: [42, 16],
+        params: [21, 4],
         speed: 0.3
     },
 
@@ -264,6 +294,15 @@ const Curves = {
         ],
         params: [13, 41],
         speed: 0.05
+    },
+
+    heart: {
+        func: (a, b, t) => [
+            a * Math.cos(t),
+            -b * (Math.sin(t) + Math.sqrt(Math.abs(Math.cos(t))))
+        ],
+        params: [0.5, 0.6],
+        speed: 0.2
     },
 
     dragonfly: {
