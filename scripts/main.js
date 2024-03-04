@@ -122,6 +122,24 @@ const Curves = {
         speed: 0.05
     },
 
+    quatrefoil: {
+        func: (a, t) => [
+                a * Math.sin(t) * Math.sin(t) * Math.cos(t),
+                a * Math.cos(t) * Math.cos(t) * Math.sin(t)
+            ],
+        params: [2],
+        speed: 0.05
+    },
+
+    maltese_x: {
+        func: (a, t) => [
+                a * Math.cos(t) * (Math.cos(t) * Math.cos(t) - 2),
+                a * Math.sin(t) * Math.cos(t) * Math.cos(t)
+            ],
+        params: [0.8],
+        speed: 0.05
+    },
+
     epitrochoid: {
         func: (a, b, c, t) => [
                 ((a + b) * Math.cos(t) - c * Math.cos(((a - b) / b) * t))
@@ -546,6 +564,7 @@ class CurveScene extends Scene2d {
         this.tbody = document.querySelector('table#param-table>tbody');
         this.row_template = this.tbody.firstElementChild.cloneNode(true);
         this.param_details = document.querySelector('#params-wrapper #details');
+        this.function_ui_needs_updating = true;
         this.#create_curve_checkboxes();
         this.#create_params_section();
         this.#create_advanced_section();
@@ -555,7 +574,7 @@ class CurveScene extends Scene2d {
         const curve_settings = document.getElementById('active-curve-settings');
         active_curve_toggler.addEventListener('click', _ => {
             const hidden = curve_settings.classList.toggle('hidden');
-            active_curve_toggler.textContent = hidden ? '►' : (this.controls.scroll(0, curve_settings.offsetHeight), '▼');
+            active_curve_toggler.textContent = hidden ? '►' : (curve_settings.scrollIntoView({behavior: "smooth", block: "start"}), '▼');
         });
 
         // Show/Hide Advanced settings
@@ -563,7 +582,7 @@ class CurveScene extends Scene2d {
         const advanced_settings = document.getElementById('advanced-settings');
         advanced_toggler.addEventListener('click', _ => {
             const hidden = advanced_settings.classList.toggle('hidden');
-            advanced_toggler.textContent = hidden ? '►' : (this.controls.scroll(0, this.controls.offsetHeight), '▼');
+            advanced_toggler.textContent = hidden ? '►' : (advanced_settings.scrollIntoView({behavior: "smooth", block: "start"}), '▼');
         });
 
          // Show/Hide Function settings
@@ -571,7 +590,7 @@ class CurveScene extends Scene2d {
          const function_settings = document.getElementById('function-settings');
          function_toggler.addEventListener('click', _ => {
              const hidden = function_settings.classList.toggle('hidden');
-             function_toggler.textContent = hidden ? '►' : (this.controls.scroll(0, this.controls.offsetHeight), '▼');
+             function_toggler.textContent = hidden ? '►' : (function_settings.scrollIntoView({behavior: "smooth", block: "start"}), '▼');
          });
  
          // Buttons
@@ -711,7 +730,7 @@ class CurveScene extends Scene2d {
 
     // Curve checkboxes
     #create_curve_checkboxes() {
-        const checkbox_wrapper = document.querySelector('section#controls #curves fieldset');
+        const checkbox_wrapper = document.querySelector('section#controls #checkbox-wrapper');
         const checkbox = checkbox_wrapper.firstElementChild;
         const checkbox_clone = checkbox.cloneNode(true);
         checkbox_wrapper.innerHTML = '';
@@ -754,13 +773,14 @@ class CurveScene extends Scene2d {
                 event.target.blur();
                 // and if user has hidden a curve other than the current curve, all we do is update the checkboxes
                 this.#update_curves_listing();
+                this.function_ui_needs_updating = true;
                 this.#update_parameter_display();
             });
         }
         const curves_toggler = document.getElementById('curves-toggler');
         curves_toggler.addEventListener('click', _ => {
             const hidden = checkbox_wrapper.classList.toggle('hidden');
-            curves_toggler.textContent = hidden ? '►' : '▼';
+            curves_toggler.textContent = hidden ? '►' : (checkbox_wrapper.scrollIntoView({behavior: "smooth", block: "start"}), '▼');
         });
     }
 
@@ -808,10 +828,13 @@ class CurveScene extends Scene2d {
         func_box.querySelector('pre') ?? func_box.appendChild(pre); 
         // Change params editor section to that for the new current curve
         this.#create_param_table();
+        this.function_ui_needs_updating = false;
     }
     
     #update_parameter_display() {
-        this.#update_current_curve_styling();
+        if (this.function_ui_needs_updating) {
+            this.#update_current_curve_styling();
+        }
         const curve_options = this.curve_select.querySelectorAll('option');
         curve_options.forEach(option => {
             option.style.color = this.curves[option.value].colour;            
@@ -950,6 +973,7 @@ class CurveScene extends Scene2d {
                 this.current_curve.hidden = false;
             }
             event.target.style.color = this.current_curve.colour;
+            this.function_ui_needs_updating = true;
             this.#update_parameter_display();
             this.#update_curves_listing();
             event.target.blur();
@@ -1202,7 +1226,9 @@ class CurveScene extends Scene2d {
             input.id = `param-${i++}`;
             input.value = param;
             this.tbody.appendChild(row);
-            input.onchange = event => this.current_curve.params[~~(event.target.id.slice(6))] = ~~input.value;
+            input.onchange = event => {
+                this.current_curve.params[~~(event.target.id.slice(6))] = Number(event.target.value);
+            };
         }
     }
 
