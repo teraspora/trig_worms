@@ -110,7 +110,7 @@ const Curves = {
                 a * (2 * Math.sin(t) - Math.sin(2 * t))
             ],
         params: [0.33],   // electron rings
-        speed: 0.05
+        speed: 0.2
     },
 
     satelloid: {
@@ -198,6 +198,15 @@ const Curves = {
         speed: 0.05
     },
 
+    egg_mesh: {
+        func: (a, b, t) => [
+            (Math.cos(a + t) * Math.cos(b * t)),
+            (Math.sin(a + t) / (y = Math.sin(b * t)) ? y : 0.00000000000000000001),
+        ],
+        params: [17, 4],
+        speed: 0.05
+    },
+
     polyfolium: {
         func: (a, b, t) => [
             (Math.sin(a * t) + Math.sin(b * t)) / 2,
@@ -207,7 +216,7 @@ const Curves = {
         speed: 0.02
     },
 
-    spaceship: {
+    orbital: {
         func: (a, k, t) => [
             (Math.sin(a) * Math.cos(t) * Math.sin(k * t) - Math.cos(t) * Math.cos(k * t)) * 0.5,
             (Math.sin(a) * Math.sin(t) * Math.sin(k * t) + Math.sin(t) * Math.cos(k * t)) * 0.5
@@ -223,7 +232,7 @@ const Curves = {
         ],
         // params: [5, 7, 3],
         params: [1, 8, 11],
-        speed: 0.1
+        speed: 0.02
     },
 
     lissajous: {
@@ -233,6 +242,24 @@ const Curves = {
         ],
         params: [-3.1, 4.6],
         speed: 0.02
+    },
+
+    nodiform: {
+        func: (a, b, t) => [
+            (Math.cos(a * t) - Math.sin(t)) / 2,
+            (Math.sin(b * t) + Math.cos(t)) / 2
+        ],
+        params: [5, 7],
+        speed: 0.08
+    },
+
+    tangloid: {
+        func: (a, b, t) => [
+            (Math.cos(a * Math.sin(t)) - Math.sin(t)) / 2,
+            (Math.sin(b * Math.cos(t)) + Math.cos(t)) / 2
+        ],
+        params: [17, 12],
+        speed: 0.03
     },
 
     rhodonea: {
@@ -438,7 +465,7 @@ class Scene {
         this.progress_delta = 0.04;
         this.paused = false;
         this.plain_colour = 'hsl(36 100% 90%)';
-        this.debug_colour = 'hsl(19 100% 50%)';
+        this.debug_colour = 'hsl(42 100% 50%)';
     }
     render() {
     }
@@ -571,7 +598,7 @@ class CurveScene extends Scene2d {
                 else {
                     this.current_curve = curve;
                     this.current_curve.hidden = false;
-                    this.current_curve.shape.radius = 8;
+                    this.current_curve.shape.radius = 20;
                     if (this.current_curve.shape instanceof HubbedShape) {
                         this.current_curve.shape.hub = 4;
                     }
@@ -681,6 +708,7 @@ class CurveScene extends Scene2d {
                             else {
                                 this.curves[curve].hidden = false;
                                 this.curves[curve].colour = this.debug_colour;
+                                this.curves[curve].shape.radius = 24;
                             }
                         });
                         this.active_curves =  [this.current_curve];
@@ -1217,17 +1245,17 @@ class CurveScene extends Scene2d {
         let r;
         switch(rand_int(this.shapes.length)) {
             case 0:
-                return new Polygon(...common_params, rand_in_range(6, 64), rand_in_range(3, 12));
+                return new Polygon(...common_params, rand_in_range(6, 96), rand_in_range(3, 12));
             case 1:
-                return new Moon(...common_params, rand_in_range(6, 64));            
+                return new Moon(...common_params, rand_in_range(6, 96));            
             case 2:
-                r = rand_in_range(6, 64);
+                r = rand_in_range(6, 96);
                 return new Ring(...common_params, r, Math.floor(r / 4), rand_int(10) / 10);
             case 3:
-                r = rand_in_range(6, 64);
+                r = rand_in_range(6, 96);
                 return new Star(...common_params, r, Math.floor(r / 4), rand_in_range(3, 12));
             case 4:
-                r = rand_in_range(6, 64);
+                r = rand_in_range(6, 96);
                 return new Windmill(...common_params, r, Math.floor(r / 4), rand_in_range(3, 12));
             default:
         }
