@@ -180,18 +180,6 @@ const Curves = {
         speed: 0.2
     },
     
-    folioid: {
-        func: (a, e, p, q, t) => {
-            const tmp = a * (e * Math.cos(p / q * t) + Math.sqrt(1 - (e * e * Math.sin(p / q * t) * Math.sin(p / q * t))));
-            return [
-               tmp * Math.cos(t),
-               tmp * Math.sin(t)
-            ];
-        },
-        params: [0.3, 2, 5, 2],
-        speed: 0.1
-    },
-    
     merlinium: {
         func: (a, b, c, d, t) => [
                 Math.cos(a * Math.cos(b + Math.cos(t))),
