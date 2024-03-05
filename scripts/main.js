@@ -590,6 +590,7 @@ class CurveScene extends Scene2d {
             curve.hidden = !this.active_curves.includes(curve);
             curve.param_names = curve.func.toString().split(',').slice(0, curve.params.length).map(t => t.slice(-1));
             curve.aux = curve;
+            curve.scale = 1;
 
             if (debug) {
                 if (curve.name !=  debug) {
@@ -931,9 +932,9 @@ class CurveScene extends Scene2d {
                     param.value = this.current_curve.speed;
                     break;
                 case 'scale':
-                    param.value = this.current_curve.shape.scale;
+                    param.value = this.current_curve.scale;
                     const scale_output = param.previousElementSibling.firstElementChild;
-                    scale_output.value = this.current_curve.shape.scale;
+                    scale_output.value = this.current_curve.scale;
                     break;
                 case 'rotation':
                     param.value = this.current_curve.rotation;
@@ -1047,7 +1048,6 @@ class CurveScene extends Scene2d {
                     value = event.target.selectedOptions[0].value;
                     // When user changes shape, carry forward as many attributes as possible from the old shape
                     const common_params = [
-                        this.current_curve.shape.scale,
                         this.current_curve.shape.fill,
                         this.current_curve.shape.outline,     // outline colour
                         this.current_curve.shape.thickness,   // outline thickness
@@ -1102,7 +1102,7 @@ class CurveScene extends Scene2d {
                     break;
                 case 'scale':
                     value = event.target.value;
-                    this.current_curve.shape.scale = Number(value);
+                    this.current_curve.scale = Number(value);
                     const scale_output = document.getElementById('scale-output');
                     scale_output.value = value;
                     break;
@@ -1241,7 +1241,7 @@ class CurveScene extends Scene2d {
     }
 
     #get_random_shape() {
-        const common_params = [1, true, this.default_stroke_colour, 1, 0, 0, 0.3];
+        const common_params = [true, this.default_stroke_colour, 1, 0, 0, 0.3];
         let r;
         switch(rand_int(this.shapes.length)) {
             case 0:
@@ -1306,11 +1306,11 @@ class CurveScene extends Scene2d {
             const shape = curve.shape;
             if (!curve.hidden) {
                 let [x_raw, y_raw] = curve.func(...curve.params, this.progress * curve.speed + curve.seed);
-                [x_raw, y_raw] = [x_raw * shape.scale, y_raw * shape.scale];
+                [x_raw, y_raw] = [x_raw * curve.scale, y_raw * curve.scale];
                 let [x, y] = this.#transform_to_canvas([x_raw, y_raw]);
                 if (curve.aux !== curve) {
                     let [x_aux, y_aux] = curve.aux.func(...curve.aux.params, this.progress * curve.speed + curve.seed);
-                    [x_aux, y_aux] = [x_aux * shape.scale, y_aux * shape.scale];
+                    [x_aux, y_aux] = [x_aux * curve.scale, y_aux * curve.scale];
                     [x_aux, y_aux] = this.#transform_to_canvas([x_aux, y_aux]);
                     [x, y] = [(x + x_aux) / 2, (y + y_aux) / 2];
                 }
@@ -1353,9 +1353,8 @@ class CurveScene extends Scene2d {
 // End of CurveScene class.   Now we define Shape class and its children...
 
 class Shape {
-    constructor(scale, fill, outline, thickness, pulse, wave_amplitude, wave_frequency) {
+    constructor(fill, outline, thickness, pulse, wave_amplitude, wave_frequency) {
         this.type = this.constructor.name;
-        this.scale = 1;
         this.fill = fill;
         this.outline = outline;
         this.thickness = thickness;
@@ -1399,8 +1398,8 @@ class Shape {
 
 class Polygon extends Shape {
     static instance_count = 0;
-    constructor(scale, fill, outline, thickness, pulse, wave_amplitude, wave_frequency, radius, order) {
-        super(scale, fill, outline, thickness, pulse, wave_amplitude, wave_frequency);
+    constructor(fill, outline, thickness, pulse, wave_amplitude, wave_frequency, radius, order) {
+        super(fill, outline, thickness, pulse, wave_amplitude, wave_frequency);
         this.id = Polygon.instance_count++;
         this.radius = radius;
         this.order = order;
@@ -1426,8 +1425,8 @@ class Polygon extends Shape {
 
 class Windmill extends Shape {
     static instance_count = 0;
-    constructor(scale, fill, outline, thickness, pulse, wave_amplitude, wave_frequency, radius, order) {
-        super(scale, fill, outline, thickness, pulse, wave_amplitude, wave_frequency);
+    constructor(fill, outline, thickness, pulse, wave_amplitude, wave_frequency, radius, order) {
+        super(fill, outline, thickness, pulse, wave_amplitude, wave_frequency);
         this.id = Windmill.instance_count++;
         this.radius = radius;
         this.order = order;
@@ -1454,8 +1453,8 @@ class Windmill extends Shape {
 
 class Moon extends Shape {
     static instance_count = 0;
-    constructor(scale, fill, outline, thickness, pulse, wave_amplitude, wave_frequency, radius) {
-        super(scale, fill, outline, thickness, pulse, wave_amplitude, wave_frequency);
+    constructor(fill, outline, thickness, pulse, wave_amplitude, wave_frequency, radius) {
+        super(fill, outline, thickness, pulse, wave_amplitude, wave_frequency);
         this.id = Moon.instance_count++;
         this.radius = radius;
     }
@@ -1478,8 +1477,8 @@ class Moon extends Shape {
 class HubbedShape extends Shape {
     // Meant to be an abstract class, don't instantiate!
     static instance_count = 0;
-    constructor(scale, fill, outline, thickness, pulse, wave_amplitude, wave_frequency, radius_outer, radius_inner) {
-        super(scale, fill, outline, thickness, pulse, wave_amplitude, wave_frequency);
+    constructor(fill, outline, thickness, pulse, wave_amplitude, wave_frequency, radius_outer, radius_inner) {
+        super(fill, outline, thickness, pulse, wave_amplitude, wave_frequency);
         this.radius = radius_outer;
         this.hub = radius_inner;
     }
@@ -1490,8 +1489,8 @@ class HubbedShape extends Shape {
 
 class Ring extends HubbedShape {
     static instance_count = 0;
-    constructor(scale, fill, outline, thickness, pulse, wave_amplitude, wave_frequency, radius_outer, radius_inner, eccentricity) {
-        super(scale, fill, outline, thickness, pulse, wave_amplitude, wave_frequency, radius_outer, radius_inner);
+    constructor(fill, outline, thickness, pulse, wave_amplitude, wave_frequency, radius_outer, radius_inner, eccentricity) {
+        super(fill, outline, thickness, pulse, wave_amplitude, wave_frequency, radius_outer, radius_inner);
         this.id = Ring.instance_count++;
         this.eccentricity = eccentricity;
     }
@@ -1513,8 +1512,8 @@ class Ring extends HubbedShape {
 
 class Star extends HubbedShape {
     static instance_count = 0;
-    constructor(scale, fill, outline, thickness, pulse, wave_amplitude, wave_frequency, radius_outer, radius_inner, order) {
-        super(scale, fill, outline, thickness, pulse, wave_amplitude, wave_frequency, radius_outer, radius_inner);
+    constructor(fill, outline, thickness, pulse, wave_amplitude, wave_frequency, radius_outer, radius_inner, order) {
+        super(fill, outline, thickness, pulse, wave_amplitude, wave_frequency, radius_outer, radius_inner);
         this.id = Star.instance_count++;
         this.order = order;
     }
