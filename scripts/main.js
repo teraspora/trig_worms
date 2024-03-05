@@ -498,6 +498,7 @@ class CurveScene extends Scene2d {
         this.ctx.shadowBlur = 4;    // quantity of blur applied; dimensionless; must be non-negative
         this.ctx.shadowColor = '#000';
         this.ctx.globalAlpha = 1.0;
+        this.global_scale = 1;
         this.mirrored = true;
         this.shapes = ['Star', 'Polygon', 'Ring', 'Moon', 'Windmill'];
 
@@ -526,6 +527,10 @@ class CurveScene extends Scene2d {
                 if (!val) return this.progress_delta * 500;
                     this.progress_delta = val * 0.002;
                 },
+            'global-scale' : val => {
+                if (!val) return this.global_scale;
+                    this.global_scale = val;
+                }
         }
 
         // CanvasRenderingContext2D: globalCompositeOperation property
@@ -1319,8 +1324,9 @@ class CurveScene extends Scene2d {
                 const mag = Math.sqrt(nx * nx + ny * ny);
                 shape.normal = mag ? {x: nx / mag, y: ny / mag} : {x: 0, y: 0};
                 [shape.x_last, shape.y_last] = [x, y];
-                const x_ = x + shape.wave_amplitude * Math.sin(this.progress * shape.wave_frequency) * shape.normal.x;
-                const y_ = y + shape.wave_amplitude * Math.sin(this.progress * shape.wave_frequency) * shape.normal.y;
+                let x_ = x + shape.wave_amplitude * Math.sin(this.progress * shape.wave_frequency) * shape.normal.x;
+                let y_ = y + shape.wave_amplitude * Math.sin(this.progress * shape.wave_frequency) * shape.normal.y;
+                [x_, y_] = [(x_ - this.width / 2) * this.global_scale + this.width / 2, (y_ - this.height / 2) * this.global_scale + this.height / 2];
                 this.ctx.translate(x_, y_);
                 this.ctx.rotate(curve.rotation * this.progress);
                 shape.polychrome_speed = curve.polychrome_speed;
