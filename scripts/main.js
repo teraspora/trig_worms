@@ -447,7 +447,7 @@ class Scene {
         this.width = this.canvas.width;
         this.height = this.canvas.height;
         this.progress = 0;
-        this.progress_delta = 0.05;
+        this.progress_delta = 0.04;
         this.paused = false;
         this.plain_colour = 'hsl(36 100% 90%)';
         this.debug_colour = 'hsl(19 100% 50%)';
@@ -595,8 +595,12 @@ class CurveScene extends Scene2d {
 
         // Set current curve to be the first in the list of active curves
         this.current_curve = this.active_curves[0];
-        this.current_curve.colour = null;   // Start with current curve multicoloured
-        
+        this.current_curve.colour = null;           // Start with current curve multicoloured
+        // ...and the other two curves with no fill, just polychrome_stroke
+        [1, 2].forEach(i => {
+            this.active_curves[i].shape.polychrome_stroke = true;
+            this.active_curves[i].shape.fill = false;
+        });
         // UI Controls
         this.controls = document.querySelector('section#controls');
         this.curve_select = document.getElementById('curve-select');
@@ -1346,6 +1350,7 @@ class Shape {
         this.normal = null;
         this.wave_amplitude = wave_amplitude;
         this.wave_frequency = wave_frequency;
+        this.hue_seed = rand_int(360);
     }
     draw(ctx, progress, colour) {
         // Must be called by child class draw() methods to do filling and stroking!
@@ -1357,7 +1362,7 @@ class Shape {
             }
             else {
                 const r = (370 - (Math.sin((progress / 16) * (this.polychrome_speed / 25))
-                * 170 + 170) % 340);    // desync from polychrome fill
+                * 170 + 170) + this.hue_seed) % 340;    // desync from polychrome fill and other polychrome-stroked shapes
                 ctx.strokeStyle = `hsl(${r + (r > 100 ? 20 : 0)} 100% 50%)`;    // too much of garish greens!
             }
             ctx.stroke();
