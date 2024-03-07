@@ -137,6 +137,14 @@ input[type=checkbox].curve-check {
     background-color: #00ff88;
 }
 
+#buttons>button#record-video {
+    background-color: #00c5ab;
+}
+
+#buttons>button#record-video.recording {
+    background-color: #ff0055;
+}
+
 #buttons>button#github {
     background-color: #6e7681;
 }

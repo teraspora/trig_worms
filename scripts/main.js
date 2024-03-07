@@ -501,6 +501,19 @@ class CurveScene extends Scene2d {
         this.global_scale = 1;
         this.mirrored = true;
         this.shapes = ['Star', 'Polygon', 'Ring', 'Moon', 'Windmill'];
+        this.recorder = video_recorder;
+        this.video_chunks = [];
+        this.recorder.ondataavailable = event => this.video_chunks.push(event.data);
+        this.recorder.onstop = _  => {
+            const blob = new Blob(this.video_chunks, {'type': 'video/mp4'});
+            this.video_chunks = [];
+            const video_url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = `${this.active_curves.map(curve => [curve.name, ...curve.params].join('_')).join('_')}.mp4`;
+            link.href = video_url;
+            link.click();
+            link.delete;
+        };
 
         this.property_map = {  // maps ids of input elements to canvas context properties
             'shadow-colour': val => {
@@ -700,6 +713,22 @@ class CurveScene extends Scene2d {
                         this.mirrored = !this.mirrored;
                         event.target.textContent = this.mirrored ? 'Unmirror' : 'Mirror';
                         break;
+                    case 'record-video':
+                        switch (this.recorder.state) {
+                            case 'inactive':
+                                this.recorder.start();
+                                event.target.textContent = 'Stop Recording';
+                                event.target.classList.add('recording');
+                                break;
+                            case 'recording':
+                                this.recorder.stop();
+                                event.target.textContent = 'Record Video';
+                                event.target.classList.remove('recording');
+                                break;
+                            default:
+                                console.log(`*** Media recorder state ${this.recorder.state} not handled!\n`);
+                                break;
+                        }
                     case 'github':
                         break;
                     case 'ZU':
@@ -1570,6 +1599,11 @@ const help = document.querySelector('aside#help');
 document.querySelector('aside#help button#hide').addEventListener('click', _ => {
     help.hidden = true;
 });
+
+// Record video
+const stream = canvas.captureStream(60);
+const video_recorder = new MediaRecorder(stream);
+// ==============
 
 window.addEventListener('load', init);
 window.addEventListener('resize', _ => location.reload());
