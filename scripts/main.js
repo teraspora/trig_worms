@@ -917,7 +917,7 @@ class CurveScene extends Scene2d {
         this.curve_select.value = this.current_curve.name;
         // Populate the function box
         const func_box = document.querySelector('section#function');
-        const markup = `<code>${this.current_iunc}</code>`;
+        const markup = `<code>${this.current_curve.func}</code>`;
         const pre = func_box.querySelector('pre') ?? document.createElement('pre');
         pre.innerHTML = markup;
         func_box.querySelector('pre') ?? func_box.appendChild(pre); 
