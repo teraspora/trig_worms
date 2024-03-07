@@ -1,5 +1,5 @@
 // Main Javascript file for Trig Worms, alias Vermichrome (must think of a better name!)
-// ©John Lynch - January 2024
+// ©John Lynch - January-March 2024
 // Pushing to https://teraspora.github.io/trig_worms/ - this will always be the latest version
 // Feb. 2024 - once ok at github.io, pushing to https://www.zeroundefined.net/vermichrome/
 
@@ -616,11 +616,12 @@ class CurveScene extends Scene2d {
 
         // Set current curve to be the first in the list of active curves
         this.current_curve = this.active_curves[0];
+        this.current_curve.fill = true;
         this.current_curve.colour = null;           // Start with current curve multicoloured
         // ...and the other two curves with no fill, just polychrome_stroke
         [1, 2].forEach(i => {
             this.active_curves[i].shape.polychrome_stroke = true;
-            this.active_curves[i].shape.fill = false;
+            this.active_curves[i].fill = false;
         });
         // UI Controls
         this.controls = document.querySelector('section#controls');
@@ -887,7 +888,7 @@ class CurveScene extends Scene2d {
         this.curve_select.value = this.current_curve.name;
         // Populate the function box
         const func_box = document.querySelector('section#function');
-        const markup = `<code>${this.current_curve.func}</code>`;
+        const markup = `<code>${this.current_iunc}</code>`;
         const pre = func_box.querySelector('pre') ?? document.createElement('pre');
         pre.innerHTML = markup;
         func_box.querySelector('pre') ?? func_box.appendChild(pre); 
@@ -955,7 +956,7 @@ class CurveScene extends Scene2d {
                     y_control_output.value = this.current_curve.shape.y_control;
                     break;
                 case 'fill':
-                    param.checked = this.current_curve.shape.fill;
+                    param.checked = this.current_curve.fill;
                     break;
                 case 'hue':
                     const hue_output = param.previousElementSibling.firstElementChild;
@@ -1053,7 +1054,7 @@ class CurveScene extends Scene2d {
                     value = event.target.selectedOptions[0].value;
                     // When user changes shape, carry forward as many attributes as possible from the old shape
                     const common_params = [
-                        this.current_curve.shape.fill,
+                        this.current_curve.fill,
                         this.current_curve.shape.outline,     // outline colour
                         this.current_curve.shape.thickness,   // outline thickness
                         this.current_curve.shape.pulse,
@@ -1129,7 +1130,7 @@ class CurveScene extends Scene2d {
                     break;
                 case 'fill':
                     value = event.target.checked;
-                    this.current_curve.shape.fill = value;
+                    this.current_curve.fill = value;
                     break;
                 case 'hue':
                     value = Number(event.target.value);
@@ -1330,6 +1331,7 @@ class CurveScene extends Scene2d {
                 this.ctx.translate(x_, y_);
                 this.ctx.rotate(curve.rotation * this.progress);
                 shape.polychrome_speed = curve.polychrome_speed;
+                shape.fill = curve.fill;
                 shape.draw(this.ctx, 0, 0, curve.colour, this.progress);
                 this.ctx.restore();
                 if (this.mirrored) {
