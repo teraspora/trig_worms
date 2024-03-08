@@ -1109,7 +1109,7 @@ class CurveScene extends Scene2d {
                                 ...common_params,
                                 this.current_curve.shape.radius,
                                 this.current_curve.shape.hub ?? Math.max(Math.floor(this.current_curve.shape.radius / 4), 1),
-                                rand_int(10) / 10,    // eccentricity of ellipse
+                                rand_int(20) / 10 + 0.1,    // eccentricity of ellipse - range [0.1, .., 2.0]
                             );
                             break;
                         case 'Star':
@@ -1285,7 +1285,7 @@ class CurveScene extends Scene2d {
                 return new Moon(...common_params, rand_in_range(6, 96));            
             case 2:
                 r = rand_in_range(6, 96);
-                return new Ring(...common_params, r, Math.floor(r / 4), rand_int(10) / 10);
+                return new Ring(...common_params, r, Math.floor(r / 4), rand_int(20) / 10 + 0.1);    // eccentricity of ellipse - range [0.1, .., 2.0]
             case 3:
                 r = rand_in_range(6, 96);
                 return new Star(...common_params, r, Math.floor(r / 4), rand_in_range(3, 12));
