@@ -598,6 +598,7 @@ class CurveScene extends Scene2d {
             curve.default_colour = this.#get_random_colour();
             this.default_stroke_colour = '#111111';
             curve.colour = curve.default_colour;
+            curve.fill = true;
             curve.polychrome_speed = 25;       // we'll have a range [0, .., 100] and set the normal to 25, so user can speed up 4x and slow down 25x
             curve.shape = this.#get_random_shape();
             curve.shape.polychrome_speed = curve.polychrome_speed;
@@ -629,7 +630,6 @@ class CurveScene extends Scene2d {
 
         // Set current curve to be the first in the list of active curves
         this.current_curve = this.active_curves[0];
-        this.current_curve.fill = true;
         this.current_curve.colour = null;           // Start with current curve multicoloured
         // ...and the other two curves with no fill, just polychrome_stroke
         [1, 2].forEach(i => {
