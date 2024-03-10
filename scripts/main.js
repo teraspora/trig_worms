@@ -1578,9 +1578,8 @@ class Star extends HubbedShape {
 // ============================
 
 function init() {
-    const {width: main_width, height: main_height} = main.getBoundingClientRect();
-    canvas.width = Math.floor(main_width - 200);
-    canvas.height = main_height;
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
     const scene = new CurveScene(canvas, Curves);
     scene.render();
 }
