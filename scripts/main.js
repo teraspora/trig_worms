@@ -1304,7 +1304,7 @@ class CurveScene extends Scene2d {
     }
 
     #clear_canvas() {
-        this.ctx.fillStyle = this.canvas.style.backgroundColor;
+        this.ctx.fillStyle = getComputedStyle(this.canvas).backgroundColor;
         this.ctx.fillRect(0, 0, this.width, this.height);
         this.progress = 0;
         return;
