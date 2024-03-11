@@ -105,20 +105,20 @@ const Curves = {
     },
 
     cardioid: {
-        func: (a, t) => [
-                a * (2 * Math.cos(t) - Math.cos(2 * t)),
-                a * (2 * Math.sin(t) - Math.sin(2 * t))
+        func: (a, b, t) => [
+                a / b * (2 * Math.cos(t) - Math.cos(2 * t)),
+                a / b * (2 * Math.sin(t) - Math.sin(2 * t))
             ],
-        params: [0.33],   // electron rings
+        params: [3, 9],
         speed: 0.2
     },
 
     satelloid: {
-        func: (a, k, t) => [
-                (Math.cos(a) * Math.cos(t) * Math.cos(k * t) - Math.sin(t) * Math.sin(k * t)) * 0.5,
-                (Math.cos(a) * Math.sin(t) * Math.cos(k * t) + Math.cos(t) * Math.sin(k * t)) * 0.5
+        func: (a, k, r, t) => [
+                (Math.cos(a) * Math.cos(t) * Math.cos(k * t) - Math.sin(t) * Math.sin(k * t)) * r,
+                (Math.cos(a) * Math.sin(t) * Math.cos(k * t) + Math.cos(t) * Math.sin(k * t)) * r
             ],
-        params: [27, 11],
+        params: [27, 11, 1],
         speed: 0.05
     },
 
@@ -132,12 +132,12 @@ const Curves = {
     },
 
     maltese_x: {
-        func: (a, t) => [
+        func: (a, b, t) => [
                 a * Math.cos(t) * (Math.cos(t) * Math.cos(t) - 2),
-                a * Math.sin(t) * Math.cos(t) * Math.cos(t)
+                b * Math.sin(t) * Math.cos(t) * Math.cos(t)
             ],
-        params: [0.8],
-        speed: 0.05
+        params: [0.9, 2],
+        speed: 0.15
     },
 
     epitrochoid: {
@@ -147,8 +147,8 @@ const Curves = {
                 ((a + b) * Math.sin(t) - c * Math.sin(((a - b) / b) * t))
                     / (Math.abs(a) + Math.abs(b) + Math.abs(c)),
             ],
-        params: [5, 3, 5],
-        speed: 0.2
+        params: [9, 5, 7],
+        speed: 0.3
     },
     
     rabbit_ears: {
@@ -325,16 +325,16 @@ const Curves = {
             (a * Math.cos(-t) + Math.cos(b * t)) / (a + 1),
             (c * Math.sin(-t) + Math.sin(d * t)) / (c + 1)
         ],
+        params: [12, 18, 6, 24],
         // params: [13, 15, 17, 19],
         // params: [1, 4, 2, 7],
         // params: [2 * Math.PI, 7 * Math.PI, 13 * Math.PI, 37 * Math.PI],
         // params: [17 * Math.PI, 12 * Math.PI, 8 * Math.PI, 2 * Math.PI],
-        // params: [12, 18, 6, 24],
         // params: [5, 9, 16, 29],
         // params: [3, 6, 9, 12],
         // params: [Math.PI, 3 * Math.PI, Math.PI, 7 * Math.PI],   // nice and twirly!
-        params: [2, 3 * Math.PI, 4, 5 * Math.PI],   // nice and twirly!
-        speed: 0.01
+        // params: [2, 3 * Math.PI, 4, 5 * Math.PI],   // nice and twirly!
+        speed: 0.08
     },
 
     convolvulus: {
