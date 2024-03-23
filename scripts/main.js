@@ -152,11 +152,11 @@ const Curves = {
     },
     
     rabbit_ears: {
-        func: (t) => [
-                Math.sin(t) * Math.log(Math.sin(t) * Math.sin(t)),
-                Math.cos(4 * t)
+        func: (p, q, t) => [
+                p * Math.sin(t) * Math.log(Math.sin(t) * Math.sin(t)),
+                q * Math.cos(4 * t)
             ],
-        params: [],
+        params: [1., 1],
         speed: 0.05
     },
 
@@ -1504,7 +1504,7 @@ class Moon extends Shape {
         ctx.beginPath();
         ctx.translate(x, y);
         ctx.arc(0, 0, r, -Math.PI / 2, Math.PI / 2, true);
-        ctx.arcTo(- r / 2, 0, 0, -r, 2 * r);
+        ctx.arcTo(-r, 0, 0, -r, r);
         ctx.closePath();
         super.draw(ctx, progress, colour);
         ctx.restore();

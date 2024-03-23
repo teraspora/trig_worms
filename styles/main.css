@@ -271,10 +271,11 @@ section#details .param {
     padding: 0.1vw;
     margin: 0.1vw;
     color: var(--contrast-col);
-    font-size: 0.5vw;
+    font-size: 0.7vw;
+    height: 3vh;
 }
 
-section#details input, section#details .param {
+section#details input {
     font-size: 0.7vw;
 }
 
